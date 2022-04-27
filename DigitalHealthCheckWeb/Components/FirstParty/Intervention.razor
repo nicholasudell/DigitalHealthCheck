@@ -1,0 +1,12 @@
+﻿<p class="govuk-body">You told us '@Prompt', so here is the link to <a class="govuk-link" title="@LinkTitle" rel="noreferrer noopener" target="_blank" href="@Url">@LinkDescription (opens in a new tab)</a></p>
+
+@code {
+    [Parameter]
+    public string Prompt { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string LinkTitle { get; set; }
+    [Parameter]
+    public string LinkDescription { get; set; }
+}

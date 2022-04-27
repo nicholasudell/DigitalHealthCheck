@@ -1,0 +1,19 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.HealthCheckCompleteModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    Layout = null;
+    var baseUrl = urlBuilder.GetBaseUrl(HttpContext.Request);
+}
+
+<component type="typeof(Components.Emails.Patient.PatientReport)"
+           render-mode="Static"
+           param-check="@Model.Check"
+           param-result="@Model.Result"
+           param-validated="@Model.Validated"
+           param-everyoneHealthReferralInterventions="@Model.EveryoneHealthReferrals"
+           param-preview="@Model.Preview"
+           param-id="@Model.Id"
+           param-variant="@Model.Variant"
+           param-baseUrl="baseUrl" />

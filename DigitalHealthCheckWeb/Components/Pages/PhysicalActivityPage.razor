@@ -1,0 +1,49 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Physical activity page 1 of 4</h1>
+
+    <p class="govuk-body">Your physical activity status is used to calculate risks associated with your heart health.</p>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSRadios Name="workActivity"
+               Items="Items"
+               IdPrefix="work-activity"
+               ErrorMessage="Error.AsErrorMessageComponent()"
+               FieldSet="@(
+            new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = "What type and amount of physical activity is involved in your work?",
+                    Classes="govuk-fieldset__legend--m"
+                }
+            })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string WorkActivity { get; set; }
+
+    protected IList<GDSRadios.Item> Items => new[]{
+         new {Text="Mostly sitting", Value="sitting" },
+         new {Text="Mostly standing or walking", Value="standing" },
+         new {Text="Definite physical activity", Value="definite" },
+         new {Text="Vigorous physical activity", Value="vigorous" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, WorkActivity)
+    .Concat(new[]{
+        new GDSRadios.Item { Divider = "or"},
+        new GDSRadios.Item { Text="I am not in employment", Value="unemployed", Checked=WorkActivity=="unemployed" }
+            }).ToList();
+
+}

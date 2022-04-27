@@ -1,0 +1,26 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.FollowUpHeightAndWeightModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+@{
+    ViewData["Title"] = "Follow–up – Height and weight";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.FollowUpHeightAndWeightPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-id="@Model.Id"
+           param-FollowUpImportantToGetHeightAndWeightMeasuredError="@Model.ImportantToChangeError"
+           param-FollowUpConfidentToMakePlanToGetHeightAndWeightMeasuredError="@Model.ConfidentToChangeError"
+           param-FollowUpImportantToGetHeightAndWeightMeasured="@Model.Model?.ImportantToChange"
+           param-FollowUpConfidentToMakePlanToGetHeightAndWeightMeasured="@Model.Model?.ConfidentToChange"
+           param-FollowUpPlansForHeightAndWeight="@Model.Model?.DoYouHavePlans"
+           param-FollowUpPlansForHeightAndWeightError="@Model.DoYouHavePlansError"
+           param-FollowUpDateForHeightAndWeight="@Model.Model?.SetADate"
+           param-FollowUpDateForHeightAndWeightError="@Model.SetADateError"
+           param-FollowUpEmailForHeightAndWeight="@Model.Model?.EmailAddress"
+           param-FollowUpEmailForHeightAndWeightError="@Model.EmailAddressError" />

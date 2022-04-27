@@ -1,0 +1,159 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpNumbersPageBase
+
+<FollowUpNumbers Title="Follow-up – Cholesterol"
+                 ImportantToChange="@(new FollowUpNumbers.Question
+            {
+                Text = " It's important for me to get my cholesterol checked",
+                 Error=ImportantToChangeError,
+                 Value=ImportantToChange
+                 })"
+                 ConfidentToChange="@(new FollowUpNumbers.Question
+            {
+                Text = " I'm confident in making a plan to get my cholesterol checked",
+                 Error=ConfidentToChangeError,
+                 Value=ConfidentToChange,
+                 })"
+                 BarrierHeader="Is there anything stopping you from getting your cholesterol levels measured?"
+                 OptionsHeader="How would you like to get your cholesterol checked?"
+                 DoYouHavePlans="@(new FollowUpNumbers.Question
+            {
+                Text = " Do you have plans to get your cholesterol checked in the following months?",
+                 Error=DoYouHavePlansError,
+                 Value=DoYouHavePlans,
+                 })"
+                 SetADate="@(new FollowUpNumbers.Question
+            {
+                Text = " Will you set a date to get your cholesterol checked?",
+                 Error=SetADateError,
+                 Value=SetADate,
+                 })"
+                 BeReminded="@(new FollowUpNumbers.Question
+            {
+                Text = " Would you like to be reminded by email to get your cholesterol checked?",
+                 Error=BeRemindedError,
+                 Value=BeReminded,
+                 })"
+                 EmailAddress="@(new FollowUpNumbers.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+                 AskForEmailAddress="@AskForEmailAddress"
+                 AllOptions="@Options"
+                 ReturnPage="Cholesterol"
+                 AntiForgery="@AntiForgery"
+                 SelectedOptionError="@SelectedOptionError"
+                 SelectedOption="@SelectedOption"
+                 ShowSkipFollowUps="@ShowSkipFollowUps"
+                 IsFinalFollowUp="@IsFinalFollowUp"
+                 NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+                 AllBarriers="@AllBarriers"
+                 BarriersError="@BarriersError"
+                 OtherBarrier="@OtherBarrier"
+                 SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+                 MeasurementName="cholesterol levels"
+                 Id="@Id"
+                 BaseUrl="@BaseUrl" ErrorList="@ErrorList"
+                 BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from getting your cholesterol levels measured. These personalised resources will appear on the Follow-up – Actions page.">
+    <ChildContent>
+        <p class="govuk-body">You don't know your cholesterol levels. Please have them checked. It is important that you have your cholesterol levels checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.</p>
+
+        <GDSDetails SummaryText="The benefits of checking your cholesterol">
+            <ul class="govuk-list--bullet govuk-list">
+                <li>Cholesterol is a fatty substance that is found in the blood</li>
+                <li>Approximately six out of 10 adults have high cholesterol and many aren’t even aware that they have it </li>
+                <li>Getting an up-to-date cholesterol reading will increase the accuracy of your NHS Health Check</li>
+                <li>High cholesterol can lead to a clogging up of your blood vessels, which can lead to heart attacks and strokes. You can only find out your cholesterol level from a blood test</li>
+                <li>The good news is that a healthy lifestyle can help to manage your cholesterol levels – some people may also need medication. </li>
+                <li>You can <a class="govuk-link" href="https://www.nhs.uk/conditions/high-cholesterol/" rel="noreferrer noopener" target="_blank" title="Find out more about managing your cholesterol">find out more about managing your cholesterol levels (opens in a new tab)</a> on the NHS website.</li>
+            </ul>
+        </GDSDetails>
+    </ChildContent>
+
+    <PreOptionsContent>
+        <h2 class="govuk-heading-m">How to get your cholesterol checked</h2>
+        <p class="govuk-body">Getting your cholesterol checked is easy. Select from the list below on how you'd like to have it done.</p>
+        <GDSDetails SummaryText="The options for a free cholesterol measurement">
+            <p class="govuk-body">At-home finger-prick testing kit: </p>
+            <p class="govuk-body">We can send you an at-home finger-prick testing kit through the mail. This kit enables you to simply take a blood sample for yourself and send it in a premarked package to a lab that will update you with your results.</p>
+            <p class="govuk-body">Local leisure centre: </p>
+            <p class="govuk-body">You can book an appointment to get your blood pressure, cholesterol and blood sugar levels checked at a selection of Southwark Council’s leisure centres. This is a free service, available Monday to Friday. You will need to book an appointment via the website, which we have listed in the ‘Local leisure centre’ option below.</p>
+            <p class="govuk-body">Pharmacy: </p>
+            <p class="govuk-body">You can get your blood pressure, cholesterol levels, blood sugar level, height and weight checked at Bonamy Pharmacy. Clicking the pharmacy option below will share the possible location.</p>
+            <p class="govuk-body">You will need to book an appointment by phone, so please call in advance.</p>
+            <p class="govuk-body">GP clinic:</p>
+            <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+            <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+            <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/service-search/find-a-gp" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.</p>
+        </GDSDetails>
+
+        <p class="govuk-body">You can complete this measurement after finishing the full NHS Health Check. We can send you the details for your preferred option via email. If you go to complete this measurement now, please then return to continue with the NHS Health Check follow-up support.</p>
+    </PreOptionsContent>
+</FollowUpNumbers>
+
+@code
+{
+    [Parameter]
+    public DefaultStatus? Status { get; set; }
+
+    [Parameter]
+    public DefaultStatus? HeartDiseaseStatus { get; set; }
+
+    [Parameter]
+    public string FingerPrickEmailAddressError { get; set; }
+
+    [Parameter]
+    public string FingerPrickEmailAddress { get; set; }
+
+    public IList<FollowUpNumbers.Option> Options => new[]
+    {
+        new FollowUpNumbers.Option
+        {
+            Text="At-home finger-prick testing kit",
+            Value="home",
+            Content=@<GDSInput Id="email" Name="FingerPrickEmailAddress" Hint="@(new GDSHint.Options{ Text="If you choose this option, we will share this email address and your first and last name with Thriva, a provider of finger-prick blood tests. This test is free and provided by Southwark Council. Thriva will email you with a link to create an account and provide your postal address so the kit can be sent to you, and so Thriva can follow up if your results require urgent action. It is essential to make sure that you log in to your account to get your results. If you do not receive them, please contact Thriva."})" Type="email" Autocomplete="email" Spellcheck="false" Value="@FingerPrickEmailAddress" Label="@(new GDSLabel.Options{Text="Please confirm your email address"})" ErrorMessage="FingerPrickEmailAddressError.AsErrorMessageComponent()" />
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="Local leisure centre",
+            Value="leisurecentre",
+            Content=@<div>
+    <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+</div>
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="Pharmacy",
+            Value="pharmacy",
+            Content=@<div>
+    <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+        <p class="govuk-body">We will also email you the address and phone number for this location. </p>
+        <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+        <p class="govuk-body">Locations and contact information:</p>
+        <p class="govuk-body">Bonamy Pharmacy<br/>
+            355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+            0207 740 2523<br/>
+            pharmacy.fv733@nhs.net<br/>
+            http://bonamypharmacy.co.uk/<br/>
+            <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+        </p>
+</div>
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="GP Clinic",
+            Value="gp",
+            Content=@<div>
+    <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+    <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+    <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.nhs.uk/service-search/find-a-gp" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. </p>
+    <p class="govuk-body">We will also email you the link to this tool. </p>
+</div>
+        },
+
+    }.ToList();
+
+}

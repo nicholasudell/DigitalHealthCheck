@@ -1,0 +1,209 @@
+﻿@using DigitalHealthCheckEF
+@inherits Page
+
+<h1 class="govuk-heading-l"> NHS Health Check in progress</h1>
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<AntiForgery AntiForgeryToken="@AntiForgery" />
+
+<GDSPanel TitleText="@($"Thank you {Check.FirstName} for starting your NHS Health Check. You have taken a step towards understanding your health and living a healthier life!")">
+</GDSPanel>
+
+@if (HasContactMethods && !ErrorList.Any())
+{
+    <p class="govuk-body"><strong>You will be sent a follow-up email that contains a unique link.</strong> This link will enable you to come back and enter your height and weight measurements in order to receive your results.</p>
+}
+
+else if (!RequestedNoContact)
+{
+    <p class="govuk-body">If you would like a follow up email and/or SMS summarising your check, including the links you requested, please tell us how best we can contact you.</p>
+
+    <form method="post" novalidate>
+
+        <p class="govuk-body">Tick the box below to give the service your permission to contact you about your NHS health check results and connect you with relevant information and services.</p>
+
+        <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+        <GDSCheckboxes Items="Items" IdPrefix="contact" Name="Contact"
+                       Hint="@(new GDSHint.Options
+                        {
+                            Text="Select all options that are relevant to you."
+                        })"
+                       FieldSet="@(new GDSFieldSet.Options
+                        {
+                            Legend = new GDSFieldSet.LegendOptions()
+                            {
+                                Text = "How would you like to be contacted? (optional)",
+                                Classes="govuk-fieldset__legend--s"
+                            }
+                        })" />
+
+        <GDSButton PreventDoubleClick="true" Text="Submit contact details" Type="GDSButton.InputType.Submit" />
+    </form>
+}
+
+<GDSDetails SummaryText="How to get your measurements for your height and weight">
+
+    @if (!string.IsNullOrEmpty(Check.HeightAndWeightFollowUp?.SelectedOption))
+    {
+
+        @switch (Check.HeightAndWeightFollowUp.SelectedOption)
+        {
+            case "kiosk":
+                <p class="govuk-body">You told us you would like to get your height and weight checked at a health kiosk.</p>
+                <p class="govuk-body">There is currently a kiosk at The Castle Leisure Centre.<a class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre" rel="noreferrer noopener" target="_blank" title="Find out details about The Castle Leisure Centre on their website"> find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+                <p class="govuk-body">You don’t need to book an appointment.</p>
+
+                <h3 class="govuk-body">The Castle Leisure Centre</h3>
+                <p class="govuk-body">
+                    2 St Gabriel Walk,<br />
+                    Elephant & Castle,<br />
+                    London SE1 6FG<br />
+                    Telephone: 020 7091 4243<br />
+                </p>
+                <p class="govuk-body">Website: <a class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre">The Castle Centre</a>.</p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 6:30am to 10pm<br />
+                    Tue: 6:30am to 10pm<br />
+                    Wed: 6:30am to 10pm<br />
+                    Thu: 6:30am to 10pm<br />
+                    Fri: 6:30am to 10pm<br />
+                    Sat: 7:00am to 6pm<br />
+                    Sun: 7:00am to 10pm<br />
+                </p>
+
+                break;
+            case "leisurecentre":
+                <p class="govuk-body">You told us you would like to get your height and weight checked at a leisure centre.</p>
+
+                <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+
+                break;
+            case "pharmacy":
+                <p class="govuk-body">You told us you would like to get your height and weight checked at a pharmacy.</p>
+                <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+                <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+                <p class="govuk-body">Location and contact information:</p>
+                <p class="govuk-body">Bonamy Pharmacy<br/>
+                    355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                    0207 740 2523<br/>
+                    pharmacy.fv733@nhs.net<br/>
+                    http://bonamypharmacy.co.uk/<br/>
+                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+                </p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 9am to 7pm<br />
+                    Tue: 9am to 7pm<br />
+                    Wed: 9am to 7pm<br />
+                    Thu: 9am to 7pm<br />
+                    Fri: 9am to 7pm<br />
+                    Sat: 9am to 2pm<br />
+                    Sun: Closed<br />
+                </p>
+
+                break;
+            case "home":
+                <p class="govuk-body">You told us you would like to get your height and weight checked at home. To do this, you will need your own scales and tape measure.</p>
+
+                break;
+            default:
+                break;
+        }
+
+        <p class="govuk-body">Once you have your height and weight readings, you can return to the ‘Check your Answers’ page directly using <a class="govuk-link" href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+    }
+</GDSDetails>
+
+<p class="govuk-body">If you don’t currently know your cholesterol levels, blood sugar levels or your blood pressure, now is a good time to collect those pieces of information.</p>
+
+<p class="govuk-body">We will also send you a list of ways to get these measurements.</p>
+
+<p class="govuk-body"><a class="govuk-link" title="Unique link to amend your health information" href="@($"./CheckYourAnswers{BuildQuery(IdQueryParam)}")">Unique link to amend your health information</a></p>
+
+<h2 class="govuk-heading-m">Access a printable version</h2>
+
+<p class="govuk-body">
+    <a rel="noreferrer noopener" target="_blank" title="Your digital health check next steps" href="@($"./PatientEmailIncomplete{BuildQuery(IdQueryParam)}")" class="govuk-link">Click here to access a printable version of your results and support services (opens in a new tab)</a>
+</p>
+
+@code {
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Selected { get; set; } = new List<string>();
+
+    [Parameter]
+    public string SMSNumber { get; set; }
+
+    [Parameter]
+    public string EmailAddress { get; set; }
+
+    [Parameter]
+    public string SMSNumberError { get; set; }
+
+    [Parameter]
+    public string EmailAddressError { get; set; }
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    [Parameter]
+    public bool RequestedNoContact { get; set; }
+
+    protected RenderFragment SmsInput =>@<GDSInput Id="contact-by-text"
+                                                   Name="SmsNumber"
+                                                   Value="@SMSNumber"
+                                                   Type="tel"
+                                                   Autocomplete="tel"
+                                                   Classes="govuk-input--width-20"
+                                                   Label="@(new GDSLabel.Options
+                                                {
+                                                    Text="Mobile phone number"
+                                                })"
+                                                   ErrorMessage="SMSNumberError.AsErrorMessageComponent()" />;
+
+protected RenderFragment EmailInput =>@<GDSInput Id="contact-by-email"
+                                                 Name="EmailAddress"
+                                                 Type="email"
+                                                 Autocomplete="email"
+                                                 Spellcheck="false"
+                                                 Value="@EmailAddress"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="Email address"
+                                                        })"
+                                                 ErrorMessage="EmailAddressError.AsErrorMessageComponent()" />;
+
+protected IList<GDSCheckboxes.Item> Items => new[]
+{
+            new GDSCheckboxes.Item
+            {
+                Text="Email",
+                Value="email",
+                ConditionalContent=EmailInput,
+                Checked = Selected?.Contains("email") ?? false
+            },
+            new GDSCheckboxes.Item
+            {
+                Text="Text message",
+                Value="sms",
+                ConditionalContent=SmsInput,
+                Checked = Selected?.Contains("sms") ?? false
+            }
+    }.WithNoneOption("I do not want to be contacted").ToList();
+
+protected string Url(string page) => $"{BaseUrl}/{page}{BuildQuery(IdQueryParam, $"next=CheckYourAnswers")}";
+
+protected bool HasContactMethods => !string.IsNullOrEmpty(EmailAddress) || !string.IsNullOrEmpty(SMSNumber);
+
+protected string PrintableLink => $"{BaseUrl}/CheckYourAnswers{BuildQuery(IdQueryParam)}";
+
+}

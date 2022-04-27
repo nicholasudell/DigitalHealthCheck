@@ -1,0 +1,39 @@
+﻿@using DigitalHealthCheckEF
+
+<GDSDetails SummaryText="How many units are in alcoholic drinks?">
+    <ul class="govuk-list">
+        <li>
+            A pint of lager is 2.3 units.
+            @(Sex switch
+            {
+                DigitalHealthCheckEF.Sex.Male => "Eight units is three and a half pints.",
+                DigitalHealthCheckEF.Sex.Female => "Six units is two and a half pints.",
+                _ => "Three pints is about 7 units."
+            })
+        </li>
+        <li>
+            A 175 ml glass of wine is 2.3 units.
+            @(Sex switch
+            {
+                DigitalHealthCheckEF.Sex.Male => "Eight units is three and a half glasses of wine.",
+                DigitalHealthCheckEF.Sex.Female => "Six units is two and a half glasses of wine.",
+                _ => "Three medium glasses is about 7 units."
+            })
+        </li>
+        <li>
+            A 25ml single spirit and mixer is 1 unit.
+            @(Sex switch
+            {
+                DigitalHealthCheckEF.Sex.Male => "Eight units is eight single spirits.",
+                DigitalHealthCheckEF.Sex.Female => "Six units is six single spirits.",
+                _ => string.Empty
+            })
+        </li>
+    </ul>
+</GDSDetails>
+
+@code {
+    [Parameter]
+    public DigitalHealthCheckEF.Sex? Sex { get; set; }
+
+}

@@ -1,0 +1,149 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Risk factors page 3 of 3</h1>
+
+    <p class="govuk-body">The following questions are optional but will make the results more accurate for you.</p>
+
+    <GDSRadios Name="SystemicLupusErythematosus"
+               Items="SystemicLupusErythematosusItems"
+               IdPrefix="lupus"
+               ErrorMessage="SystemicLupusErythematosusError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you been diagnosed with systemic lupus erythematosus (SLE)?",
+                            Classes="govuk-label--m"
+                        }
+                    })" />
+
+    <GDSDetails SummaryText="What is systemic lupus erythematosus?">
+        <p class="govuk-body">Systemic lupus erythematosus, also known as lupus or SLE, is a long-term condition that causes joint pain, skin rashes and tiredness. You are normally under the care of a specialist rheumatology team. You can <a rel="noreferrer noopener" target="_blank" class="govuk-link" title="Find out more about systemic lupus erythematosus" href="https://www.nhs.uk/conditions/lupus/">find out more about systemic lupus erythematosus (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+
+    <GDSRadios Name="SevereMentalIllness"
+               Items="SevereMentalIllnessItems"
+               IdPrefix="mental-illness"
+               Hint="@(new GDSHint.Options { Text="This includes schizophrenia, bipolar disorder and moderate/severe depression." })"
+               ErrorMessage="SevereMentalIllnessError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you been diagnosed with a severe mental illness?",
+                            Classes="govuk-label--m"
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string SystemicLupusErythematosus { get; set; }
+
+    [Parameter]
+    public string SystemicLupusErythematosusError { get; set; }
+
+    [Parameter]
+    public string SevereMentalIllness { get; set; }
+
+    [Parameter]
+    public string SevereMentalIllnessError { get; set; }
+
+    [Parameter]
+    public string AtypicalAntipsychoticMedication { get; set; }
+
+    [Parameter]
+    public string AtypicalAntipsychoticMedicationError { get; set; }
+
+    protected IEnumerable<GDSRadios.Item> Items = new[]{
+        new GDSRadios.Item
+        {
+            Text="Yes",
+            Value="yes"
+        },
+        new GDSRadios.Item
+        {
+            Text="No",
+            Value="no"
+        },
+        new GDSRadios.Item
+        {
+            Divider="or"
+        },
+        new GDSRadios.Item
+        {
+            Text="Prefer not to say",
+            Value="skip"
+        }
+    };
+
+    protected IList<GDSRadios.Item> SystemicLupusErythematosusItems =>
+        Items.Select(x => new GDSRadios.Item
+        {
+            Text = x.Text,
+            Value = x.Value,
+            Divider = x.Divider,
+            Checked = string.IsNullOrEmpty(x.Divider) && x.Value == SystemicLupusErythematosus
+        }).ToList();
+
+    protected IList<GDSRadios.Item> AtypicalAntipsychoticMedicationItems =>
+        Items.Select(x => new GDSRadios.Item
+        {
+            Text = x.Text,
+            Value = x.Value,
+            Divider = x.Divider,
+            Checked = string.IsNullOrEmpty(x.Divider) && x.Value == AtypicalAntipsychoticMedication
+        }).ToList();
+
+    protected RenderFragment AtypicalAntipsychoticsQuestion =>@<div>
+        <GDSRadios Name="AtypicalAntipsychoticMedication"
+                   Items="AtypicalAntipsychoticMedicationItems"
+                   ErrorMessage="AtypicalAntipsychoticMedicationError.AsErrorMessageComponent()"
+                   IdPrefix="medication"
+                   FieldSet="@(new GDSFieldSet.Options
+                       {
+                           Legend = new GDSFieldSet.LegendOptions
+                           {
+                               Text = "Are you on atypical antipsychotic medication?"
+                           }
+                       })" />
+        <GDSDetails Classes="govuk-!-margin-bottom-4" SummaryText="What is atypical antipsychotic medication?">
+            <p class="govuk-body">Atypical antipsychotic medication is also known as second-generation antipsychotic medication. Atypical antipsychotic drugs can be used to treat different types of mental health disorders. You can <a rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/mental-health/conditions/psychosis/treatment/" class="govuk-body" title="Find out more about psychosis and its treatment">find out more about psychosis and its treatment (opens in a new tab)</a> on the NHS website. Examples include: amisulpride; aripiprazole; asenapine; cariprazine; clozapine; lurasidone hydrochloride; olanzapine; paliperidone; quetiapine and risperidone. You can <a rel="noreferrer noopener" target="_blank" href="https://bnf.nice.org.uk/treatment-summary/psychoses-and-related-disorders.html" class="govuk-body" title="Find out more about these specific antipsychotic medicines">find out more about these specific antipsychotic medicines (opens in a new tab)</a> on the National Institute for Health and Care Excellence website.</p>
+            <p class="govuk-body">If you are unsure if the medicine you are on is an atypical antipsychotic, speak to a pharmacist or the person who prescribes it for you.</p>
+        </GDSDetails>
+    </div>;
+
+protected IList<GDSRadios.Item> SevereMentalIllnessItems => new[]{
+        new GDSRadios.Item
+        {
+            Text="Yes",
+            Value="yes",
+            ConditionalContent = AtypicalAntipsychoticsQuestion,
+            Checked = SevereMentalIllness == "yes"
+        },
+        new GDSRadios.Item
+        {
+            Text="No",
+            Value="no",
+            Checked = SevereMentalIllness == "no"
+        },
+        new GDSRadios.Item
+        {
+            Divider="or"
+        },
+        new GDSRadios.Item
+        {
+            Text="Prefer not to say",
+            Value="skip",
+            Checked = SevereMentalIllness == "skip"
+        }
+    };
+}

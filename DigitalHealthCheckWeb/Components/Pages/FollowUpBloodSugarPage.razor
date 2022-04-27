@@ -1,0 +1,154 @@
+﻿@using Model;
+@inherits FollowUpNumbersPageBase
+
+<FollowUpNumbers Title="Follow Up - Blood Sugar"
+                 ImportantToChange="@(new FollowUpNumbers.Question
+            {
+                Text = " It's important for me to get my blood sugar checked",
+                 Error=ImportantToChangeError,
+                 Value=ImportantToChange
+                 })"
+                 ConfidentToChange="@(new FollowUpNumbers.Question
+            {
+                Text = " I'm confident in making a plan to get my blood sugar level checked",
+                 Error=ConfidentToChangeError,
+                 Value=ConfidentToChange,
+                 })"
+                 BarrierHeader="Is there anything stopping you from getting your blood sugar level measured?"
+                 OptionsHeader="How would you like to get your blood sugar level checked?"
+                 DoYouHavePlans="@(new FollowUpNumbers.Question
+            {
+                Text = " Do you have plans to get your blood sugar level checked in the next months?",
+                 Error=DoYouHavePlansError,
+                 Value=DoYouHavePlans,
+                 })"
+                 SetADate="@(new FollowUpNumbers.Question
+            {
+                Text = " Will you set a date to get your blood sugar level checked?",
+                 Error=SetADateError,
+                 Value=SetADate,
+                 })"
+                 BeReminded="@(new FollowUpNumbers.Question
+            {
+                Text = "Would you like to be reminded by email to get your blood sugar level checked?",
+                 Error=BeRemindedError,
+                 Value=BeReminded,
+                 })"
+                 EmailAddress="@(new FollowUpNumbers.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+                 AskForEmailAddress="@AskForEmailAddress"
+                 AllOptions="@Options"
+                 ReturnPage="BloodSugar"
+                 AntiForgery="@AntiForgery"
+                 SelectedOptionError="@SelectedOptionError"
+                 SelectedOption="@SelectedOption"
+                 ShowSkipFollowUps="@ShowSkipFollowUps"
+                 IsFinalFollowUp="@IsFinalFollowUp"
+                 NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+                 AllBarriers="@AllBarriers"
+                 BarriersError="@BarriersError"
+                 OtherBarrier="@OtherBarrier"
+                 SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+                 MeasurementName="blood sugar level"
+                 Id="@Id"
+                 BaseUrl="@BaseUrl" ErrorList="@ErrorList"
+                 BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from getting your blood sugar level measured. These personalised resources will appear on the Follow-up – Actions page.">
+    <ChildContent>
+        <p class="govuk-body">You do not know your blood sugar levels. Please have them checked.</p>
+        <p class="govuk-body">It is important that you have your blood sugar levels checked, as you may be at an increased risk of Type 2 diabetes. We will direct you to a way of getting this blood test done.</p>
+
+        <GDSDetails SummaryText="The benefits of knowing your blood sugar level">
+            <ul class="govuk-list--bullet govuk-list">
+                <li>Diabetes is a condition that causes people’s blood sugar to become too high</li>
+                <li>About 3.5 million people in the UK are diagnosed with diabetes, but at least half a million people in the UK have diabetes and don’t yet know it</li>
+                <li>About 2 million people in England are at a high risk of developing Type 2 diabetes</li>
+                <li>High blood sugar can damage your blood vessels, which can lead to heart disease, kidney disease and diabetic eye disease. By knowing your blood sugar level, if it is high, you can get help to reduce your risk of developing Type 2 diabetes and other heart and circulatory diseases</li>
+                <li>Getting an up-to-date blood sugar reading will also increase the accuracy of your NHS Health Check</li>
+                <li>You can only find out your blood sugar level from a blood test.</li>
+            </ul>
+        </GDSDetails>
+    </ChildContent>
+
+    <PreOptionsContent>
+        <h2 class="govuk-heading-m">How to get your blood sugar levels checked</h2>
+        <GDSDetails SummaryText="The options for a free blood sugar measurement">
+            <p class="govuk-body">At-home finger-prick testing kit: </p>
+            <p class="govuk-body">We can send you an at-home finger-prick testing kit through the mail. This kit enables you to simply take a blood sample for yourself and send it in a premarked package to a lab that will update you with your results.</p>
+            <p class="govuk-body">Local leisure centre: </p>
+            <p class="govuk-body">You can book an appointment to get your blood pressure, cholesterol and blood sugar levels checked at a selection of Southwark Council’s leisure centres. This is a free service, available Monday to Friday. You will need to book an appointment via the website, which we have listed in the ‘Local leisure centre’ option below.</p>
+            <p class="govuk-body">Pharmacy: </p>
+            <p class="govuk-body">You can get your blood pressure, cholesterol levels, blood sugar level, height and weight checked at Bonamy Pharmacy. Clicking the pharmacy option below will share the possible location.</p>
+            <p class="govuk-body">You will need to book an appointment by phone, so please call in advance.</p>
+            <p class="govuk-body">GP clinic:</p>
+            <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+            <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+            <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/service-search/find-a-gp" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.</p>
+        </GDSDetails>
+
+        <p class="govuk-body">You can complete this measurement after finishing the full NHS Health Check. We can send you the details for your preferred option via email. If you go to complete this measurement now, please then return to continue with the NHS Health Check follow-up support.</p>
+    </PreOptionsContent>
+</FollowUpNumbers>
+
+@code
+{
+    [Parameter]
+    public bool HighRiskInOtherFactors { get; set; }
+
+    [Parameter]
+    public string FingerPrickEmailAddress { get; set; }
+
+    [Parameter]
+    public string FingerPrickEmailAddressError { get; set; }
+
+    public IList<FollowUpNumbers.Option> Options => new[]
+    {
+        new FollowUpNumbers.Option
+        {
+            Text="At-home finger-prick testing kit",
+            Value="home",
+            Content=@<GDSInput Id="email" Name="FingerPrickEmailAddress" Hint="@(new GDSHint.Options{ Text="If you choose this option, we will share this email address and your first and last name with Thriva, a provider of finger-prick blood tests. This test is free and provided by Southwark Council. Thriva will email you with a link to create an account and provide your postal address so the kit can be sent to you, and so Thriva can follow up if your results require urgent action. It is essential to make sure that you log in to your account to get your results. If you do not receive them, please contact Thriva."})" Type="email" Autocomplete="email" Spellcheck="false" Value="@FingerPrickEmailAddress" Label="@(new GDSLabel.Options{Text="Please confirm your email address"})" ErrorMessage="FingerPrickEmailAddressError.AsErrorMessageComponent()" />
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="Local leisure centre",
+            Value="leisurecentre",
+            Content=@<div>
+<p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+</div>
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="Pharmacy",
+            Value="pharmacy",
+            Content=@<div>
+    <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+        <p class="govuk-body">We will also email you the address and phone number for this location. </p>
+        <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+        <p class="govuk-body">Locations and contact information:</p>
+        <p class="govuk-body">Bonamy Pharmacy<br/>
+            355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+            0207 740 2523<br/>
+            pharmacy.fv733@nhs.net<br/>
+            http://bonamypharmacy.co.uk/<br/>
+            <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+        </p>
+</div>
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="GP Clinic",
+            Value="gp",
+            Content=@<div>
+    <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+    <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+    <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.nhs.uk/service-search/find-a-gp" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. </p>
+    <p class="govuk-body">We will also email you the link to this tool. </p>
+</div>
+        },
+    }.ToList();
+
+}

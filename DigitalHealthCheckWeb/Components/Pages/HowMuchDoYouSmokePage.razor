@@ -1,0 +1,74 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Smoking page 2 of 2</h1>
+
+    <GDSRadios Name="howMuch"
+               Items="Items"
+               ErrorMessage="Error.AsErrorMessageComponent()"
+               IdPrefix="how-much"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How much do you smoke?",
+                        Classes="govuk-fieldset__legend--m"
+                    }
+                })"
+               Hint="@(new GDSHint.Options
+                {
+                    Text="We need to know how often you smoke tobacco or tobacco and cannabis combined if you smoke these together."
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string HowMuch { get; set; }
+
+    protected IList<GDSRadios.Item> Items => new[]{
+
+        new GDSRadios.Item
+        {
+            Text= "Light smoker",
+            Value="light",
+            Hint=new GDSHint.Options
+            {
+                 Text="Fewer than 10 a day"
+            },
+            Checked= HowMuch=="light"
+        },
+        new GDSRadios.Item
+        {
+            Text= "Moderate smoker",
+            Value="moderate",
+            Hint=new GDSHint.Options
+            {
+                 Text="11 to 19 a day"
+            },
+            Checked= HowMuch=="moderate"
+        },
+        new GDSRadios.Item
+        {
+            Text= "Heavy smoker",
+            Value="heavy",
+            Hint=new GDSHint.Options
+            {
+                 Text="More than 20 a day"
+            },
+            Checked= HowMuch=="heavy"
+        }
+    }.ToList();
+
+}

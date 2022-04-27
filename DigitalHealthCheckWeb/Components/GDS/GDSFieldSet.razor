@@ -1,0 +1,83 @@
+﻿<fieldset class="govuk-fieldset @Classes"
+          role="@Role"
+          aria-describedby="@DescribedBy"
+          @attributes="InputAttributes">
+    @if (UseLegend())
+    {
+        <legend class="govuk-fieldset__legend @Legend.Classes">
+            @if (Legend.IsPageHeading)
+            {
+                <h1 class="govuk-fieldset__heading">
+                    @if (Legend.Content is null)
+                    {
+                        @Legend.Text
+                    }
+                    else
+                    {
+                        @Legend.Content
+                    }
+                </h1>
+            }
+            else
+            {
+                @if (Legend.Content is null)
+                {
+                    @Legend.Text
+                }
+                else
+                {
+                    @Legend.Content
+                }
+            }
+        </legend>
+    }
+
+    @ChildContent
+</fieldset>
+
+@code {
+
+    public class LegendOptions
+    {
+        public RenderFragment Content { get; set; }
+
+        public string Classes { get; set; }
+
+        public string Text { get; set; }
+
+        public bool IsPageHeading { get; set; }
+    }
+
+    public class Options //For use by other components
+    {
+        public IDictionary<string, object> Attributes { get; set; }
+
+        public string Classes { get; set; }
+
+        public string Role { get; set; }
+
+        public string DescribedBy { get; set; }
+
+        public LegendOptions Legend { get; set; }
+    }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    bool UseLegend() => Legend is not null;
+
+    [Parameter]
+    public LegendOptions Legend { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public string Role { get; set; }
+
+    [Parameter]
+    public string DescribedBy { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

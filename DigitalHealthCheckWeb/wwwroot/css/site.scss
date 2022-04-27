@@ -1,0 +1,18 @@
+﻿$govuk-assets-path: '/node_modules/govuk-frontend/govuk/assets/';
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+// Replace font stack
+$govuk-font-family: 'Open Sans', sans-serif;
+
+// Replace URL colour with one that has enough contrast for WCAG AAA
+$govuk-link-colour: #0c599a;
+
+@import "node_modules/govuk-frontend/govuk/all";
+
+//TODO: We can use e.g. @import "node_modules/govuk-frontend/govuk/components/button/button"; to import just the components we use and lower file size.
+
+@import "../../Components/FirstParty/TrafficLight.scss";
+
+@import "../../Pages/Shared/Layout.scss";
+

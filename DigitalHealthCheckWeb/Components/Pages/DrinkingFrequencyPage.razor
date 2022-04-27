@@ -1,0 +1,47 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 2 of 7</h1>
+
+    <GDSRadios Name="Frequency"
+               Items="FrequencyItems"
+               IdPrefix="frequency"
+               ErrorMessage="FrequencyError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often do you have a drink containing alcohol?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string FrequencyError { get; set; }
+
+    [Parameter]
+    public string Frequency { get; set; }
+
+    static IEnumerable<dynamic> Items = new[]{
+        new {Text="Less than monthly", Value="lessthanmonthly" },
+        new {Text="Monthly", Value="monthly" },
+        new {Text="2 to 4 times per month", Value="twotofourpermonth" },
+        new {Text="2 to 3 times per week", Value="twotothreeperweek" },
+        new {Text="4 times or more per week", Value="fourtimesweeklyplus" },
+
+    };
+
+    protected IList<GDSRadios.Item>
+        FrequencyItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, Frequency);
+}

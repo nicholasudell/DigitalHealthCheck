@@ -1,0 +1,13 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.DataProtectionPageModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{ViewData["Title"] = "Data Protection";}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.DataProtectionPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-id="@Model.Id" />

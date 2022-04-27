@@ -1,0 +1,99 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Smoking"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to quit smoking",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I'm confident about quitting",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="Is there anything stopping you from quitting smoking?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to quit smoking in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to quit?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to set a ‘quit smoking’ date?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName" ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from quitting smoking. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    <p class="govuk-body">Smoking is one of the most harmful activities you can do.</p>
+
+    <p class="govuk-body">@CallToAction</p>
+
+    <GDSDetails SummaryText="Benefits of quitting smoking">
+        <p class="govuk-body">Your health will improve the moment that you stop smoking, even if you already have health problems related to smoking.</p>
+
+        <p class="govuk-body">By stopping smoking you will:  </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>save a lot of money</li>
+            <li>have younger-looking skin, whiter teeth and sweeter breath</li>
+            <li>breathe more easily and have more energy</li>
+            <li>feel less stressed</li>
+            <li>have better sex and improved fertility</li>
+            <li>have better sense of smell and taste</li>
+            <li>live longer in better health</li>
+            <li>protect the health of your loved ones</li>
+            <li>lower risk of dementia</li>
+        </ul>
+
+        <p class="govuk-body">You can <a class="govuk-link" href="https://www.nhs.uk/live-well/quit-smoking/Smoking" rel="noreferrer noopener" target="_blank" title="Find out more about the health benefits of quitting smoking">find out more about the health benefits of quitting smoking (opens in a new tab)</a> on the NHS website</p>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public DefaultStatus SmokingStatus { get; set; }
+
+    string SmokingLevel => SmokingStatus switch
+    {
+        DefaultStatus.Danger => "currently smoke",
+        DefaultStatus.Healthy or _ => "don't smoke or have quit. Well done!",
+    };
+
+    string Summary => $"Your results show that you {SmokingLevel}.";
+
+    string CallToAction => SmokingStatus switch
+    {
+        DefaultStatus.Healthy => "Keep up the good work! ",
+        DefaultStatus.Danger or _ => "Get support to stop smoking now – or swap cigarettes for vaping. It will bring immediate benefits to your health.",
+    };
+
+}

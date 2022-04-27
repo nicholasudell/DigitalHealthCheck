@@ -1,0 +1,104 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Blood pressure page 2 of 2</h1>
+
+    <p class="govuk-body">If you had your blood pressure level measured within the last six months but cannot remember the number, you have two options. You can either go and find those results, or you can get a new measurement.</p>
+
+    <GDSDetails SummaryText="How can I find the results of my last blood pressure measurement?">
+        <p class="govuk-body">The result of your blood pressure measurement is in your GP record.</p>
+        <p class="govuk-body">GP records include information about your medicine, allergies, vaccinations, previous illnesses and test results, hospital discharge summaries, appointment letters and referral letters.</p>
+        <p class="govuk-body">You can access your GP records online through GP online services.</p>
+        <p class="govuk-body">To get your health records online you need to register for GP online services. This is a three-step process that can take from 30 minutes to a couple of hours.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/gps/online-health-and-prescription-services/" title="Visit GP online services">Visit GP online services (opens in new tab)</a></p>
+        <p class="govuk-body">If you have registered for GP online services, you can access your health information through NHS login or the NHS app.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/online-services/nhs-log-in/" title="View health records on NHS login and the NHS app">View health records on NHS login and the NHS app (opens in new tab)</a></p>
+        <p class="govuk-body">Once logged in you need to click on ‘View your GP health record’, where you will find ‘Test results.’</p>
+    </GDSDetails>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSRadios Name="KnowYourBloodPressure"
+               Items="KnowYourBloodPressureItems"
+               IdPrefix="know-your-blood-pressure"
+               ErrorMessage="KnowYourBloodPressureError.AsErrorMessageComponent()"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "How would you like to proceed?",
+                            Classes="govuk-fieldset__legend--m",
+                            IsPageHeading=true
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string DiastolicBloodPressure { get; set; }
+
+    [Parameter]
+    public string DiastolicBloodPressureError { get; set; }
+
+    [Parameter]
+    public string SystolicBloodPressure { get; set; }
+
+    [Parameter]
+    public string SystolicBloodPressureError { get; set; }
+
+    [Parameter]
+    public string KnowYourBloodPressureError { get; set; }
+
+    [Parameter]
+    public string KnowYourBloodPressure { get; set; }
+
+    RenderFragment BloodPressureInner =>
+    @<GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text = "What is your blood pressure in mmHg? " })">
+        <GDSInput Classes="govuk-!-width-one-third"
+              Name="Systolic"
+              InputMode="numeric"
+              Id="systolic-blood-pressure"
+              Pattern="[0-9]*"
+              Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Upper level (this is known as systolic blood pressure)", "What is your systolic blood pressure in millimetres of mercury?") })"
+              Value="@SystolicBloodPressure"
+              Suffix="@(new GDSInput.AffixOptions { Text = "mmHg"})"
+              ErrorMessage="@SystolicBloodPressureError.AsErrorMessageComponent()" />
+        <GDSInput Classes="govuk-!-width-one-third"
+              Name="Diastolic"
+              Id="diastolic-blood-pressure"
+              InputMode="numeric"
+              Pattern="[0-9]*"
+              Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Lower level (this is known as diastolic blood pressure)", "What is your diastolic blood pressure in millimetres of mercury") })"
+              Value="@DiastolicBloodPressure"
+              Suffix="@(new GDSInput.AffixOptions { Text = "mmHg" })"
+              ErrorMessage="@DiastolicBloodPressureError.AsErrorMessageComponent()" />
+    </GDSFieldSet>;
+
+    private RenderFragment VisuallyHiddenLabelContent(string visible, string hidden) =>@<span>@visible<span class="govuk-visually-hidden">@hidden</span></span>;
+
+    protected IList<GDSRadios.Item>
+    KnowYourBloodPressureItems => new[]{
+        new GDSRadios.Item
+        {
+        Text= "I found my blood pressure measurements",
+        Value="yes",
+        Checked = KnowYourBloodPressure == "yes",
+        ConditionalContent = BloodPressureInner
+        },
+        new GDSRadios.Item
+        {
+        Text= "I cannot find my blood pressure measurement or I would prefer to get a new measurement",
+        Value="no",
+        Checked = KnowYourBloodPressure == "no",
+        ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you.</p>
+        }
+        }.ToList();
+
+}

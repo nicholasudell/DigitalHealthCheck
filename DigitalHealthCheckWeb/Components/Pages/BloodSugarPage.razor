@@ -1,0 +1,88 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Diabetes page 3 of 3</h1>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSDetails SummaryText="What is blood sugar and why does it matter?">
+        <p class="govuk-body">Your body uses blood sugar to produce energy.</p>
+        <p class="govuk-body">The amount of sugar in the blood is controlled by a hormone called insulin, which is produced by the pancreas (a gland behind the stomach). When food is digested and enters your bloodstream, insulin moves glucose (sugar) out of the blood and into cells, where it's broken down to produce energy.</p>
+        <p class="govuk-body">Your blood sugar level is a measurement that shows how much sugar you have in your blood. If they are high, you may be at risk of developing Type 2 diabetes, or you may already have undiagnosed Type 2 diabetes. </p>
+        <p class="govuk-body">If you have diabetes, your body is unable to break down glucose into energy. This is because there's either not enough insulin to move the glucose, or the insulin produced does not work properly.</p>
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/conditions/high-blood-sugar-hyperglycaemia/" title="Find out more about blood sugar">find out more about blood sugar (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="How is blood sugar measured?">
+        <p class="govuk-body">The level of sugar in your blood can be determined by measuring something called ‘HbA1c’. This is the average sugar level in your blood over a period of a few months and shows whether you have a healthy or unhealthy level of sugar in your blood. Your blood sugar level is measured by a blood test.</p>
+    </GDSDetails>
+
+    <GDSRadios Name="KnowYourHbA1c"
+               Items="KnowYourHbA1cItems"
+               ErrorMessage="KnowYourHbA1cError.AsErrorMessageComponent()"
+               IdPrefix="know-your-hba1c"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you had your blood sugar level measured within the last six months?",
+                            Classes="govuk-fieldset__legend--m",
+                            IsPageHeading=false
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string HbA1c { get; set; }
+
+    [Parameter]
+    public string HbA1cError { get; set; }
+
+    [Parameter]
+    public string KnowYourHbA1cError { get; set; }
+
+    [Parameter]
+    public string KnowYourHbA1c { get; set; }
+
+    RenderFragment HbA1cInner =>
+    @<GDSInput Classes="govuk-!-width-one-third"
+               Name="HbA1c"
+               Id="hba1c"
+               Label="@(new GDSLabel.Options { Text = "What is your HbA1c in millimoles per mole?" })"
+               Value="@HbA1c"
+               Suffix="@(new GDSInput.AffixOptions { Text = "mmol/mol" })"
+               ErrorMessage="@HbA1cError.AsErrorMessageComponent()" />;
+
+protected IList<GDSRadios.Item> KnowYourHbA1cItems => new[]{
+        new GDSRadios.Item
+        {
+            Text= "Yes, and I can remember the number",
+            Value="yes",
+            Checked = KnowYourHbA1c == "yes",
+            ConditionalContent = HbA1cInner
+        },
+           new GDSRadios.Item
+        {
+            Text= "Yes, but I cannot remember the number",
+            Value="forgot",
+            Checked = KnowYourHbA1c == "forgot",
+            ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information.</p>
+        },
+        new GDSRadios.Item
+        {
+            Text= "No, I have not had my blood sugar measured in the last six months",
+            Value="no",
+            Checked = KnowYourHbA1c == "no",
+            ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information if your final NHS Health Check results show that you would benefit from having your blood sugar level measured. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you. </p>
+        }
+    }.ToList();
+
+}

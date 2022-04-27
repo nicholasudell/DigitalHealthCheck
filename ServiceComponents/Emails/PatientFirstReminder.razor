@@ -1,0 +1,225 @@
+﻿@using DigitalHealthCheckEF;
+@inherits PatientEmail;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+        <p>Dear @Check.FirstName @Check.Surname</p>
+        <p>Thank you again for completing your NHS Health Check. This service helps you to take control of your health and wellbeing.</p>
+        <p>We hope that you have benefitted from the experience. We recognise that change is difficult and that it takes time to improve one’s health and wellbeing. We would like to encourage you to persist in your goals, and take each step that you can when you can.</p>
+        <p>You told us that you would like to be reminded about the following:</p>
+
+        @foreach(var reminder in Reminders)
+        {
+            <p><strong>@ReminderTitle(reminder)</strong></p>
+        }
+
+        <p>Here are the relevant pieces of information and services you chose to support these actions:</p>
+
+        @foreach(var reminder in Reminders)
+        {
+            <p style="font-size: 16pt">@ReminderTitle(reminder)</p>
+
+            @foreach (var intervention in AllInterventions.OrderBy(x=> x.Id).Where(x=>x.Category == ReminderCategory(reminder)))
+            {
+                <p style="margin-bottom:8px">You told us '@intervention.Text', so here is the link to <a href="@intervention.Url" title="@intervention.LinkTitle">@intervention.LinkDescription</a></p>
+
+                if(Check.PrefersToContactEveryoneHealth == true && EveryoneHealthReferralInterventions.Contains(intervention))
+                {
+                    <p>You asked us to provide you with the phone number to contact the service, you can contact them by calling 0333 005 0159.</p>
+                }
+            }
+
+            @switch(reminder)
+            {
+                case ReminderType.BloodPressure:
+
+                   @if (!string.IsNullOrEmpty(Check.BloodPressureFollowUp?.SelectedOption))
+                    {
+
+                        @switch (Check.BloodPressureFollowUp?.SelectedOption)
+                        {
+                            case "kiosk":
+                                <p>You told us you would like to get your blood pressure checked at a health kiosk.</p>
+                                <p>There is currently a kiosk at The Castle Leisure Centre. <a title="Find out details about The Castle Leisure Centre on their website" href="https://www.everyoneactive.com/centre/The-Castle-Centre">Find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+                                <p>You don’t need to book an appointment.</p>
+
+                                <p style="font-size: 14pt">The Castle Leisure Centre</p>
+                                <p>
+                                    2 St Gabriel Walk,<br />
+                                    Elephant & Castle,<br />
+                                    London SE1 6FG<br />
+                                    Telephone: 020 7091 4243<br />
+                                </p>
+                                <p>Website: <a href="https://www.everyoneactive.com/centre/The-Castle-Centre">The Castle Centre</a>.</p>
+                                <p>
+                                    Opening times:<br />
+                                    Mon: 6:30am - 10pm<br />
+                                    Tue: 6:30am - 10pm<br />
+                                    Wed: 6:30am - 10pm<br />
+                                    Thu: 6:30am - 10pm<br />
+                                    Fri: 6:30am - 10pm<br />
+                                    Sat: 7:00am - 6pm<br />
+                                    Sun: 7:00am - 10pm<br />
+                                </p>
+                                <p>We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two.</p>
+                                break;
+                            case "leisurecentre":
+                                <p>You told us you would like to get your blood pressure checked at a leisure centre.</p>
+
+                                <p >There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                                break;
+                            case "gp":
+                                <p>You told us you would like to get your blood pressure checked at your GP clinic.</p>
+                                <p>You will need to book an appointment to get your blood pressure measured. If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                                break;
+                            case "home":
+                                <p>You told us you would like to get your blood pressure checked at home. To do this, you will need your own blood pressure monitor. </p>
+                                <p>You can buy your own blood pressure monitor from a chemist. Visit the British Heart Foundation website to <a href="https://www.bhf.org.uk/informationsupport/heart-matters-magazine/medical/tests/blood-pressure-measuring-at-home#Heading2" title="Find out more about choosing your home blood pressure monitor">find out more about choosing your home blood pressure monitor</a>. </p>
+                                <p>If you are taking your own blood pressure reading, please take it three times. You may find that your reading will change a little. We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third reading, by adding the numbers together and then dividing by two.</p>
+                                break;
+                            default:
+                                break;
+                        }
+
+                        <p>Once you have your blood pressure reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+                    }
+
+                    break;
+                case ReminderType.BloodSugar:
+
+                @if (!string.IsNullOrEmpty(Check.BloodSugarFollowUp?.SelectedOption))
+                {
+                    @switch (Check.BloodSugarFollowUp?.SelectedOption)
+                    {
+                        case "leisurecentre":
+                            <p>You told us you would like to get your blood sugar level checked at a leisure centre.</p>
+                            <p>There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                            break;
+                        case "gp":
+                            <p>You told us you would like to get your blood sugar level checked at your GP clinic.</p>
+                            <p>You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                            <p>If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                            <p>If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                    <p>Once you have your blood sugar reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+
+                }
+
+
+                    break;
+                case ReminderType.Cholesterol:
+
+                @if (!string.IsNullOrEmpty(Check.CholesterolFollowUp?.SelectedOption))
+                {
+
+                    @switch (Check.CholesterolFollowUp?.SelectedOption)
+                    {
+                        case "leisurecentre":
+                            <p>You told us you would like to get your cholesterol checked at a leisure centre.</p>
+
+                            <p >There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                            break;
+                        case "gp":
+                            <p>You told us you would like to get your cholesterol checked at your GP clinic.</p>
+                            <p>You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                            <p>If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                            <p>If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                            break;
+                        default:
+                            break;
+                    }
+
+                    <p>Once you have your cholesterol reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+                }
+
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        <p>Your feedback is important to us. It can help to shape our new Digital NHS Health Check service and ultimately help improve the health and wellbeing of others like yourself.</p>
+        <p>There will be three short surveys across three months – starting with the one below. Complete all three and be entered into a prize draw to win Decathlon gift vouchers! There are multiple prizes of £100.00, £50.00 and £25.00. You have an estimated 1 in 15 chance of winning.</p>
+        <p>Click this link to <a href="https://www.surveymonkey.co.uk/r/36LL893" title="Complete the first survey">complete the first survey</a>. It will take no more than 5 mins to complete.</p>
+
+        @if(HasBiometricReminders)
+        {
+           <p>You can amend your measurements, including adding up-to-date blood pressure, cholesterol or blood sugar test results by using <a href="@(Url("CheckYourAnswers"))">your unique link to amend your health information</a>.</p> 
+        }
+
+        <p>If you would like further support to help you make changes to your lifestyle or improve your mental wellbeing, please call our free healthy lifestyle support service on 0333 005 0159.</p>
+        <p>This service is brought to you by the NHS and Southwark Council public health team. If you have any further questions about the digital NHS Health Check, please contact: publichealth@southwark.gov.uk.</p>
+        <p>Sincerely,</p>
+        <p>Southwark Public Health Team</p>
+        <p><a href="mailto:publichealth@southwark.gov.uk">publichealth@southwark.gov.uk</a></p>
+
+        <p>You can <a href="@(Url("Unsubscribe"))" title="click this link to unsubscribe from further emails">click this link to unsubscribe from further emails</a>.</p>
+        
+    </div>
+</body>
+</html>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<DigitalHealthCheckEF.Intervention> EveryoneHealthReferralInterventions { get; set; }
+
+    [Parameter]
+    public IEnumerable<ReminderType> Reminders { get; set; }
+
+    IEnumerable<DigitalHealthCheckEF.Intervention> AllInterventions => Check.ChosenInterventions ?? new List<DigitalHealthCheckEF.Intervention>();
+
+    string ReminderTitle(ReminderType reminder) => reminder switch
+    {
+        ReminderType.VisitGP => "Visit your GP clinic",
+        ReminderType.Smoking => "Stop smoking",
+        ReminderType.Weight => "Achieve a healthy weight",
+        ReminderType.Drinking => "Drink less",
+        ReminderType.Move => "Move more",
+        ReminderType.Mental => "Improve your mental wellbeing",
+        ReminderType.ImproveCholesterol => "Improve your cholesterol levels",
+        ReminderType.ImproveBloodPressure => "Improve your blood pressure",
+        ReminderType.ImproveBloodSugar => "Improve your blood sugar level",
+        ReminderType.BloodSugar => "Check your blood sugar level",
+        ReminderType.Cholesterol => "Check your cholesterol levels",
+        ReminderType.BloodPressure => "Check your blood pressure level",
+        ReminderType.HeightAndWeight => "Check your height and weight",
+    };
+
+    string ReminderCategory(ReminderType reminder) => reminder switch
+    {
+        ReminderType.VisitGP => "gp",
+        ReminderType.Smoking => "smoking",
+        ReminderType.Weight => "weight",
+        ReminderType.Drinking => "alcohol",
+        ReminderType.Move => "move",
+        ReminderType.Mental => "mental",
+        ReminderType.ImproveCholesterol => "improvecholesterol",
+        ReminderType.ImproveBloodPressure => "improvebloodpressure",
+        ReminderType.ImproveBloodSugar => "improvebloodsugar",
+        ReminderType.BloodSugar => "bloodsugar",
+        ReminderType.Cholesterol => "cholesterol",
+        ReminderType.BloodPressure => "bloodpressure",
+        ReminderType.HeightAndWeight => "heightandweight",
+    };
+
+    bool ReminderRequested(ReminderType reminder) => Reminders.Contains(reminder);
+
+    bool HasBiometricReminders => 
+        Reminders.Union(new[] 
+        { 
+            ReminderType.BloodPressure, 
+            ReminderType.BloodSugar, 
+            ReminderType.Cholesterol, 
+            ReminderType.HeightAndWeight 
+        }).Any();
+}

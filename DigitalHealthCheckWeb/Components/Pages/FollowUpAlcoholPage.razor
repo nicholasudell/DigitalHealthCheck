@@ -1,0 +1,153 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Alcohol"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to drink less",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I'm confident in making a plan to drink less",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="Is there anything stopping you from drinking less?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to reduce your alcohol consumption in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start reducing your alcohol consumption?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to reduce your alcohol consumption?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+          ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from drinking less. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    <p class="govuk-body">By drinking within the recommended guidelines you are more likely to lower your risk of harming your health.</p>
+
+    @switch (DrinkingStatus)
+    {
+        case DefaultStatus.Healthy:
+            <p class="govuk-body">It’s important to keep your alcohol consumption as low as possible.</p>
+            <p class="govuk-body">There is no ‘safe’ drinking level. Find ways to cut down your alcohol intake further by changing to non-alcoholic drinks or taking more drink-free days. </p>
+            break;
+        case DefaultStatus.Warning:
+            <p class="govuk-body">Please consider ways to cut down on your alcohol consumption.</p>
+            <p class="govuk-body">A good place to start is by contacting your GP clinic for a non-urgent discussion of your results and to access additional support.</p>
+            <p class="govuk-body">Your GP clinic may suggest different types of local community alcohol services, including free local support groups and other alcohol counselling sessions that may suit you.</p>
+            break;
+        case DefaultStatus.Danger:
+            <p class="govuk-body">Please consider ways to cut down on your alcohol consumption. </p>
+            <p class="govuk-body">A good place to start is by contacting your GP clinic for a non-urgent discussion of your results and to access additional support.</p>
+            <p class="govuk-body">Your GP clinic may suggest different types of local community alcohol services, including free local support groups and other alcohol counselling sessions that may suit you.</p>
+            <p class="govuk-body">Please try to be accurate and honest about how much you drink and any problems it may cause you. If you have become dependent on alcohol, you will need some help to either cut down and control your drinking or stop completely.</p>
+            <p class="govuk-body">If you are alcohol dependent it is important to get help in stopping drinking. There are <a class="govuk-link" href="https://www.drinkaware.co.uk/facts/health-effects-of-alcohol/mental-health/alcohol-withdrawal-symptoms" title="Alcohol dependence withdrawal symptoms" rel="noreferrer noopener" target="_blank">alcohol withdrawal symptoms that you need to be aware of (opens in a new tab)</a> which can be found on the Drinkaware website. If you experience these, please seek urgent medical attention.</p>
+            break;
+    }
+
+    <GDSDetails SummaryText="What are the low-risk levels of alcohol consumption?">
+
+        <p class="govuk-body">Everyone responds to alcohol differently. Your height, weight and sex are just some of the factors that play a part in how alcohol affects you. Even what you've had to eat that day or how much sleep you've had can make a difference to how you feel when you drink. </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>To keep health risks from alcohol to a low level it is safest not to drink more than 14 units a week on a regular basis </li>
+            <li>14 units is six pints, six medium glasses of wine, or seven double measures of spirits</li>
+            <li>If you regularly drink as much as 14 units per week it's best to spread your drinking evenly over three or more days </li>
+            <li>If you drink less than 14 units a week this is considered low-risk drinking. It's called ‘low risk’ rather than ‘safe’ because there's no safe drinking level</li>
+        </ul>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="You may need help with your drinking if:">
+        <ul class="govuk-list govuk-list--bullet">
+            <li>you often feel the need to have a drink</li>
+            <li>you get into trouble because of your drinking</li>
+            <li>other people warn you about how much you're drinking</li>
+            <li>you think your drinking is causing you problems</li>
+        </ul>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="The benefits of drinking less alcohol">
+        <p class="govuk-body">Short-term benefits:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>feeling better in the mornings</li>
+            <li>being less tired and more energetic</li>
+            <li>having better-looking skin</li>
+            <li>saving some money</li>
+        </ul>
+
+        <p class="govuk-body">Long-term benefits: </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>lower blood pressure</li>
+            <li>lower risk of stroke, hypertension, cancer and liver disease</li>
+            <li>lower cholesterol levels</li>
+            <li>better mood, memory and quality of sleep</li>
+            <li>help with weight management</li>
+            <li>lower risk of dementia</li>
+        </ul>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="Long-term consequences of drinking alcohol">
+        <p class="govuk-body">The type of illnesses you can develop after 10 to 20 years of regularly drinking more than 14 units a week include:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>cancers of the mouth, throat and breast</li>
+            <li>stroke</li>
+            <li>heart disease</li>
+            <li>liver disease</li>
+            <li>brain damage</li>
+            <li>damage to the nervous system</li>
+        </ul>
+
+        <p class="govuk-body">There's also evidence that regular drinking at high-risk levels can make your mental health worse. Research has found strong links between alcohol misuse and self-harming, including suicide.</p>
+
+        <p class="govuk-body">You can <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.nhs.uk/live-well/alcohol-support/the-risks-of-drinking-too-much/" title="Find out more about the consequences of drinking too much alcohol">find out more about the consequences of drinking too much alcohol (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public DefaultStatus DrinkingStatus { get; set; }
+
+    string DrinkingLevel => DrinkingStatus switch
+    {
+        DefaultStatus.Danger => "that you are drinking at a harmful level and may be dependent on alcohol. ",
+        DefaultStatus.Warning => "that your alcohol use may be harmful to your health.",
+        DefaultStatus.Healthy or _ => "that the amount of alcohol that you drink is at a low-risk level. ",
+    };
+
+    string Summary => $"Your results show {DrinkingLevel}";
+
+}

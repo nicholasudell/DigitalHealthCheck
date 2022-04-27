@@ -1,0 +1,48 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<h1 class="govuk-heading-l">Smoking</h1>
+
+<p class="govuk-body">Your smoking status is used to calculate risks associated with your heart health.</p>
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSRadios Name="everSmoked"
+               Items="@Items"
+               IdPrefix="ever-smoked"
+               ErrorMessage="Error.AsErrorMessageComponent()"
+               Hint="@(new GDSHint.Options {
+                Text="We need to know about your use of tobacco products for smoking only. If you smoke tobacco and cannabis together please respond ‘Yes’ to this question. If you answer yes to this general question you will be offered more specific options."
+               })"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Do you ever smoke tobacco or cannabis and tobacco combined?",
+                        Classes="govuk-fieldset__legend--m"
+                    }
+               })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    protected IList<GDSRadios.Item> Items => new[]
+    {
+        new {Text="Yes", Value="yes"},
+        new {Text="No, non-smoker (never smoked)", Value="no"},
+        new {Text="No, ex-smoker (previously smoked)", Value="ex"}
+    }.AsRadioComponents(x => x.Value, x => x.Text, Smoker);
+
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string Smoker { get; set; }
+}

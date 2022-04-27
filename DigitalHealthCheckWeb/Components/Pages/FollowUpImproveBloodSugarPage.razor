@@ -1,0 +1,103 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Blood Sugar"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to improve my blood sugar level",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I'm confident in making a plan to improve my blood sugar level",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="Is there anything stopping you from improving your blood sugar level?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to improve your blood sugar level in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start improving your blood sugar level?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to improve your blood sugar level?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+          ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from improving your blood sugar level. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    <p class="govuk-body">The HbA1c measurement can tell you your average blood sugar level over the past 2 to 3 months. A high HbA1c level shows that you have too much sugar in your blood, which can lead to illnesses such as diabetes.</p>
+
+    @switch (Status)
+    {
+        case BloodSugarStatus.Healthy:
+            <p class="govuk-body">Well done! Keep up the good work. </p>
+            <p class="govuk-body">Maintain a healthy blood sugar level with regular exercise and a healthy diet.</p>
+            break;
+        case BloodSugarStatus.Warning:
+            <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.</p>
+            <p class="govuk-body">Improve your blood sugar level with regular exercise and a healthy diet.</p>
+            <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+            break;
+        case BloodSugarStatus.Danger:
+            <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support. You will require a further blood test to confirm whether you have Type 2 diabetes.</p>
+            <p class="govuk-body">Improve your blood sugar level with regular exercise and a healthy diet.</p>
+            <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+            break;
+        case BloodSugarStatus.Severe:
+            <p class="govuk-body">If you are not already receiving support for this from a healthcare professional please contact your GP clinic urgently. If you are not able to make urgent contact with your GP clinic, please ring 111. If you do not do this you could be seriously endangering your health.</p>
+            break;
+    }
+
+    <GDSDetails SummaryText="The benefits of healthy blood sugar level">
+        <ul class="govuk-list--bullet govuk-list">
+            <li>Reduces the risk of developing diabetes</li>
+            <li>Reduces the risk of damage to your blood vessels, which can lead to heart disease, kidney disease and diabetic eye disease</li>
+            <li>Helps maintain a healthy weight</li>
+            <li>Less likely to have abnormal cholesterol levels</li>
+            <li>The good news is that a healthy lifestyle can help to manage your blood sugar level</li>
+        </ul>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public BloodSugarStatus Status { get; set; }
+
+    public string Summary => Status switch
+    {
+        BloodSugarStatus.Healthy => "Your results show that you have normal sugar levels over the last three months. ",
+        BloodSugarStatus.Warning => "Your results show that you are at risk of developing diabetes.  ",
+        BloodSugarStatus.Danger => "Your results show that you may have diabetes. ",
+        BloodSugarStatus.Severe => " Your results show that your blood sugar level is extremely high.",
+    };
+
+}

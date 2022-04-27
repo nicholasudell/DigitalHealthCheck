@@ -1,0 +1,118 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@using DigitalHealthCheckEF;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Mental wellbeing"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It is important for me to have positive mental wellbeing",
+          Error=ImportantToChangeError,
+          Value=ImportantToChange
+          })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = " I am confident about improving my mental wellbeing",
+          Error=ConfidentToChangeError,
+          Value=ConfidentToChange,
+          })"
+          BarrierHeader="Is there anything stopping you from improving your mental wellbeing?"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome what is currently stopping you from improving your mental wellbeing. These personalised resources will appear on the Follow-up – actions page."
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to try to improve your mental wellbeing in the following months?",
+          Error=DoYouHavePlansError,
+          Value=DoYouHavePlans,
+          })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start trying to improve your mental wellbeing?",
+          Error=SetADateError,
+          Value=SetADate,
+          })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to start trying to improve your mental wellbeing?",
+          Error=BeRemindedError,
+          Value=BeReminded,
+          })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          OtherBarrier="@OtherBarrier"
+          BarriersError="@BarriersError"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName" ErrorList="@ErrorList">
+    <ChildContent>
+        @switch (Result.MentalWellbeing)
+        {
+            case DefaultStatus.Healthy:
+                <p class="govuk-body">Your initial results show that your mental wellbeing score is good and that you don't seem to have significant problems with your mood or anxiety.</p>
+                <p class="govuk-body">Explore new ways to manage your mental wellbeing and strengthen it even more by using the services we offer in the follow-up section.</p>
+                break;
+            case DefaultStatus.Warning:
+                <p class="govuk-body">Your results show that your mental wellbeing score is OK, but can be improved.</p>
+                @if (Check.UnderCare == true)
+                {
+                    <p class="govuk-body">Continue to see your psychological therapist, counsellor or doctor who is supporting your mental wellbeing. You may wish to discuss your results with them at your next appointment.</p>
+                }
+                else
+                {
+                    <p class="govuk-body">Explore ways to improve your mental wellbeing, such as using Southwark’s free NHS talking therapies, which you can find in the follow-up actions section.</p>
+                }
+                break;
+            case DefaultStatus.Danger:
+                <p class="govuk-body">Your results show that your mental wellbeing score is poor and that you might be struggling more than most people.</p>
+
+                <p class="govuk-body">If you believe you are experiencing a mental health crisis, you can talk to someone now by calling Southwark’s NHS mental health crisis line on 0800 731 2864 (select option 1). <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Find out more about South London and Maudsley NHS Foundation Trust mental health crisis services" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/">Find out more about mental health crisis services (opens in a new tab)</a> on the South London and Maudsley NHS Trust website.</p>
+                @if (Check.UnderCare == true)
+                {
+                    <p class="govuk-body">Continue to see your psychological therapist, counsellor or doctor who is supporting your mental wellbeing. You may wish to discuss your results with them at your next appointment.</p>
+                    <p class="govuk-body">Please answer the questions below and consider the healthy lifestyle and mental wellbeing services we offer in the upcoming ‘Actions’ page.</p>
+                }
+                else
+                {
+                    <p class="govuk-body">If you are not experiencing a mental health crisis, please contact your GP clinic for a non-urgent discussion about your mental wellbeing. You can also explore ways to improve your mental wellbeing in the follow-up section of the NHS Health Check, such as accessing Southwark’s free NHS talking therapies.</p>
+                }
+                break;
+            default:
+                break;
+        }
+
+        <p class="govuk-body">Improving your mental wellbeing increases your ability to choose, start and maintain a healthy lifestyle. In this way, it can help reduce your risk of developing heart and circulatory disease, and Type 2 diabetes.</p>
+
+        <p class="govuk-body">Having positive mental wellbeing allows us to think, feel and behave in ways that help us live fulfilling and independent lives. It does not mean feeling happy all the time or the absence of a mental health condition.</p>
+
+        <GDSDetails SummaryText="Benefits of improving your mental wellbeing">
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Increases your self-esteem</li>
+                <li>Makes you feel more relaxed</li>
+                <li>Improves your mood</li>
+                <li>Makes you better able to cope when times are tough</li>
+                <li>You’re able to think more clearly</li>
+                <li>Protects against ill health</li>
+                <li>Helps you to be able to make positive changes to your lifestyle, such as quitting smoking or eating more healthily</li>
+            </ul>
+        </GDSDetails>
+    </ChildContent>
+    <PostBarriersContent>
+        <p class="govuk-body">If you feel like you need support right now, call either your GP clinic, crisis support or Samaritans on 116 123. You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Access crisis support on the South London and Maudsley NHS Foundation Trust website" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/">access crisis support on the South London and Maudsley NHS Foundation Trust website (opens in a new tab)</a>.</p>
+    </PostBarriersContent>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    [Parameter]
+    public Result Result { get; set; }
+}

@@ -1,0 +1,170 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+<AntiForgery AntiForgeryToken="@AntiForgery" />
+
+<h1 class="govuk-heading-l">Reporting</h1>
+
+    <GDSRadios Name="ReportKey"
+               Items="Reports"
+               IdPrefix="reports"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Select a report to generate",
+                        Classes="govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSDateInput FieldSet="@(
+                  new GDSFieldSet.Options
+                  {
+                      Legend = new GDSFieldSet.LegendOptions
+                      {
+                          Text = "From date (Optional)",
+                          Classes = "govuk-fieldset__legend--m"
+                      }
+                  })"
+                  Hint="@(
+                    new GDSHint.Options
+                    {
+                        Text="The generated report will include all data from 00:00 AM on this date."
+                    }
+                  )"
+                  ErrorMessage="@(FromDateError.AsErrorMessageComponent())"
+                  Items="@(
+                        new []
+                        {
+                            new GDSDateInput.Item {
+                                Name="FromDateDay",
+                                Id="from-date-day",
+                                Value=FromDateDay,
+                                Classes = $"govuk-input--width-2 {(FromDateDayInvalid ? "govuk-input--error" : "")}",
+                                Label="Day"
+                            },
+                            new GDSDateInput.Item {
+                                Name="FromDateMonth",
+                                Id="from-date-month",
+                                Value=FromDateMonth,
+                                Classes = $"govuk-input--width-2 {(FromDateMonthInvalid ? "govuk-input--error" : "")}",
+                                Label="Month"
+                            },
+                            new GDSDateInput.Item {
+                                Name="FromDateYear",
+                                Id="from-date-year",
+                                Value=FromDateYear,
+                                Classes = $"govuk-input--width-4 {(FromDateYearInvalid ? "govuk-input--error" : "")}",
+                                Label="Year"
+                            }
+                        }.ToList()
+                  )"
+                  Id="from-date" />
+
+    <GDSDateInput FieldSet="@(
+                  new GDSFieldSet.Options
+                  {
+                      Legend = new GDSFieldSet.LegendOptions
+                      {
+                          Text = "To date (Optional)",
+                          Classes = "govuk-fieldset__legend--m"
+                      }
+                  })"
+                  Hint="@(
+                    new GDSHint.Options
+                    {
+                        Text="The generated report will include all data up to 00:00 AM on this date. It will not include any data recorded from this date."
+                    }
+                  )"
+                  ErrorMessage="@(ToDateError.AsErrorMessageComponent())"
+                  Items="@(
+                        new []
+                        {
+                            new GDSDateInput.Item {
+                                Name="ToDateDay",
+                                Id="to-date-day",
+                                Value=ToDateDay,
+                                Classes = $"govuk-input--width-2 {(ToDateDayInvalid ? "govuk-input--error" : "")}",
+                                Label="Day"
+                            },
+                            new GDSDateInput.Item {
+                                Name="ToDateMonth",
+                                Id="to-date-month",
+                                Value=ToDateMonth,
+                                Classes = $"govuk-input--width-2 {(ToDateMonthInvalid ? "govuk-input--error" : "")}",
+                                Label="Month"
+                            },
+                            new GDSDateInput.Item {
+                                Name="ToDateYear",
+                                Id="to-date-year",
+                                Value=ToDateYear,
+                                Classes = $"govuk-input--width-4 {(ToDateYearInvalid ? "govuk-input--error" : "")}",
+                                Label="Year"
+                            }
+                        }.ToList()
+                  )"
+                  Id="to-date" />
+
+    <GDSButton PreventDoubleClick="true" Text="Generate" Type="GDSButton.InputType.Submit" />
+
+</form>
+
+@code {
+
+    [Parameter]
+    public string ReportKey { get; set; }
+
+    protected IList<GDSRadios.Item> Reports => new []
+    {
+        new {Value= "AnonymisedDataSet", Text = "Anonymised Data Set" },
+        new {Value= "AnonymisedBarriers", Text = "Anonymised Barriers" },
+        new {Value= "AnonymisedInterventions", Text = "Anonymised Actions" },
+        new {Value= "Thriva", Text = "Blood Kit Requests" },
+        new {Value= "UptakeRate", Text = "Uptake Rate" },
+        new {Value= "InterventionEligibility", Text = "Intervention Eligibility" },
+        new {Value= "BiometricAssessmentSuccess", Text = "Biometric Assessment Success" },
+        new {Value= "DetailedUptake", Text = "Detailed Uptake Rate" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, ReportKey);
+
+    [Parameter]
+    public string FromDateError { get; set; }
+
+    [Parameter]
+    public string FromDateDay { get; set; }
+
+    [Parameter]
+    public string FromDateMonth { get; set; }
+
+    [Parameter]
+    public string FromDateYear { get; set; }
+
+    [Parameter]
+    public bool FromDateDayInvalid { get; set; }
+
+    [Parameter]
+    public bool FromDateMonthInvalid { get; set; }
+
+    [Parameter]
+    public bool FromDateYearInvalid { get; set; }
+
+    [Parameter]
+    public string ToDateError { get; set; }
+
+    [Parameter]
+    public string ToDateDay { get; set; }
+
+    [Parameter]
+    public string ToDateMonth { get; set; }
+
+    [Parameter]
+    public string ToDateYear { get; set; }
+
+    [Parameter]
+    public bool ToDateDayInvalid { get; set; }
+
+    [Parameter]
+    public bool ToDateMonthInvalid { get; set; }
+
+    [Parameter]
+    public bool ToDateYearInvalid { get; set; }
+}

@@ -1,0 +1,16 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.SmokerModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Smoking page 2 of 2";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.HowMuchDoYouSmokePage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-howMuch="@Model.HowMuch"
+           param-error="@Model.Error" />

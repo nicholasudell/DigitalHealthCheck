@@ -1,0 +1,55 @@
+﻿<span id="@Id" class="govuk-error-message @Classes" @attributes="InputAttributes">
+    @if (UseVisuallyHiddenText())
+    {
+        <span class="govuk-visually-hidden">@ActualVisuallyHiddenText:</span>
+    }
+    @if (ChildContent is null)
+    {
+        @Text
+    }
+    else
+    {
+        @ChildContent
+    }
+</span>
+
+@code {
+
+    public class Options
+    {
+        public IDictionary<string, object> Attributes { get; set; }
+
+        public string Classes { get; set; }
+
+        public RenderFragment Content { get; set; }
+
+        public string Text { get; set; }
+
+        public string Id { get; set; }
+
+        public string VisuallyHiddenText { get; set; }
+    }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public string VisuallyHiddenText { get; set; }
+
+    protected string ActualVisuallyHiddenText => string.IsNullOrEmpty(VisuallyHiddenText) ? "Error" : VisuallyHiddenText;
+
+    protected bool UseVisuallyHiddenText() => !string.Equals(VisuallyHiddenText, "False", StringComparison.OrdinalIgnoreCase);
+
+}

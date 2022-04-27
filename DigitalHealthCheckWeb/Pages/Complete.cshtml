@@ -1,0 +1,21 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.CompleteModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Your communication preferences";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.CompletePage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-sMSNumber="@Model.Model.SmsNumber"
+           param-emailAddress="@Model.Model.EmailAddress"
+           param-phoneNumber="@Model.Model.PhoneNumber"
+           param-sMSNumberError="@Model.SmsNumberError"
+           param-emailAddressError="@Model.EmailAddressError"
+           param-phoneNumberError="@Model.PhoneNumberError"
+           param-selected="@Model.Model.Contact" />

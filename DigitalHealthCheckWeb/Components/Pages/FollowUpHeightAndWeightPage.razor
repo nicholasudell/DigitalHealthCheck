@@ -1,0 +1,237 @@
+﻿@inherits Page
+
+<h1 class="govuk-heading-l"> Follow–up – Height and weight</h1>
+
+<form method="post" novalidate>
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <p class="govuk-body">
+        You don’t know your height or weight. Please have your height and weight measured as this information is required to complete your NHS Health Check.
+    </p>
+
+    <p class="govuk-body">
+        We will show you where you can get this done.
+    </p>
+
+    <GDSDetails SummaryText="Benefits of getting your accurate height and weight measured">
+        <ul class="govuk-list--bullet govuk-list">
+            <li>Getting an up-to-date height and weight measurement will increase the accuracy of your NHS Health Check</li>
+            <li>You will receive an accurate Body Mass Index (BMI) measurement to help determine if you are at a healthy weight </li>
+        </ul>
+    </GDSDetails>
+
+    <GDSRadios Name="ImportantToChange"
+               Items="ImportantToMeasureWeigthAndHeightItems"
+               IdPrefix="important-to-change"
+               ErrorMessage="FollowUpImportantToGetHeightAndWeightMeasuredError.AsErrorMessageComponent()"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "It's important for me to get my height and weight measured",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })"
+               Hint="@(new GDSHint.Options
+                {
+                    Text="Choose from range - 1 least to 5 most"
+                })" />
+
+    <GDSRadios Name="ConfidentToChange"
+               Items="ConfidentToMakePlanToMeasueHeightAndWeight"
+               ErrorMessage="FollowUpConfidentToMakePlanToGetHeightAndWeightMeasuredError.AsErrorMessageComponent()"
+               IdPrefix="confident-to-change"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "I'm confident in making a plan to get my height and weight measured",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })"
+               Hint="@(new GDSHint.Options
+                {
+                    Text="Choose from range - 1 least to 5 most"
+                })" />
+
+    <h2 class="govuk-heading-l"> How to get your height and weight measured</h2>
+
+    <p class="govuk-body">
+        Getting your height and weight measures is easy and takes about five minutes. Select from the list below on how you'd like to have it done.
+    </p>
+
+    <GDSDetails SummaryText="The options for free height and weight measurements">
+        <p class="govuk-body">
+            Health kiosk: You can go to a community venue, such as a leisure centre, where you can use a self-service health kiosk machine to measure your own height and weight. You don’t need to book an appointment.
+        </p>
+        <p class="govuk-body">
+            A health kiosk is a machine that can help you to check your health status, giving you accurate results for key measurements such as your height and weight or blood pressure. Located in community venues, you can access the kiosk at a time convenient to you. The machine gives you clear instructions on what to do and then confidentially gives you your results by email.
+        </p>
+        <p class="govuk-body">
+            Clicking the health kiosk option below will share the possible locations.
+        </p>
+        <p class="govuk-body">
+            Local leisure centre: You can book an appointment to get your height and weight measured at any of Southwark Council’s leisure centres. This is a free service, available Monday to Friday. You will need to book an appointment via the website, which we have listed in the ‘Local leisure centre’ option below.
+        </p>
+        <p class="govuk-body">Pharmacy: You can get your blood pressure, cholesterol levels, blood sugar level, height and weight checked at Bonamy Pharmacy. Clicking the pharmacy option below will share the possible location. You will need to book an appointment by phone, so please call in advance.</p>
+        <p class="govuk-body">
+            At home: If you have the equipment, you can take your own height and weight at home.
+        </p>
+    </GDSDetails>
+
+    <p class="govuk-body">You can complete this measurement after finishing the full NHS Health Check. We can send you the details for your preferred option via email. If you go to complete this measurement now, please then return to continue with the NHS Health Check follow-up support.</p>
+
+    <GDSRadios Name="SelectedOption"
+               Items="DetailsAboutWhereYouCanGetHeightAndWeightMeasured"
+               IdPrefix="options"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Classes="govuk-fieldset__legend--m",
+                            IsPageHeading=false,
+                            Text = "How would you like to get your height and weight checked?"
+                        }
+                    })" />
+
+    <YesNoRadios Name="DoYouHavePlans"
+                 Error="@FollowUpPlansForHeightAndWeightError"
+                 Value="@FollowUpPlansForHeightAndWeight"
+                 IdPrefix="do-you-have-plans"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = "Do you have any plans to get your height and weight measurements in the following months?",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <YesNoRadios Name="SetADate"
+                 Error="@FollowUpDateForHeightAndWeightError"
+                 Value="@FollowUpDateForHeightAndWeight"
+                 IdPrefix="set-a-date"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = " Will you set a date to get your height and weight measurements",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <YesNoRadios Name="BeReminded"
+                 Error="@FollowUpEmailForHeightAndWeightError"
+                 Value="@FollowUpEmailForHeightAndWeight"
+                 IdPrefix="contact-by-email"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = " Would you like to be reminded by email to get your height and weight measurements checked?",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <p class="govuk-body">At the end of this service, you will be provided with a unique link that will enable you to come back and enter your updated height and weight readings.</p>
+
+    <p class="govuk-body">Alternatively, you can also go get this reading now and come back using this link: <a title="Unique link to amend your health information" href="@($"./CheckYourAnswers{BuildQuery(IdQueryParam)}")">Your unique link to amend your health information</a></p>
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string FollowUpImportantToGetHeightAndWeightMeasuredError { get; set; }
+
+    [Parameter]
+    public string FollowUpConfidentToMakePlanToGetHeightAndWeightMeasuredError { get; set; }
+
+    [Parameter]
+    public string FollowUpImportantToGetHeightAndWeightMeasured { get; set; }
+
+    [Parameter]
+    public string FollowUpConfidentToMakePlanToGetHeightAndWeightMeasured { get; set; }
+
+    [Parameter]
+    public string FollowUpPlansForHeightAndWeight { get; set; }
+
+    [Parameter]
+    public string FollowUpPlansForHeightAndWeightError { get; set; }
+
+    [Parameter]
+    public string FollowUpDateForHeightAndWeight { get; set; }
+
+    [Parameter]
+    public string FollowUpDateForHeightAndWeightError { get; set; }
+
+    [Parameter]
+    public string FollowUpEmailForHeightAndWeight { get; set; }
+
+    [Parameter]
+    public string FollowUpEmailForHeightAndWeightError { get; set; }
+
+    private struct Response
+    {
+        public string Value { get; private set; }
+
+        public string Text { get; private set; }
+
+        public Response(string value, string text)
+        {
+            this.Value = value;
+            this.Text = text;
+        }
+    }
+
+    private IEnumerable<Response> responses = new[]
+            {
+        new Response("1", "1- Disagree"),
+        new Response("2", "2- Somewhat disagree"),
+        new Response("3", "3- Neither disagree nor agree"),
+        new Response("4", "4- Somewhat agree"),
+        new Response("5", "5- Agree")
+    };
+
+    protected IList<GDSRadios.Item> ImportantToMeasureWeigthAndHeightItems => responses.AsRadioComponents(x => x.Value, x => x.Text, FollowUpImportantToGetHeightAndWeightMeasured);
+
+    protected IList<GDSRadios.Item> ConfidentToMakePlanToMeasueHeightAndWeight => responses.AsRadioComponents(x => x.Value, x => x.Text, FollowUpImportantToGetHeightAndWeightMeasured);
+
+    protected IList<GDSRadios.Item>
+    DetailsAboutWhereYouCanGetHeightAndWeightMeasured => new[]{
+        new GDSRadios.Item
+        {
+        Text= "Health kiosk",
+        Value="kiosk",
+        ConditionalContent =@<div>
+        <p class="govuk-body"> We will send you a list of these locations with their websites, locations and opening times.</p>
+        <p class="govuk-body"> There is currently a kiosk at <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre/" title="The Castle Leisure Centre website">The Castle Centre (opens in a new tab)</a>.</p>
+        <p class="govuk-body"> You don’t need to book an appointment. </p>
+    </div>
+        },
+        new GDSRadios.Item
+        {
+        Text="Local leisure centre",
+        Value="leisurecentre",
+        ConditionalContent=@<div>
+        <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+    </div>
+        },
+        new GDSRadios.Item
+        {
+        Text="Pharmacy",
+        Value="pharmacy",
+        ConditionalContent=@<div>
+        <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+        <p class="govuk-body">We will also email you the address and phone number for this location. </p>
+        <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+        <p class="govuk-body">Locations and contact information:</p>
+        <p>Location and contact information:</p>
+        <p class="govuk-body">Bonamy Pharmacy<br/>
+            355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+            0207 740 2523<br/>
+            pharmacy.fv733@nhs.net<br/>
+            http://bonamypharmacy.co.uk/<br/>
+        </p>
+    </div>
+        }, new GDSRadios.Item
+        {
+        Text="At Home",
+        Value="home",
+        ConditionalContent=@<p class="govuk-body">
+        If you have the equipment, you can take your own height and weight at home.
+    </p>
+    },
+                    }.ToList();
+
+}

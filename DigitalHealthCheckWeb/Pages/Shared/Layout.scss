@@ -1,0 +1,30 @@
+﻿.dhc-header_container {
+    border-bottom: hidden;
+    margin-bottom: 0px;
+}
+
+.dhc-govuk-header {
+    background: #005eb8
+}
+
+.dhc-govuk-footer {
+    border-top: 4px solid #005eb8;
+    color: #0b0c0c;
+    background: #d8dde0
+}
+
+$southwark-logo-image-width: 250px;
+$southwark-logo-image-height: 110px;
+
+.dhc-govuk-footer__southwark-logo {
+    display: inline-block;
+    min-width: $southwark-logo-image-width;
+    padding-top: ($southwark-logo-image-height + govuk-spacing(2));
+    //SASS can't do relative paths, so we have to put an icky absolute path in
+    background-image: url('/Pages/Shared/southwark.png');
+    background-repeat: no-repeat;
+    background-position: 50% 0%;
+    background-size: $southwark-logo-image-width $southwark-logo-image-height;
+    text-align: center;
+    white-space: nowrap;
+}

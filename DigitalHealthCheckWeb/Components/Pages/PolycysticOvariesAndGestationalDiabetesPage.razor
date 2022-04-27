@@ -1,0 +1,77 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Diabetes page 2 of 3</h1>
+
+    <GDSRadios Classes="govuk-radios--inline"
+               Name="PolycysticOvaries"
+               Items="PolycysticOvariesItems"
+               ErrorMessage="PolycysticOvariesError.AsErrorMessageComponent()"
+               IdPrefix="polycystic-ovaries"
+               FieldSet="@(new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you ever been diagnosed with polycystic ovary syndrome?",
+                            Classes="govuk-fieldset__legend--m"
+                        }
+                    })" />
+
+    <GDSDetails SummaryText="What is polycystic ovary syndrome?">
+        <p class="govuk-body">Polycystic ovary syndrome (PCOS) is a common condition that impacts the way the ovaries work. You can <a class="govuk-link" href="https://www.nhs.uk/conditions/polycystic-ovary-syndrome-pcos/" rel="noreferrer noopener" target="_blank" title="Find out more about polycystic ovary syndrome">find out more about polycystic ovary syndrome (opens in a new tab)</a> on the NHS website. If you are concerned that you might have PCOS, please contact your GP clinic for a non-urgent discussion as it is important to get a medical diagnosis.</p>
+    </GDSDetails>
+
+    <GDSRadios Classes="govuk-radios--inline"
+               Name="GestationalDiabetes"
+               Items="GestationalDiabetesItems"
+               ErrorMessage="GestationalDiabetesError.AsErrorMessageComponent()"
+               IdPrefix="gestational-diabetes"
+               Hint="@(new GDSHint.Options
+                {
+                    Text="Gestational diabetes is diabetes that arose during pregnancy. This includes a diagnosis at any time in the past."
+                })"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you ever been diagnosed with gestational diabetes? ",
+                            Classes="govuk-fieldset__legend--m"
+                        }
+                    })" />
+
+    <GDSDetails SummaryText="What is gestational diabetes?">
+        <p class="govuk-body">Gestational diabetes is when the mother has high blood sugar which can develop during pregnancy and usually goes after giving birth. Gestational diabetes occurs because the mother cannot produce enough insulin (a hormone that helps to control blood sugar levels) during pregnancy. You can <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.nhs.uk/conditions/gestational-diabetes/" title="Find out more about gestational diabetes">find out more about gestational diabetes (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string PolycysticOvariesError { get; set; }
+
+    [Parameter]
+    public string PolycysticOvaries { get; set; }
+
+    protected IList<GDSRadios.Item> PolycysticOvariesItems => new[]{
+        "Yes",
+        "No"
+    }.AsRadioComponents(x => x.ToLowerInvariant(), x => x, PolycysticOvaries);
+
+    [Parameter]
+    public string GestationalDiabetesError { get; set; }
+
+    [Parameter]
+    public string GestationalDiabetes { get; set; }
+
+    protected IList<GDSRadios.Item> GestationalDiabetesItems => new[]{
+        "Yes",
+        "No"
+    }.AsRadioComponents(x => x.ToLowerInvariant(), x => x, GestationalDiabetes);
+
+}

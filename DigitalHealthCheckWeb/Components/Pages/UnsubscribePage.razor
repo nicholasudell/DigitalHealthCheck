@@ -1,0 +1,23 @@
+﻿@inherits Page
+
+@if(Success)
+{
+    <h1 class="govuk-heading-l">Unsubcribe</h1>
+    <p class="govuk-body">You have now been unsubscribed from further emails.</p>
+}
+else
+{
+    <h1 class="govuk-heading-l">Something went wrong</h1>
+    <p class="govuk-body">We have been unable to unsubscribe you from further emails. Please check the link you used to unsubscribe and try again.</p>
+
+    <p class="govuk-body">If the problem persists, you can email us on <a class="govuk-link" href="mailto:takecare@southwark.gov.uk">takecare@southwark.gov.uk</a>.</p>
+}
+
+<GDSButton PreventDoubleClick="true" HRef="@($"./Index{BuildQuery(IdQueryParam)}")">Go back</GDSButton>
+
+@code {
+
+    [Parameter]
+    public bool Success { get; set; }
+
+}

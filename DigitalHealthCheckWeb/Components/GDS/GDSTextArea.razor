@@ -1,0 +1,137 @@
+﻿<div class="govuk-form-group @FormGroupErrorClass @FormGroup?.Classes">
+    <GDSLabel Text="@Label?.Text" Classes="@Label?.Classes" For="@Id" IsPageHeading="Label?.IsPageHeading ?? false" @attributes="Label?.Attributes">
+        @if (Label?.Content is null)
+        {
+            @Label?.Text
+        }
+        else
+        {
+            @Label?.Content
+        }
+    </GDSLabel>
+    @if (UseHint())
+    {
+        <GDSHint Id="@HintId" Classes="@Hint.Classes" @attributes="Hint.Attributes">
+            @if (Hint.Content is null)
+            {
+                @Hint.Text
+            }
+            else
+            {
+                @Hint.Content
+            }
+        </GDSHint>
+    }
+    @if (UseErrorMessage())
+    {
+        <GDSErrorMessage Id="@ErrorMessageId" Classes="@ErrorMessage.Classes" @attributes="ErrorMessage.Attributes">
+            @if (ErrorMessage.Content is null)
+            {
+                @ErrorMessage.Text
+            }
+            else
+            {
+                @ErrorMessage.Content
+            }
+        </GDSErrorMessage>
+    }
+    <textarea class="govuk-textarea @TextAreaError @Classes" id="@Id" name="@Name" rows="@(Rows ?? 5)"
+              spellcheck="@ActualSpellcheck"
+              aria-describedby="@ActualDescribedBy"
+              autocomplete="@Autocomplete"
+              @attributes="@InputAttributes">@Value</textarea>
+</div>
+
+@code {
+
+    public class Options // For other components
+    {
+        public string DescribedBy { get; set; }
+        public string Value { get; set; }
+        public bool? Spellcheck { get; set; }
+        public string Autocomplete { get; set; }
+        public string Id { get; set; }
+        public int? Rows { get; set; } = 5;
+        public string Classes { get; set; }
+        public GDSFormGroup.Options FormGroup { get; set; }
+        public GDSLabel.Options Label { get; set; }
+        public GDSHint.Options Hint { get; set; }
+        public GDSErrorMessage.Options ErrorMessage { get; set; }
+        public string Name { get; set; }
+    }
+
+    [Parameter]
+    public string DescribedBy { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public bool? Spellcheck { get; set; }
+
+    [Parameter]
+    public string Autocomplete { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public int? Rows { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public GDSFormGroup.Options FormGroup { get; set; }
+
+    [Parameter]
+    public GDSLabel.Options Label { get; set; }
+
+    [Parameter]
+    public GDSHint.Options Hint { get; set; }
+
+    [Parameter]
+    public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    // Convert this to string because Razor doesn't show tags when the value is false.
+    protected string ActualSpellcheck => Spellcheck.HasValue ? (Spellcheck.Value.ToString().ToLower()) : null;
+
+    protected string FormGroupErrorClass => ErrorMessage is not null ? "govuk-form-group--error" : null;
+
+    bool UseHint() => Hint is not null;
+    bool UseErrorMessage() => ErrorMessage is not null;
+
+    protected string HintId => $"{Id}-hint";
+    protected string ErrorMessageId => $"{Id}-error";
+
+    protected string TextAreaError => UseErrorMessage() ? "govuk-textarea--error" : null;
+
+    protected string ActualDescribedBy
+    {
+        get
+        {
+            var descriptions = new[]
+            {
+                DescribedBy,
+                UseHint() ? HintId : null,
+                UseErrorMessage() ? ErrorMessageId : null
+            };
+
+            var validDescriptions = descriptions.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            if (!validDescriptions.Any())
+            {
+                return null;
+            }
+
+            return string.Join(' ', validDescriptions);
+        }
+    }
+
+}

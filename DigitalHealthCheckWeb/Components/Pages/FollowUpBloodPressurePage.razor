@@ -1,0 +1,168 @@
+﻿@using Model;
+@inherits FollowUpNumbersPageBase
+
+<FollowUpNumbers Title="Follow–up – Blood pressure"
+                 ImportantToChange="@(new FollowUpNumbers.Question
+            {
+                Text = "It's important for me to get my blood pressure checked",
+                Error=ImportantToChangeError,
+                Value=ImportantToChange
+            })"
+                 ConfidentToChange="@(new FollowUpNumbers.Question
+            {
+                Text = "I'm confident in making a plan to get my blood pressure checked",
+                Error=ConfidentToChangeError,
+                Value=ConfidentToChange,
+            })"
+                 BarrierHeader="Is there anything stopping you from getting your blood pressure measured?"
+                 OptionsHeader="How would you like to get your blood pressure checked?"
+                 DoYouHavePlans="@(new FollowUpNumbers.Question
+            {
+                Text = "Do you have plans to get your blood pressure checked in the following months?",
+                Error=DoYouHavePlansError,
+                Value=DoYouHavePlans,
+            })"
+                 SetADate="@(new FollowUpNumbers.Question
+            {
+                Text = "Will you set a date to get your blood pressure checked?",
+                Error=SetADateError,
+                Value=SetADate,
+            })"
+                 BeReminded="@(new FollowUpNumbers.Question
+            {
+                Text = " Would you like to be reminded by email to get your blood pressure checked?",
+                Error=BeRemindedError,
+                Value=BeReminded,
+            })"
+                 EmailAddress="@(new FollowUpNumbers.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+                 AskForEmailAddress="@AskForEmailAddress"
+                 AllOptions="@Options"
+                 MeasurementName="blood pressure"
+                 ReturnPage="BloodPressure"
+                 AntiForgery="@AntiForgery"
+                 SelectedOptionError="@SelectedOptionError"
+                 SelectedOption="@SelectedOption"
+                 ShowSkipFollowUps="@ShowSkipFollowUps"
+                 IsFinalFollowUp="@IsFinalFollowUp"
+                 NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+                 AllBarriers="@AllBarriers"
+                 BarriersError="@BarriersError"
+                 OtherBarrier="@OtherBarrier"
+                 SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+                 Id="@Id"
+                 BaseUrl="@BaseUrl" ErrorList="@ErrorList"
+                 BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from getting your blood pressure measured. These personalised resources will appear on the Follow-up – Actions page.">
+    <ChildContent>
+        <p class="govuk-body">You don't know your blood pressure. Please have it checked. It is important that you have your blood pressure checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.</p>
+
+        <GDSDetails SummaryText="Benefits of getting your blood pressure checked">
+            <ul class="govuk-list--bullet govuk-list">
+                <li>Around a third of adults in the UK have high blood pressure, although many will not realise it</li>
+                <li>High blood pressure can increase your risk of heart attacks and strokes</li>
+                <li>The only way to find out if your blood pressure is high is to have your blood pressure checked</li>
+                <li>Getting an up-to-date blood pressure check will increase the accuracy of your NHS Health Check</li>
+                <li>The good news is that a healthy lifestyle can help to manage your blood pressure. Some people may also need medication.</li>
+            </ul>
+
+            <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/conditions/high-blood-pressure-hypertension/prevention/" title="Find out more about managing your blood pressure">find out more about managing your blood pressure (opens in a new tab)</a> on the NHS website.</p>
+        </GDSDetails>
+    </ChildContent>
+
+    <PreOptionsContent>
+        <h2 class="govuk-heading-m">How to get your blood pressure checked</h2>
+        <p class="govuk-body">Getting your blood pressure checked is easy and takes about five minutes. Select from the list below on how you'd like to have it done.</p>
+
+        <GDSDetails SummaryText="The options for a free blood pressure measurement">
+            <p class="govuk-body">Health kiosk:</p>
+            <p class="govuk-body">You can go to a community venue, such as a leisure centre, where you can use a self-service health kiosk machine to take your own blood pressure measurement. You don’t need to book an appointment.</p>
+            <p class="govuk-body">A health kiosk is a machine that can help you to check your health status, giving you accurate results for key measurements such as your height, weight or blood pressure. Located in community venues, you can access the kiosk at a time convenient to you. The machine gives you clear instructions on what to do and then confidentially gives you your results by email.</p>
+            <p class="govuk-body">Clicking the health kiosk option below will share the possible locations.</p>
+            <p class="govuk-body">Local leisure centre:</p>
+            <p class="govuk-body">You can book an appointment to get your blood pressure, cholesterol and blood sugar level checked at five of Southwark Council’s leisure centres. This is a free service, available Monday to Friday. You will need to book an appointment via the website, which we have listed in the ‘Local leisure centre’ option below.</p>
+            <p class="govuk-body">Pharmacy:</p>
+            <p class="govuk-body">You can get your blood pressure, cholesterol levels, blood sugar level, height and weight checked at Bonamy Pharmacy. Clicking the pharmacy option below will share the possible location.</p>
+            <p class="govuk-body">You will need to book an appointment by phone, so please call in advance.</p>
+            <p class="govuk-body">At home:</p>
+            <p class="govuk-body">If you have the equipment, you can take your own blood pressure measurement at home.</p>
+            <p class="govuk-body">You can buy your own blood pressure monitor from a chemist. Visit the British Heart Foundation website to <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.bhf.org.uk/informationsupport/heart-matters-magazine/medical/tests/blood-pressure-measuring-at-home#Heading2" title="Find out more about choosing your home blood pressure monitor">find out more about choosing your home blood pressure monitor (opens in a new tab)</a>.</p>
+            <p class="govuk-body">If you are taking your own blood pressure reading, please take it three times. You may find that your reading will change a little. We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third reading, by adding the numbers together and then dividing by two.</p>
+            <p class="govuk-body">GP clinic:</p>
+            <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood pressure measured.</p>
+        </GDSDetails>
+
+        <p class="govuk-body">You can complete this measurement after finishing the full NHS Health Check. We can send you the details for your preferred option via email. If you go to complete this measurement now, please then return to continue with the NHS Health Check follow-up support.</p>
+
+    </PreOptionsContent>
+</FollowUpNumbers>
+
+@code
+{
+
+    public IList<FollowUpNumbers.Option> Options => new[]
+        {
+    new FollowUpNumbers.Option
+        {
+            Text="Health kiosk",
+            Value="kiosk",
+            Content=@<div>
+        <p class="govuk-body"> There is currently a kiosk at The Castle Centre. <a rel="noreferrer noopener" target="_blank" class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre" title="Find out details about The Castle Leisure Centre on their website">Find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+        <p class="govuk-body"> You don’t need to book an appointment. </p>
+        <p class="govuk-body"> We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two. </p>
+    </div>
+        },
+        new FollowUpNumbers.Option
+        {
+            Text="Local leisure centre",
+            Value="leisurecentre",
+            Content=@<div>
+        <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+    </div>
+        },
+        new FollowUpNumbers.Option
+    {
+        Text="Pharmacy",
+        Value="pharmacy",
+        Content=@<div>
+        <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+        <p class="govuk-body">We will also email you the address and phone number for this location. </p>
+        <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+        <p class="govuk-body">Locations and contact information:</p>
+        <p class="govuk-body">Bonamy Pharmacy<br/>
+            355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+            0207 740 2523<br/>
+            pharmacy.fv733@nhs.net<br/>
+            http://bonamypharmacy.co.uk/<br/>
+            <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+        </p>
+</div>
+    },
+
+        new FollowUpNumbers.Option
+    {
+        Text="At home",
+        Value="home",
+        Content=@<p class="govuk-body">
+        If you are taking your own blood pressure reading, please take it three times. You may find that your reading will change a little. We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two.
+    </p>
+    },
+
+    new FollowUpNumbers.Option
+    {
+        Text="GP clinic",
+        Value="gp",
+        Content=@<div>
+        <p class="govuk-body">
+            You will need to book an appointment to get your blood pressure measured. If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/service-search/find-a-gp" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.
+        </p>
+        <p class="govuk-body">
+            We will also email you the link to this tool.
+        </p>
+    </div>
+    }
+    }.ToList();
+}

@@ -1,0 +1,37 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Alcohol</h1>
+
+    <p class="govuk-body">Your drinking status is used to calculate the risks associated with your heart health.</p>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <YesNoRadios Name="drinkAlcohol"
+                 Error="@Error"
+                 IdPrefix="drink-alcohol"
+                 Hint="If you answer yes to this general question you will be offered more specific options."
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                            Text = "Do you drink any alcohol?",
+                            Classes="govuk-fieldset__legend--l",
+                            IsPageHeading=true
+                        })"
+                 Value="@DrinksAlcohol" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string DrinksAlcohol { get; set; }
+
+}

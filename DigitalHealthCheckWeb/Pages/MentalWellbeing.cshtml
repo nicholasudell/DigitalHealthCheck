@@ -1,0 +1,24 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.MentalWellbeingModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Mental wellbeing";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.MentalWellbeingPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-underCare="@Model.Model.UnderCare"
+           param-underCareError="@Model.UnderCareError"
+           param-disinterested="@Model.Model.Disinterested"
+           param-disinterestedError="@Model.DisinterestedError"
+           param-feelingDown="@Model.Model.FeelingDown"
+           param-feelingDownError="@Model.FeelingDownError"
+           param-anxious="@Model.Model.Anxious"
+           param-anxiousError="@Model.AnxiousError"
+           param-control="@Model.Model.Control"
+           param-controlError="@Model.ControlError" />

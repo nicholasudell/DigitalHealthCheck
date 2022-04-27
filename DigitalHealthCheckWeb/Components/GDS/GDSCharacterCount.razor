@@ -1,0 +1,67 @@
+﻿<div class="govuk-character-count" data-module="govuk-character-count"
+     data-maxlength="@MaxLength"
+     data-threshold="@Threshold"
+     data-maxwords="@MaxWords">
+    <GDSTextArea Id="@Id"
+                 Name="@TextArea.Name"
+                 DescribedBy="@($"{Id}-info")"
+                 Rows="@TextArea.Rows"
+                 Spellcheck="@TextArea.Spellcheck"
+                 Value="@TextArea.Value"
+                 FormGroup="@TextArea.FormGroup"
+                 Classes="@($"govuk-js-character-count {TextArea.Classes}")"
+                 Hint="@TextArea.Hint"
+                 ErrorMessage="@TextArea.ErrorMessage"
+                 Label="@TextArea.Label"
+                 @attributes="@InputAttributes" />
+
+    <GDSHint Id="@($"{Id}-info")"
+             Text="@HintText"
+             Classes="@($"govuk-character-count__message {CountMessageClasses}")"
+             aria-live="polite" />
+</div>
+
+@code {
+
+    public class Options // For other components
+    {
+        public int? MaxWords { get; set; }
+
+        public int? Threshold { get; set; }
+
+        public int? MaxLength { get; set; }
+
+        public string CountMessageClasses { get; set; }
+
+        public GDSTextArea.Options TextArea { get; set; }
+        public string Id { get; set; }
+        public GDSHint.Options Hint { get; set; }
+    }
+
+    [Parameter]
+    public string CountMessageClasses { get; set; }
+
+    [Parameter]
+    public int? MaxWords { get; set; }
+
+    [Parameter]
+    public int? Threshold { get; set; }
+
+    [Parameter]
+    public int? MaxLength { get; set; }
+
+    string HintText => $"You can enter up to {(MaxLength ?? MaxWords)} {(MaxWords is not null ? "words" : "characters")}";
+
+    [Parameter]
+    public GDSTextArea.Options TextArea { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public GDSHint.Options Hint { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+}

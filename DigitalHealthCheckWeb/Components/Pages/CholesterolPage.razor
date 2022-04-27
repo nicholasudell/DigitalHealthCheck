@@ -1,0 +1,106 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Cholesterol</h1>
+
+    <GDSDetails SummaryText="What is cholesterol and why does it matter?">
+
+        <p class="govuk-body">Cholesterol is a fatty substance found in your blood. It’s created naturally by your liver, but can also be found in certain foods. Your body needs a certain amount of cholesterol to work properly, but too much can be dangerous.</p>
+        <p class="govuk-body">High cholesterol is when you have too much cholesterol in your blood. This can increase your risk of heart and circulatory diseases such as heart attack and stroke.</p>
+        <p class="govuk-body">High-density lipoproteins or HDL is called ‘good’ cholesterol. This is because it gets rid of the ‘bad’ cholesterol from your blood. It takes cholesterol that you don’t need back to the liver. The liver breaks it down so it can be passed out of your body.</p>
+        <p class="govuk-body">Non-high-density lipoproteins or non-HDL is called 'bad' cholesterol. This is because when there is too much of it, it can build up inside the walls of the blood vessels. This clogs them up causing the narrowing of the arteries, which increases your risk of having a heart attack or stroke.</p>
+        <p class="govuk-body">You can <a class="govuk-link" title="Find out more about cholesterol" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/conditions/high-cholesterol/">find out more about cholesterol (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="How is cholesterol measured?">
+
+        <p class="govuk-body">Cholesterol levels are measured with a blood test. For this assessment you need to enter your total cholesterol and your HDL (high-density lipoproteins) cholesterol. Cholesterol is usually measured in millimoles per litre (mmol/L) of blood.</p>
+    </GDSDetails>
+
+    <GDSRadios Name="KnowYourCholesterol"
+               Items="KnowYourCholesterolItems"
+               ErrorMessage="KnowYourCholesterolError.AsErrorMessageComponent()"
+               IdPrefix="know-your-cholesterol"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you had your cholesterol measured within the last year?",
+                            Classes="govuk-fieldset__legend--m",
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string HdlCholesterolMmoll { get; set; }
+
+    [Parameter]
+    public string HdlCholesterolMmollError { get; set; }
+
+    [Parameter]
+    public string TotalCholesterolMmoll { get; set; }
+
+    [Parameter]
+    public string TotalCholesterolMmollError { get; set; }
+
+    [Parameter]
+    public string KnowYourCholesterolError { get; set; }
+
+    [Parameter]
+    public string KnowYourCholesterol { get; set; }
+
+    private RenderFragment VisuallyHiddenLabelContent(string visible, string hidden) =>@<span>@visible <span class="govuk-visually-hidden">@hidden</span></span>;
+
+    RenderFragment CholesterolInner =>
+    @<GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text = "What are your cholesterol levels in millimoles per litre?" })">
+        <GDSInput Classes="govuk-!-width-one-third"
+                  Name="TotalCholesterolMmoll"
+                  Id="total-cholesterol"
+                  Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Total cholesterol","in millimoles per litre") })"
+                  Value="@TotalCholesterolMmoll"
+                  Suffix="@(new GDSInput.AffixOptions { Text = "mmol/L" })"
+                  ErrorMessage="@TotalCholesterolMmollError.AsErrorMessageComponent()" />
+        <GDSInput Classes="govuk-!-width-one-third"
+                  Name="HdlCholesterolMmoll"
+                  Id="hdl-cholesterol"
+                  Label="@(new GDSLabel.Options { Content =  VisuallyHiddenLabelContent("HDL cholesterol","in millimoles per litre") })"
+                  Value="@HdlCholesterolMmoll"
+                  Suffix="@(new GDSInput.AffixOptions { Text = "mmol/L" })"
+                  ErrorMessage="@HdlCholesterolMmollError.AsErrorMessageComponent()" />
+    </GDSFieldSet>;
+
+protected IList<GDSRadios.Item> KnowYourCholesterolItems => new[]{
+        new GDSRadios.Item
+        {
+            Text= "Yes, and I can remember the number",
+            Value="yes",
+            Checked = KnowYourCholesterol == "yes",
+            ConditionalContent = CholesterolInner
+        },
+         new GDSRadios.Item
+        {
+            Text= "Yes, but I cannot remember the number",
+            Value="forgot",
+            Checked = KnowYourCholesterol == "forgot",
+            ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information.</p>
+        },
+        new GDSRadios.Item
+        {
+            Text= "No, or I cannot remember the number",
+            Value="no",
+            Checked = KnowYourCholesterol == "no",
+            ConditionalContent = @<p class="govuk-body"> We will direct you to a way of getting this information. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you.</p>
+        }
+    }.ToList();
+
+}

@@ -1,0 +1,811 @@
+﻿@using DigitalHealthCheckCommon
+@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Model;
+@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<h1 class="govuk-heading-l">Your results</h1>
+
+<GDSPanel TitleText="@($"Thank you {Check.FirstName} for completing the first part of your NHS Health Check.")" HeadingLevel="2">
+    Please find below your personalised results. Take a look at the follow-up pages, which are based on your results and health priorities.
+</GDSPanel>
+
+<h2 class="govuk-heading-m">Overview</h2>
+
+@if (Check.GenderAffirmation == true)
+{
+    <p class="govuk-body">Your risk of developing heart and circulatory disease, and Type 2 diabetes has been @(Variant? "recalculated" : "calculated") using your answers in the assessment and @(CurrentGender? "your current gender identity" : "your sex assigned at birth").</p>
+
+    @if (Variant)
+    {
+        <p class="govuk-body">We will email you this set of results, in addition to the previous results calculated based on @(CurrentGender ? "your sex assigned at birth" : "your current gender identity").</p>
+         <p class="govuk-body">You can discuss how to interpret both sets of your results in relation to your individual situation and context with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society.</p>
+    }
+    else
+    {
+        <p class="govuk-body">We recognise that you @(PrefersNotToDiscloseIdentity? "would prefer not to say your gender identity" : ($"are {RichIdentity}")). You can also view your results for @(CurrentGender ? "your sex assigned at birth" : "your current gender identity") by clicking the button at the bottom of this page.</p>
+        <p class="govuk-body">You can discuss how to interpret your results in relation to your individual situation and context with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society.</p>
+    }
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+    <p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+
+}
+
+<h3 class="govuk-heading-s">In a crowd of 100 people with the same risk factors as you, @(Percentage(HeartDiseaseRisk)) are likely to have a heart attack or stroke within the next 10 years.</h3>
+
+<p class="govuk-body">In other words, you have @(AOrAn((int)HeartDiseaseRisk)) @(Percentage(HeartDiseaseRisk))% chance of having a heart attack or stroke within the next 10 years.</p>
+
+@switch (Result.HeartDisease)
+{
+    case DefaultStatus.Healthy:
+
+        switch (BehaviourStatus)
+        {
+            case TrafficLight.Status.Green:
+                <p class="govuk-body">You are living a healthy lifestyle and have a low risk of developing heart and circulatory diseases in the next 10 years. Keep up the good work and consider health services that might help you continue on this healthy path. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+
+            case TrafficLight.Status.Amber:
+                <p class="govuk-body">You have a low risk of developing heart and circulatory disease in the next 10 years. However, your current lifestyle choices put you at medium risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+
+            case TrafficLight.Status.Red:
+                <p class="govuk-body">You have a low risk of developing heart disease in the next 10 years. Your risk is low due to your age, as the risk of getting heart and circulatory disease increases significantly as you get older. Your current lifestyle choices put  you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+        }
+        break;
+
+    case DefaultStatus.Warning:
+
+        switch (BehaviourStatus)
+        {
+            case TrafficLight.Status.Green:
+                <p class="govuk-body">You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. This is largely due to factors such as your age, family history and medical conditions that you might have. You are doing everything you can and are at a much lower risk because of your healthy behaviours. Keep up the good work. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+
+            case TrafficLight.Status.Amber:
+                <p class="govuk-body">You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+
+            case TrafficLight.Status.Red:
+                <p class="govuk-body">You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. Your risk of getting heart and circulatory disease will increase as you get older. Your current lifestyle choices put you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+        }
+        break;
+
+    case DefaultStatus.Danger:
+
+        switch (BehaviourStatus)
+        {
+            case TrafficLight.Status.Green:
+                <p class="govuk-body">You have a high risk of developing heart disease in the next 10 years. This is largely due to factors such as your age, family history and medical conditions. You are doing everything you can and are at much lower risk because of your healthy behaviours. Keep up the good work and please contact your GP clinic for a non-urgent discussion of your results and to access additional support.</p>
+                break;
+
+            case TrafficLight.Status.Amber:
+            case TrafficLight.Status.Red:
+                <p class="govuk-body">You have a high risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support. Your current lifestyle choices put you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                break;
+        }
+        break;
+}
+
+@{var missing = new List<string>();
+
+    if (Result.BloodSugar is null && (
+        Result.BodyMassIndex == BodyMassIndexStatus.Obese ||
+        Result.BloodPressure == BloodPressureStatus.High ||
+        Result.BloodPressure == BloodPressureStatus.Severe ||
+        Result.Diabetes == DefaultStatus.Danger
+        ))
+    {
+        missing.Add("HbA1c");
+    }
+    if (Result.BloodPressure is null)
+    {
+        missing.Add("blood pressure");
+    }
+    if (Result.Cholesterol is null)
+    {
+        missing.Add("cholesterol");
+    }
+
+    var missingText = "";
+
+    if (missing.Any())
+    {
+
+        if (missing.Count == 1)
+        {
+            missingText = missing.Single();
+        }
+        else if (missing.Count == 2)
+        {
+            missingText = $"{missing.First()} and {missing.Last()}";
+        }
+        else
+        {
+            missingText = $"{missing.First()}, {missing[1]}, and {missing.Last()}";
+        }
+    }
+}
+
+@if (missing.Any())
+{
+    <p class="govuk-body">This score was calculated using estimated data where you were unable to provide your @missingText levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+}
+
+<GDSDetails SummaryText="How is your risk of developing heart disease calculated?">
+
+    <p class="govuk-body">
+        The QRISK®3 algorithm calculates a person's risk of developing a heart attack or stroke over the next 10 years. The tool also calculates a person's risk of developing a heart attack or stroke over the course of their lifetime.
+    </p>
+
+    <p class="govuk-body">The calculation combines information about your body (for example, age, height, weight, ethnicity), your existing health conditions (such as diabetes) and lifestyle behaviours (for example, physical activity, smoking, alcohol) in order to give you an estimation of your risk. The calculation is based on a database of people with the same demographic and lifestyle risk factors as those you have entered.</p>
+
+    <p class="govuk-body">The QRISK®3 algorithm has been developed by doctors and academics working in the UK National Health Service and is based on routinely collected, anonymised data from many thousands of patients registered with GP surgeries across the country who have freely contributed data to the QResearch database for medical research.</p>
+</GDSDetails>
+
+<GDSDetails SummaryText="Why haven’t we asked for more details about what you eat?">
+
+    <p class="govuk-body">We recognise that diet is a leading risk factor for heart disease and diabetes. We thought about adding diet into this service. However, a risk prediction algorithm that includes diet has not been created and validated for the English population. Instead, we use the validated QRISK3 algorithm that is recommended by NICE. This algorithm also includes information about blood pressure, body weight and cholesterol, which are all factors that explain the link between poor diet and subsequent disease. We hope that by including these factors, we partly capture the health differences between people with high and poor-quality diets. You can <a class="govuk-link" href="https://www.nhs.uk/live-well/eat-well/the-eatwell-guide/" rel="noreferrer noopener" target="_blank" title="learn more about healthy eating on the Eat Well website">learn more about healthy eating on the Eat Well website (opens in a new tab)</a>.</p>
+</GDSDetails>
+
+<GDSDetails SummaryText="What lifestyle behaviours affect your risk of getting cancer?">
+
+    <p class="govuk-body">Your lifestyle behaviours can affect your risk of developing some cancers.</p>
+
+    <p class="govuk-body">You can <a class="govuk-link" href="https://www.cancerresearchuk.org/about-cancer/causes-of-cancer/can-cancer-be-prevented-0" rel="noreferrer noopener" target="_blank" title="learn more about how to reduce your risk of developing cancer (opens in a new tab)">learn more about how to reduce your risk of developing cancer (opens in a new tab)</a> on the Cancer Research UK website.</p>
+</GDSDetails>
+
+<h3 class="govuk-heading-m">Your heart is comparable to the heart of a @HeartAge year old</h3>
+
+<p class="govuk-body">You are @Age years old and your risk of getting heart disease is similar to that of a @HeartAge year old.</p>
+
+@switch (Result.HeartAge)
+{
+    case DefaultStatus.Healthy:
+        <p class="govuk-body">
+            Your heart age is close to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be lower for you than other people your age who have a less healthy lifestyle. You will also have a lower risk of developing some cancers and dementia. Keep up the good work.
+        </p>
+        break;
+    case DefaultStatus.Warning:
+        <p class="govuk-body">
+            Your heart age is high in comparison to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be higher for you than other people your age who have a healthier lifestyle. You will also have a higher risk of developing some cancers and dementia. You can reduce your risk by improving your lifestyle. In the follow-up section, we will direct you to the relevant information and services.
+        </p>
+
+        <p class="govuk-body">
+            If you lower your risk factors by making improvements to your lifestyle, your heart could feel @(HeartAge - Age) years younger.
+        </p>
+        break;
+    case DefaultStatus.Danger:
+        <p class="govuk-body">
+            Your heart age is very high in comparison to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be significantly higher for you than other people your age who have a healthier lifestyle. You will also have a higher risk of developing some cancers and dementia. You can reduce your risk by improving your lifestyle. In the follow-up section, we will direct you to the relevant information and services.
+        </p>
+
+        <p class="govuk-body">
+            If you lower your risk factors by making improvements to your lifestyle, your heart could feel @(HeartAge - Age) years younger.
+        </p>
+        break;
+}
+
+@if (missing.Any())
+{
+    <p class="govuk-body">This score was calculated using estimated data where you were unable to provide your @missingText levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+}
+
+<GDSDetails SummaryText="How is heart age calculated?">
+
+    <p class="govuk-body">
+        The QRISK®3 algorithm calculates a person's risk of developing a heart attack or stroke over the next 10 years. The tool also calculates a person's risk of developing a heart attack or stroke over the course of their lifetime. Lifetime risk is explained using a person’s ‘heart age’.
+    </p>
+
+    <p class="govuk-body">
+        The calculation combines information about your body (for example, age, height, weight, ethnicity), your existing health conditions (such as diabetes) and lifestyle behaviours (for example, physical activity levels, smoking status, alcohol consumption) in order to give you an estimation of your risk. The calculation is based on a database of people with the same demographic and lifestyle behaviour risk factors as those you have entered.
+    </p>
+
+    <p class="govuk-body">
+        The QRISK®3 algorithm has been developed by doctors and academics working in the UK National Health Service and is based on routinely collected, anonymised data from many thousands of patients registered with GP surgeries across the country who have freely contributed data to the QResearch database for medical research.
+    </p>
+</GDSDetails>
+
+@switch (Result.Diabetes)
+{
+    case DefaultStatus.Healthy:
+        <h3 class="govuk-heading-m">You are at low risk of developing Type 2 diabetes</h3>
+        <p class="govuk-body">In a crowd of 100 people with the same risk factors as you, @(Percentage(DiabetesRisk)) are likely to develop Type 2 diabetes within the next 10 years. </p>
+        <p class="govuk-body">In other words, you have @(AOrAn((int)DiabetesRisk)) @(Percentage(DiabetesRisk))% chance of developing Type 2 diabetes within the next 10 years.</p>
+        <p class="govuk-body">Everyone has some level of risk for developing Type 2 diabetes. Some risk factors cannot be controlled, such as your age or ethnicity. Other risk factors, such as your weight and physical activity levels, can be changed, which is why maintaining a healthy lifestyle is important. </p>
+        break;
+
+    case DefaultStatus.Danger:
+        <h3 class="govuk-heading-m">You are at a high risk of developing Type 2 diabetes</h3>
+
+        <p class="govuk-body">
+            In a crowd of 100 people with the same risk factors as you, @(Percentage(DiabetesRisk)) are likely to develop Type 2 diabetes within the next 10 years.
+        </p>
+       <p class="govuk-body">In other words, you have @(AOrAn((int)DiabetesRisk)) @(Percentage(DiabetesRisk))% chance of developing Type 2 diabetes within the next 10 years.</p>
+        <p class="govuk-body">Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. This will include a blood test to check your blood sugar level. You may also be referred to the Diabetes Prevention Programme.</p>
+        break;
+}
+
+@if (Result.Diabetes == DefaultStatus.Danger && Check.BloodSugar is null)
+{
+    <p class="govuk-body">This score was calculated using estimated data where you were unable to provide your HbA1c levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+}
+
+<GDSDetails SummaryText="How is your risk of developing diabetes calculated?">
+
+    <p class="govuk-body">The QDiabetes® algorithm is used to calculate your risk of developing Type 2 diabetes over the next 10 years by answering some simple questions. It is suitable for people who do not already have a diagnosis of Type 2 diabetes.</p>
+
+    <p class="govuk-body">The calculation combines information about your body (for example, age, height, weight, ethnicity), your existing health conditions (such as angina) and your family history in order to give you an estimation of your risk. The calculation is based on a large database of people with the same demographic and lifestyle risk factors as those you have entered.</p>
+
+    <p class="govuk-body">The QDiabetes® algorithm has been developed by doctors and academics working in the UK National Health Service and is based on routinely collected, anonymised data from many thousands of patients registered with GP surgeries across the country who have freely contributed data for medical research.</p>
+</GDSDetails>
+@if(Check.SkipMentalHealthQuestions == false)
+{
+    @switch (Result.MentalWellbeing)
+    {
+        case DefaultStatus.Danger:
+            <h3 class="govuk-heading-m">Your results show that your mental wellbeing score is poor</h3>
+            <p class="govuk-body">Your results show that your mental wellbeing score is poor and that you might be struggling more than most people. Many people can relate to where you feel you are right now. If you believe you are experiencing a mental health crisis, you can talk to someone now by calling Southwark’s NHS mental health crisis line on 0800 731 2864 (select option 1). <a rel="noreferrer noopener" target="_blank" title="Find information about mental health crisis support services on the South London and Maudsley NHS mental health website" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/" class="govuk-link">Find information about mental health crisis support services (opens in a new tab)</a> on the South London and Maudsley NHS mental health website.</p>
+
+            @if (Check.UnderCare == true)
+            {
+                <p class="govuk-body">You reported that you are currently seeing a psychological therapist, counsellor or doctor for your mental wellbeing. Please continue to see the healthcare professional who is supporting your mental health; you may wish to discuss your results at your next appointment.</p>
+            }
+            else
+            {
+                <p class="govuk-body">If you are not experiencing a mental health crisis, please contact your GP clinic for a non-urgent discussion about your mental wellbeing.</p>
+            }
+            break;
+        case DefaultStatus.Warning:
+            <h3 class="govuk-heading-m">Your results show that your mental wellbeing score is OK, but can be improved.</h3>
+            @if (Check.UnderCare != true)
+            {
+                <p class="govuk-body">Your results show that your mental wellbeing score is OK, but can be improved. You can explore ways to improve your mental wellbeing in the follow-up section of the NHS Health Check, such as accessing Southwark’s free NHS talking therapies.</p>
+            }
+            else
+            {
+                <p class="govuk-body">You reported that you are currently seeing a psychological therapist, counsellor or doctor for your mental wellbeing. Please continue to see the healthcare professional who is supporting your mental health; you may wish to discuss your results at your next appointment.</p>
+            }
+            break;
+        default:
+            <h3 class="govuk-heading-m">Your initial results show that your mental wellbeing score is good</h3>
+            <p class="govuk-body">Your initial results show that your mental wellbeing score is good and that you don't seem to have significant problems with your mood or anxiety.</p>
+            <p class="govuk-body">You can still explore ways to improve your mental wellbeing in the follow-up section of the NHS Health Check, such as accessing Southwark’s free NHS talking therapies.</p>
+            break;
+    }
+}
+
+<h2 class="govuk-heading-m">Your results in detail</h2>
+
+<TrafficLight IdPrefix="results-in-detail" Items="@TrafficLightItems.ToList()" />
+
+<h2 class="govuk-heading-m">Select two health priorities to follow-up and take action</h2>
+
+<p class="govuk-body">You can reduce your risk of heart and circulatory disease, diabetes and even dementia and some cancers by making some positive changes to your lifestyle. You can also help to better manage these and other long-term conditions.</p>
+
+<p class="govuk-body">In the next step, we will provide you with follow-up support and advice that is tailored to your results, priorities and preferences. </p>
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSRadios Name="FirstHealthPriority"
+               Items="FirstHealthPriorities"
+               Classes="govuk-!-margin-bottom-6"
+               ErrorMessage="FirstHealthPrioritiesError.AsErrorMessageComponent()"
+               IdPrefix="first-priority"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Select one of the following as your first health priority.",
+                        Classes="govuk-fieldset__legend--s"
+                    }
+})" />
+
+    <GDSRadios Name="SecondHealthPriority"
+               Items="SecondHealthPriorities"
+               ErrorMessage="SecondHealthPrioritiesError.AsErrorMessageComponent()"
+               IdPrefix="second-priority"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Select one of the following as your second health priority.",
+                        Classes="govuk-fieldset__legend--s"
+                    }
+                })" />
+
+    <h2 class="govuk-heading-m">Follow-up on the results of your NHS Health Check</h2>
+
+    <p class="govuk-body">Please select which item you would like to follow up with first.</p>
+
+    @if (Check.GenderAffirmation == true)
+    {
+        @if (Variant)
+        {
+            @if (CurrentGender)
+            {
+                <p class="govuk-body">We recognise that you @(PrefersNotToDiscloseIdentity? "would prefer not to say your gender identity" : ($"are {RichIdentity}")). The results above reflect your current gender identity. We will also email you the initially calculated results that were based on your sex at birth. Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</p>
+            }
+            else
+            {
+                
+                <p class="govuk-body">We recognise that you @(PrefersNotToDiscloseIdentity? "would prefer not to say your gender identity" : ($"are {RichIdentity}")). The results above reflect your sex assigned at birth. We will also email you the initially calculated results that were based on your current gender identity. Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</p>
+            }
+
+            <GDSDetails SummaryText="Why would I want to look at both sets of results?">
+                <p class="govuk-body">There is limited research as to whether undergoing gender-affirmation treatments has an impact on your risk of developing heart and circulatory disease, or Type 2 diabetes.</p>
+                <p class="govuk-body">There is currently not enough research to give a precise risk based on the type and duration of your gender-affirmation treatment. The research available suggests that your risk will change from your sex assigned at birth and move towards your current new gender identity over time. You may wish to view results for both your sex assigned at birth and your current gender identity, because your individual results are likely to be between the two. This approximation will be close, because the difference in the two sets of risk results is about 5%.</p>
+                <p class="govuk-body">You have now seen both sets of results. You can choose how you would like to approach the follow-up support for improving your health. In any case, we recognise and respect your current gender identity. We also recognise that this can be a difficult question for some people.</p>
+                <p class="govuk-body">You may want to follow up with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society.</p>
+            
+                <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+        <p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+            </GDSDetails>
+
+            <p class="govuk-body">Now that you have seen both sets of results, you can choose how you would like to approach the follow-up support for improving your health.</p>
+            <h3 class="govuk-heading-s">View follow-up support based on your current gender identity</h3>
+
+            @if (ShowGPFollowUp)
+            {
+                <div class="govuk-button-group">
+                    <GDSButton PreventDoubleClick="true" Text="Follow-up – visit your GP clinic" Name="SubmitAction" Value="GPCurrentGender" />
+                    <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="PrioritiesCurrentGender" />
+                </div>
+            }
+            else
+            {
+                <GDSButton PreventDoubleClick="true" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="PrioritiesCurrentGender" />
+            }
+
+            <h3 class="govuk-heading-s">View follow-up support based on your sex assigned at birth</h3>
+
+            @if (ShowGPFollowUp)
+            {
+                <div class="govuk-button-group">
+                    <GDSButton PreventDoubleClick="true" Text="Follow-up – visit your GP clinic" Name="SubmitAction" Value="GPSexAtBirth" />
+                    <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="PrioritiesSexAtBirth" />
+                </div>
+            }
+            else
+            {
+                <GDSButton PreventDoubleClick="true" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="PrioritiesSexAtBirth" />
+            }
+        }
+        else
+        {
+            @if (CurrentGender)
+            {
+                
+                <p class="govuk-body">We recognise that you @(PrefersNotToDiscloseIdentity? "would prefer not to say your gender identity" : ($"are {RichIdentity}")). The results above reflect your current gender identity. You can also view your results for your sex assigned at birth. Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</p>
+
+                <p class="govuk-body">If you choose not to see the second set of results, the follow-up pages will be based on your current gender identity. If you choose to see the second set of results, you will be sent both results via email and you will have the choice of how to approach the follow-up pages.</p>
+            }
+            else
+            {
+                <p class="govuk-body">We recognise that you @(PrefersNotToDiscloseIdentity? "would prefer not to say your gender identity" : ($"are {RichIdentity}")). The results above reflect your sex assigned at birth. You can also view your results for your current gender identity. Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</p>
+
+                <p class="govuk-body">If you choose not to see the second set of results, the follow-up pages will be based on your sex assigned at birth. If you choose to see the second set of results, you will be sent both results via email and you will have the choice of how to approach the follow-up pages.</p>
+            }
+
+            <GDSDetails SummaryText="Why would I want to look at both sets of results?">
+                <p class="govuk-body">There is limited research as to whether undergoing gender-affirmation treatments has an impact on your risk of developing heart and circulatory disease, or Type 2 diabetes.</p>
+                <p class="govuk-body">There is currently not enough research to give a precise risk based on the type and duration of your gender-affirmation treatment. The research available suggests that your risk will change from your sex assigned at birth and move towards your current new gender identity over time. You may wish to view results for both your sex assigned at birth and your current gender identity, because your individual results are likely to be between the two. This approximation will be close, because the difference in the two sets of risk results is about 5%.</p>
+                <p class="govuk-body">You have the option to view both results. You can decide whether you would like to view the second set. In any case, we recognise and respect your current gender identity. We also recognise that this can be a difficult question for some people.</p>
+                <p class="govuk-body">You may want to follow up with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society.</p>
+            
+                <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+        <p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+            </GDSDetails>
+
+            <GDSButton PreventDoubleClick="true" Text="@($"Click here to recalculate your results for {(CurrentGender ? "your sex assigned at birth" : "your current gender identity")}")" Name="SubmitAction" Value="Recalculate" />
+
+            <p class="govuk-body">View follow-up support based on @(CurrentGender ? "your current gender identity" : "your sex assigned at birth").</p>   
+
+            @if (ShowGPFollowUp)
+            {
+                <div class="govuk-button-group">
+                    <GDSButton PreventDoubleClick="true" Text="Follow-up – visit your GP clinic" Name="SubmitAction" Value="GP" />
+                    <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="Priorities" />
+                </div>
+            }
+            else
+            {
+                <GDSButton PreventDoubleClick="true" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="Priorities" />
+            }
+        }
+    }
+    else
+    {
+        @if (ShowGPFollowUp)
+        {
+            <div class="govuk-button-group">
+                <GDSButton PreventDoubleClick="true" Text="Follow-up – visit your GP clinic" Name="SubmitAction" Value="GP" />
+                <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="Priorities" />
+            </div>
+        }
+        else
+        {
+            <GDSButton PreventDoubleClick="true" Text="Follow-up – on your first health priority" Name="SubmitAction" Value="Priorities" />
+        }
+    }
+
+    
+</form>
+
+@code {
+    public bool CurrentGender => (Variant ?  Check.Variant.Sex : Check.SexForResults) != Check.SexAtBirth;
+
+    public bool PrefersNotToDiscloseIdentity => Check.Identity == "skip";
+
+    public string AOrAn(int number) => number switch
+    {
+        8 => "an",
+        11 => "an",
+        18 => "an",
+        var x when (x >= 80 && x <= 89) => "an",
+        _ => "a"
+    };
+
+    public string RichIdentity => Check.Identity switch
+    {
+        "transman" => "a trans man",
+        "transwoman" => "a trans woman",
+        "nonbinary" => "nonbinary",
+        "intersex" => "intersex",
+        "custom" => Check.CustomIdentity,
+        _ => ""
+    };
+
+    private bool ShowGPFollowUp => Result.BloodPressure == BloodPressureStatus.Severe ||
+        Result.BloodSugar == BloodSugarStatus.Severe ||
+        Result.BodyMassIndex == BodyMassIndexStatus.SeverelyUnderweight ||
+        Result.HeartDisease == DefaultStatus.Warning ||
+        Result.HeartDisease == DefaultStatus.Danger ||//High risk for GP follow up for CVD is 10%+ which is Amber
+        Result.Diabetes == DefaultStatus.Danger;
+
+    private const string UnknownStatusText = "Unknown";
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    [Parameter]
+    public bool Variant { get; set; }
+
+    [Parameter]
+    public string FirstHealthPrioritiesError { get; set; }
+
+    [Parameter]
+    public string SecondHealthPrioritiesError { get; set; }
+
+    [Parameter]
+    public string FirstHealthPriority { get; set; }
+
+    [Parameter]
+    public string SecondHealthPriority { get; set; }
+
+    private struct Priority
+    {
+        public string Value { get; private set; }
+
+        public string Text { get; private set; }
+
+        public Priority(string value, string text)
+        {
+            this.Value = value;
+            this.Text = text;
+        }
+    }
+
+    protected DefaultStatus OverallStatus => (DefaultStatus)(Math.Max(Math.Max((int)Result.HeartDisease, (int)Result.HeartAge), (int)Result.Diabetes));
+
+    protected bool HighRisk => OverallStatus == DefaultStatus.Danger;
+
+    protected TrafficLight.Status BehaviourStatus =>
+        (TrafficLight.Status)TrafficLightItems
+            .Where(x => x.StatusText != UnknownStatusText)
+            .Select(x => (int)x.Status)
+            .Max();
+
+    IEnumerable<Priority> GetPriorities()
+    {
+        if (Result.BloodPressure is null)
+        {
+            yield return new Priority("bloodpressure", "Learn what my blood pressure is, and what this means for me");
+        }
+        else
+        {
+            yield return new Priority("improvebloodpressure", "Improve my blood pressure");
+        }
+
+        if (Result.BloodSugar is null && (Result.BodyMassIndex > BodyMassIndexStatus.Overweight || Result.BloodPressure >= BloodPressureStatus.High || Result.Diabetes == DefaultStatus.Danger))
+        {
+            yield return new Priority("bloodsugar", "Learn what my blood sugar level is, and what that means for me");
+        }
+        else if(Result.BloodSugar is not null)
+        {
+            yield return new Priority("improvebloodsugar", "Improve my blood sugar level");
+        }
+
+        yield return new Priority("smoking", "Stop smoking");
+        yield return new Priority("alcohol", "Drink less alcohol");
+        yield return new Priority("weight", "Healthy weight");
+
+        if (Result.Cholesterol is null)
+        {
+            yield return new Priority("cholesterol", "Learn what my cholesterol levels are, and what this means for me");
+        }
+        else
+        {
+            yield return new Priority("improvecholesterol", "Improve my cholesterol levels");
+        }
+        yield return new Priority("move", "Move more");
+        yield return new Priority("mental", "Mental wellbeing");
+    }
+
+    protected IList<GDSRadios.Item> FirstHealthPriorities =>
+        GetPriorities().AsRadioComponents(x => x.Value, x => x.Text, FirstHealthPriority);
+
+    protected IList<GDSRadios.Item> SecondHealthPriorities =>
+        GetPriorities().AsRadioComponents(x => x.Value, x => x.Text, SecondHealthPriority);
+
+    [Parameter]
+    public Result Result { get; set; }
+
+
+    public double DiabetesRisk => Variant ? Check.Variant.QDiabetes.Value : Check.QDiabetes.Value;
+
+    public double HeartDiseaseRisk => Variant ? Check.Variant.QRisk.Value : Check.QRisk.Value;
+
+    public int HeartAge => Variant ? Check.Variant.HeartAge.Value : Check.HeartAge.Value;
+
+    public int Age => Check.Age.Value;
+
+    protected string Percentage(double val) => val.ToString("n0"); //QRISK and QDIABETES already come out as percentage, so we just trunkate
+
+    TrafficLight.Status Convert(DefaultStatus? status) =>
+            status switch
+            {
+                DefaultStatus.Danger => TrafficLight.Status.Red,
+                DefaultStatus.Warning => TrafficLight.Status.Amber,
+                DefaultStatus.Healthy => TrafficLight.Status.Green,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BloodSugarStatus? status) =>
+            status switch
+            {
+                BloodSugarStatus.Severe => TrafficLight.Status.Red,
+                BloodSugarStatus.Danger => TrafficLight.Status.Red,
+                BloodSugarStatus.Warning => TrafficLight.Status.Amber,
+                BloodSugarStatus.Healthy => TrafficLight.Status.Green,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BodyMassIndexStatus? status) =>
+        status switch
+        {
+            BodyMassIndexStatus.Obese => TrafficLight.Status.Red,
+            BodyMassIndexStatus.Underweight => TrafficLight.Status.Red,
+            BodyMassIndexStatus.Overweight => TrafficLight.Status.Amber,
+            BodyMassIndexStatus.Healthy => TrafficLight.Status.Green,
+            _ => TrafficLight.Status.Red
+        };
+
+    TrafficLight.Status Convert(PhysicalActivityStatus? status) =>
+            status switch
+            {
+                PhysicalActivityStatus.Active => TrafficLight.Status.Green,
+                PhysicalActivityStatus.MostlyActive => TrafficLight.Status.Amber,
+                PhysicalActivityStatus.MostlyInactive => TrafficLight.Status.Red,
+                PhysicalActivityStatus.Sedentary => TrafficLight.Status.Red,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BloodPressureStatus? status) =>
+    status switch
+    {
+        BloodPressureStatus.Severe => TrafficLight.Status.Red,
+        BloodPressureStatus.High => TrafficLight.Status.Red,
+        BloodPressureStatus.SlightlyHigh => TrafficLight.Status.Amber,
+        BloodPressureStatus.Healthy => TrafficLight.Status.Green,
+        BloodPressureStatus.Low => TrafficLight.Status.Amber,
+        _ => TrafficLight.Status.Red
+    };
+
+    private IList<string> trafficLightSortOrder = new List<string>()
+{
+        "Blood pressure",
+        "Cholesterol",
+        "Total cholesterol",
+        "HDL cholesterol",
+        "Cholesterol ratio",
+        "Smoking",
+        "Alcohol",
+        "Weight",
+        "Diabetes",
+        "Blood sugar",
+        "Physical activity",
+        "Risk factors"
+    };
+
+    protected IEnumerable<TrafficLight.Item> TrafficLightItems =>
+        TrafficLightItemsUnsorted
+            .OrderByDescending(x => x.Status)
+            .ThenBy(x => trafficLightSortOrder.IndexOf(x.HeadingText));
+
+    private IEnumerable<TrafficLight.Item> TrafficLightItemsUnsorted
+    {
+        get
+        {
+            yield return Result.Smoker switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Smoking", Convert(Result.Smoker), "Your results show that you don't smoke or have quit. Well done!"),
+                _ => new TrafficLight.Item("Smoking", Convert(Result.Smoker), "Your results show that you currently smoke. Please consider the stop smoking services we offer in the follow-up section.")
+            };
+
+            yield return Result.Alcohol switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that the amount of alcohol you drink is at a low-risk level. It’s important to keep your alcohol consumption as low as possible."),
+                DefaultStatus.Warning => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that your alcohol use may be harmful to your health. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                _ => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that you are drinking at a harmful level and may be dependent on alcohol. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.")
+            };
+
+            yield return Result.PhysicalActivity switch
+            {
+                PhysicalActivityStatus.Active => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are physically active. Well done!"),
+                var activity when (activity == PhysicalActivityStatus.MostlyActive && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), " Your results show that you are moderately active. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.MostlyActive && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately active. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Your walking is a great way to keep active. Keep it up."),
+                var activity when (activity == PhysicalActivityStatus.MostlyInactive && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately inactive. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.MostlyInactive && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately inactive. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Your walking is a great way to keep active. Keep it up."),
+                var activity when (activity == PhysicalActivityStatus.Sedentary && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are inactive. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.Sedentary && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are inactive. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Walking is a great way to stay active. Keep it up.")
+            };
+
+            yield return Result.BodyMassIndex switch
+            {
+                BodyMassIndexStatus.SeverelyUnderweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are severely underweight which means that you are undernourished. If you are not already receiving care for this please contact your GP clinic urgently. If you are not able to make urgent contact with your GP clinic, please ring 111."),
+                BodyMassIndexStatus.Underweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are underweight which means that you might be undernourished. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                BodyMassIndexStatus.Healthy => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are a healthy weight."),
+                BodyMassIndexStatus.Overweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are overweight. If you want to lose weight please consider the diet and physical activity services we offer in the follow-up section."),
+                _ => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are obese. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support.")
+            };
+
+            yield return Result.BloodPressure switch
+            {
+                BloodPressureStatus.Low => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that your blood pressure is a little low. Normally this is not a problem and can in fact reflect being very healthy. Sometimes, however, this can make people feel dizzy or unwell. If you feel unwell please contact your GP clinic."),
+                BloodPressureStatus.Healthy => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have the ideal blood pressure. Well done!"),
+                BloodPressureStatus.SlightlyHigh => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that your blood pressure is only just within the normal range. Improving your lifestyle, such as moving more, can help you to lower it."),
+                BloodPressureStatus.High => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have high blood pressure. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                BloodPressureStatus.Severe => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have very high blood pressure. Please contact your GP clinic urgently for a discussion of your results today. If you are not able to make urgent contact with your GP clinic today, please ring 111."),
+                _ => new TrafficLight.Item("Blood pressure", TrafficLight.Status.Red, "You don't know your blood pressure. Please have it checked. It is important that you have your blood pressure checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            yield return Result.Cholesterol switch
+            {
+                var cholesterol when (cholesterol == DefaultStatus.Healthy && Result.HeartDisease == DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Green, "Your results show that you have healthy cholesterol levels. "),
+                var cholesterol when (cholesterol == DefaultStatus.Healthy && Result.HeartDisease != DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that your cholesterol is in the normal range. However, because your overall risk of developing heart and circulatory disease is high, please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                var cholesterol when (cholesterol == DefaultStatus.Warning && Result.HeartDisease == DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Amber, "Your results show that your cholesterol is higher than it should be, however, at this stage, medicines are not normally needed to help bring it down. Please consider the healthy lifestyle services we offer in the follow-up section, particularly moving more and healthy weight for dietary support."),
+                var cholesterol when (cholesterol == DefaultStatus.Warning && Result.HeartDisease != DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that both your cholesterol and the risk of developing heart and circulatory diseases are high. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                DefaultStatus.Danger => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that your cholesterol is high. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                _ => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "You don't know your cholesterol levels. Please have them checked. It is important that you have your cholesterol levels checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            yield return Result.Diabetes switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Diabetes", Convert(Result.Diabetes), "Your results show that you are at a low risk of developing diabetes."),
+                _ => new TrafficLight.Item("Diabetes", Convert(Result.Diabetes), "Your results show that you might be at risk of developing diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.")
+            };
+
+            yield return Result.BloodSugar switch
+            {
+                BloodSugarStatus.Healthy => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that you have normal blood sugar levels. Well done!"),
+                BloodSugarStatus.Warning => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that you are at risk of developing diabetes.  Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                var bloodsugar when (bloodsugar == BloodSugarStatus.Danger && Result.Diabetes != DefaultStatus.Danger) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "Your results show that you might have diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                var bloodsugar when (bloodsugar == BloodSugarStatus.Danger && Result.Diabetes == DefaultStatus.Danger) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "Your results show that you are at high risk of developing diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                BloodSugarStatus.Severe => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that your blood sugar level is extremely high. If you are not already receiving support for this from a healthcare professional please contact your GP clinic urgently. If you are not able to make urgent contact with your GP clinic, please ring 111. If you do not do this you could be seriously endangering your health."),
+                var bloodsugar when (bloodsugar is null && (
+                    Result.BodyMassIndex >= BodyMassIndexStatus.Overweight ||
+                    Result.BloodPressure >= BloodPressureStatus.High ||
+                    Result.Diabetes == DefaultStatus.Danger)) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "You do not know your blood sugar level. Please have it checked. It is important that you have your blood sugar level checked as you may be at an increased risk of Type 2 diabetes. We will direct you to a way of getting this blood test done.")
+                    {
+                        StatusText = UnknownStatusText
+                    },
+                null => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Amber, "You do not know your blood sugar level.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            var riskFactors = new List<string>();
+
+            if (Check.FamilyHistoryCVD == true)
+            {
+                riskFactors.Add("angina or heart attack in a close family member under the age of 60");
+            }
+
+            if (Check.ChronicKidneyDisease == true)
+            {
+                riskFactors.Add("chronic kidney disease");
+            }
+
+            if (Check.AtrialFibrillation == true)
+            {
+                riskFactors.Add("atrial fibrillation");
+            }
+
+            if (Check.BloodPressureTreatment == true)
+            {
+                riskFactors.Add("you are on blood pressure treatment");
+            }
+
+            if (Check.Migraines == true)
+            {
+                riskFactors.Add("migraines");
+            }
+
+            if (Check.RheumatoidArthritis == true)
+            {
+                riskFactors.Add("rheumatoid arthritis");
+            }
+
+            if (Check.SystemicLupusErythematosus == YesNoSkip.Yes)
+            {
+                riskFactors.Add("systemic lupus erythematosus");
+            }
+
+            if (Check.SevereMentalIllness == YesNoSkip.Yes)
+            {
+                riskFactors.Add("severe mental illness");
+            }
+
+            if (Check.AtypicalAntipsychoticMedication == YesNoSkip.Yes)
+            {
+                riskFactors.Add("you are on atypical antipsychotic medication");
+            }
+
+            if (riskFactors.Any())
+            {
+                var hasModifiableBehaviours = (Result.BodyMassIndex != BodyMassIndexStatus.Healthy ||
+                    Result.Alcohol != DefaultStatus.Healthy ||
+                    Result.Smoker != DefaultStatus.Healthy ||
+                    Result.PhysicalActivity != PhysicalActivityStatus.Active ||
+                    (Result.BloodPressure is not null && Result.BloodPressure != BloodPressureStatus.Healthy) ||
+                    (Result.Cholesterol is not null && Result.Cholesterol != DefaultStatus.Healthy) ||
+                    (Result.BloodSugar is not null && Result.BloodSugar != BloodSugarStatus.Healthy));
+
+                var secondLine = hasModifiableBehaviours ?
+                    "While it is not possible to change these risk factors, you can reduce your risk by living a healthier lifestyle. Please consider the services we offer in the follow-up section." :
+                    "While it is not possible to change these risk factors, you can keep your risk as low as possible by maintaining your healthy lifestyle. Please consider the services we offer in the follow-up section.";
+
+                yield return new TrafficLight.Item("Risk factors", TrafficLight.Status.Red, $"Your results show that you have the following risk factors: {string.Join(", ", riskFactors)}. {secondLine}");
+            }
+        }
+    }
+
+    private bool ShouldShowExtraTextForUnknownBloodSugar =>
+        Result.BloodPressure == BloodPressureStatus.High ||
+        Result.BloodPressure == BloodPressureStatus.Severe ||
+        Result.BodyMassIndex == BodyMassIndexStatus.Obese ||
+        Result.Diabetes == DefaultStatus.Danger;
+}

@@ -1,0 +1,44 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.FollowUpCholesterolPageModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    ViewData["Title"] = "Follow-up – Cholesterol";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+@{
+    var baseUrl = urlBuilder.GetBaseUrl(HttpContext.Request);
+}
+
+<component type="typeof(Components.Pages.FollowUpCholesterolPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-baseUrl="@baseUrl"
+           param-id="@Model.Id"
+           param-importantToChange="@Model.Model.ImportantToChange"
+           param-importantToChangeError="@Model.ImportantToChangeError"
+           param-setADate="@Model.Model.SetADate"
+           param-setADateError="@Model.SetADateError"
+           param-beReminded="@Model.Model.BeReminded"
+           param-beRemindedError="@Model.BeRemindedError"
+           param-emailAddress="@Model.Model.EmailAddress"
+           param-emailAddressError="@Model.EmailAddressError"
+           param-askForEmailAddress="@Model.AskForEmailAddress"
+           param-doYouHavePlans="@Model.Model.DoYouHavePlans"
+           param-doYouHavePlansError="@Model.DoYouHavePlansError"
+           param-confidentToChange="@Model.Model.ConfidentToChange"
+           param-confidentToChangeError="@Model.ConfidentToChangeError"
+           param-selectedOptionError="@Model.SelectedOptionError"
+           param-selectedOption="@Model.Model.SelectedOption"
+           param-selectedBarriers="@Model.Model.Barriers"
+           param-otherBarrier="@Model.Model.OtherBarrier"
+           param-allBarriers="@Model.Barriers"
+           param-nextHealthPriorityNumber="@Model.NextHealthPriorityNumber"
+           param-nextHealthPriorityName="@Model.NextHealthPriorityName"
+           param-isFinalFollowUp="@Model.IsFinalFollowUp"
+           param-fingerPrickEmailAddressError="@Model.FingerPrickEmailAddressError"
+           param-fingerPrickEmailAddress="@Model.Model.FingerPrickEmailAddress"
+           param-showSkipFollowUps="@Model.ShowSkipFollowUps" />

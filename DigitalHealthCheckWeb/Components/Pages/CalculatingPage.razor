@@ -1,0 +1,18 @@
+﻿@inherits Page
+
+<h1 class="govuk-heading-l">Calculating your results</h1>
+<p class="govuk-body">We are now calculating your personalised results. This calculation will take a moment.</p>
+<p class="govuk-body">This page will automatically redirect you to your results when they are ready.</p>
+
+<p class="govuk-body">
+    If you do not get redirected, click the button below to check if your results are ready.
+</p>
+
+<GDSButton PreventDoubleClick="true" Text="Check if your results are ready" HRef="@Url" />
+
+@code {
+    [Parameter]
+    public bool Variant { get; set; }
+
+    protected string Url => $"{BuildQuery(IdQueryParam, "checkReady=true","variant="+Variant.ToString())}";
+}

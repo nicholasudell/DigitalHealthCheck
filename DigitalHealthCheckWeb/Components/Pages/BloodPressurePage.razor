@@ -1,0 +1,112 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Blood pressure</h1>
+
+    <GDSDetails SummaryText="What is blood pressure and why does it matter?">
+        <p class="govuk-body">Blood pressure is the pressure of blood in your arteries – the vessels that carry your blood from your heart to your brain and the rest of your body. You need a certain amount of pressure to get the blood moving around your body.</p>
+        <p class="govuk-body">High blood pressure is medically known as hypertension. It means that your blood pressure is consistently too high and your heart has to work harder to pump blood around your body. High blood pressure is serious. If you ignore it, it can lead to heart and circulatory diseases such as a  heart attack or stroke. It can also cause kidney failure, heart failure, problems with your sight and vascular dementia.</p>
+        <p class="govuk-body">You can <a class="govuk-link" title="Find out more about blood pressure" href="https://www.bhf.org.uk/informationsupport/risk-factors/high-blood-pressure" rel="noreferrer noopener" target="_blank">find out more about blood pressure (opens in a new tab)</a> on the British Heart Foundation website.</p>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="How is blood pressure measured?">
+        <p class="govuk-body">Your blood pressure is usually measured using a battery-operated electric monitor  which is connected to an inflatable cuff that is wrapped around your upper arm. You can buy your own blood pressure monitor from a chemist. Visit the British Heart Foundation website for <a class="govuk-link" title="Guidance on choosing your home blood pressure monitor" href="https://www.bhf.org.uk/informationsupport/heart-matters-magazine/medical/tests/blood-pressure-measuring-at-home" rel="noreferrer noopener" target="_blank">guidance on choosing your home blood pressure monitor (opens in a new tab)</a> </p>
+        <p class="govuk-body">When you have your blood pressure measured the reading is written as two numbers. The first is when the pressure is at its highest (or systolic pressure), the second is when it’s at its lowest (or diastolic pressure). For example, your reading will be something like: 140/90mmHg (mmHg is a unit for measuring blood pressure). You’ll be told something like ‘140 over 90’.</p>
+        <p class="govuk-body">Systolic pressure: This is the highest level of your blood pressure – when your heart beats and contracts to pump blood through your arteries.</p>
+        <p class="govuk-body">Diastolic pressure: This is the lowest level of your blood pressure – when your heart relaxes between beats.</p>
+        <p class="govuk-body">If you are measuring your blood pressure at a kiosk or at home, we recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two. </p>
+    </GDSDetails>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSRadios Name="KnowYourBloodPressure"
+               Items="KnowYourBloodPressureItems"
+               IdPrefix="know-your-blood-pressure"
+               ErrorMessage="KnowYourBloodPressureError.AsErrorMessageComponent()"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "Have you had your blood pressure measured within the last six months?",
+                            Classes="govuk-fieldset__legend--m",
+                            IsPageHeading=true
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string DiastolicBloodPressure { get; set; }
+
+    [Parameter]
+    public string DiastolicBloodPressureError { get; set; }
+
+    [Parameter]
+    public string SystolicBloodPressure { get; set; }
+
+    [Parameter]
+    public string SystolicBloodPressureError { get; set; }
+
+    [Parameter]
+    public string KnowYourBloodPressureError { get; set; }
+
+    [Parameter]
+    public string KnowYourBloodPressure { get; set; }
+
+    RenderFragment BloodPressureInner =>
+    @<GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text = "What is your blood pressure in mmHg? " })">
+        <GDSInput Classes="govuk-!-width-one-third"
+              Name="Systolic"
+              InputMode="numeric"
+              Id="systolic-blood-pressure"
+              Pattern="[0-9]*"
+              Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Upper level (this is known as systolic blood pressure)", "What is your systolic blood pressure in millimetres of mercury?") })"
+              Value="@SystolicBloodPressure"
+              Suffix="@(new GDSInput.AffixOptions { Text = "mmHg"})"
+              ErrorMessage="@SystolicBloodPressureError.AsErrorMessageComponent()" />
+        <GDSInput Classes="govuk-!-width-one-third"
+              Name="Diastolic"
+              Id="diastolic-blood-pressure"
+              InputMode="numeric"
+              Pattern="[0-9]*"
+              Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Lower level (this is known as diastolic blood pressure)", "What is your diastolic blood pressure in millimetres of mercury") })"
+              Value="@DiastolicBloodPressure"
+              Suffix="@(new GDSInput.AffixOptions { Text = "mmHg" })"
+              ErrorMessage="@DiastolicBloodPressureError.AsErrorMessageComponent()" />
+    </GDSFieldSet>;
+
+    private RenderFragment VisuallyHiddenLabelContent(string visible, string hidden) =>@<span>@visible <span class="govuk-visually-hidden">@hidden</span></span>;
+
+    protected IList<GDSRadios.Item>
+    KnowYourBloodPressureItems => new[]{
+        new GDSRadios.Item
+        {
+        Text= "Yes, and I can remember the number",
+        Value="yes",
+        Checked = KnowYourBloodPressure == "yes",
+        ConditionalContent = BloodPressureInner
+        },
+         new GDSRadios.Item
+        {
+            Text= "Yes, but I cannot remember the number",
+            Value="forgot",
+            Checked = KnowYourBloodPressure == "forgot",
+            ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information.</p>
+        },
+        new GDSRadios.Item
+        {
+        Text= "No, or I cannot remember the number",
+        Value="no",
+        Checked = KnowYourBloodPressure == "no",
+        ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you.</p>
+        }
+                                    }.ToList();
+
+}

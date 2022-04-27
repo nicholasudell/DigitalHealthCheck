@@ -1,0 +1,33 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.EthnicityModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Ethnicity";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+@{
+    if (@Model.ShowGroup)
+    {
+        <component type="typeof(Components.Pages.EthnicityPage)"
+                   render-mode="Static"
+                   param-antiForgery="@antiForgeryToken"
+                   param-errorList="@Model.ErrorList"
+                   param-ethnicity="@Model.Ethnicity"
+                   param-ethnicGroup="@Model.EthnicGroupValue"
+                   param-ethnicityError="@Model.EthnicityError" />
+    }
+    else
+    {
+        <component type="typeof(Components.Pages.EthnicityPageDetailed)"
+                   render-mode="Static"
+                   param-antiForgery="@antiForgeryToken"
+                   param-errorList="@Model.ErrorList"
+                   param-ethnicity="@Model.Ethnicity"
+                   param-ethnicGroup="@Model.EthnicGroupValue"
+                   param-ethnicities="@Model.EthnicGroup?.DetailedItems"
+                   param-legend="@Model.EthnicGroup?.Legend"
+                   param-ethnicityError="@Model.EthnicityError" />
+    }
+}

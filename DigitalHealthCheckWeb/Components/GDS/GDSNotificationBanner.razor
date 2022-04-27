@@ -1,0 +1,140 @@
+﻿<div class="govuk-notification-banner @TypeClass @Classes" role="@RoleAttribute"
+     aria-labelledby="@AriaLabelledBy"
+     data-module="govuk-notification-banner"
+     data-disable-auto-focus="@DisabledAutoFocusAttribute"
+     @attributes="@InputAttributes">
+    <div class="govuk-notification-banner__header">
+        @Header(TitleHeadingLevel ?? 2, TitleInner)
+    </div>
+    <div class="govuk-notification-banner__content">
+        @if (ChildContent is null)
+        {
+            if (!string.IsNullOrEmpty(Text))
+            {
+                <p class="govuk-notification-banner__heading">@Text</p>
+            }
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+</div>
+
+
+@code {
+    private string TypeClass => Type == "success" ? "govuk-notification-banner--success" : null;
+
+    private string AriaLabelledBy => TitleId ?? "govuk-notification-banner-title";
+
+    private string DisabledAutoFocusAttribute => DisableAutoFocus ? "true" : null;
+
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string TitleId { get; set; }
+
+    [Parameter]
+    public string Role { get; set; }
+
+    string RoleAttribute => string.IsNullOrEmpty(Role) ? (Type == "success" ? "alert" : "region") : Role;
+
+    [Parameter]
+    public bool DisableAutoFocus { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public int? TitleHeadingLevel { get; set; }
+
+    [Parameter]
+    public string TitleText { get; set; }
+
+    [Parameter]
+    public RenderFragment TitleContent { get; set; }
+
+    protected RenderFragment TitleInner
+    {
+        get
+        {
+            if (TitleContent is null)
+            {
+                if (Type == "success")
+                {
+                    return builder => builder.AddContent(0, "Success");
+                }
+
+                if (string.IsNullOrEmpty(TitleText))
+                {
+                    return builder => builder.AddContent(0, "Important");
+                }
+
+                return builder => builder.AddContent(0, TitleText);
+            }
+            else
+            {
+                return TitleContent;
+            }
+        }
+    }
+
+    public class Options // For other components
+    {
+
+        public string Classes { get; set; }
+
+        public int? TitleHeadingLevel { get; set; }
+
+        public string TitleText { get; set; }
+
+        public RenderFragment TitleContent { get; set; }
+
+        public IDictionary<string, object> Attributes { get; set; }
+
+        public string Type { get; set; }
+
+        public string Text { get; set; }
+
+        public string Role { get; set; }
+
+        public string TitleId { get; set; }
+
+        public bool DisableAutoFocus { get; set; }
+    }
+
+
+    string IdAttribute => TitleId ?? "govuk-notification-banner-title";
+
+    protected RenderFragment Header(int level, RenderFragment inner)
+    {
+        switch (level)
+        {
+            case 1:
+                return
+    @<h1 class="govuk-notification-banner__title">@inner</h1>;
+            case 3:
+                return @<h3 class="govuk-notification-banner__title" id="@IdAttribute">@inner</h3>;
+            case 4:
+                return @<h4 class="govuk-notification-banner__title" id="@IdAttribute">@inner</h4>;
+            case 5:
+                return @<h5 class="govuk-notification-banner__title" id="@IdAttribute">@inner</h5>;
+            case 6:
+                return @<h6 class="govuk-notification-banner__title" id="@IdAttribute">@inner</h6>;
+            default:
+            case 2:
+                return @<h2 class="govuk-notification-banner__title" id="@IdAttribute">@inner</h2>;
+        }
+    }
+
+}

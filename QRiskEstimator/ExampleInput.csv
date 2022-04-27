@@ -1,0 +1,2 @@
+UniqueLink,NHSNumber,Age,AtrialFibrillation,AtypicalAntipsychoticMedication,ErectileDysfunction,Steroids,Migraines,RheumatoidArthritis,ChronicKidneyDisease,SevereMentalIllness,SystemicLupusErythematosus,BloodPressureTreatment,BMI,SexAtBirth,Ethnicity,FamilyHistoryCVD,Type1Diabetes,Type2Diabetes,CholesterolRatio,SystolicBloodPressure,SmokingStatus,Postcode,QRISK
+foo,bar,35,N,N,N,N,N,Y,N,Y,N,N,28.3,F,WhiteBritish,N,Y,N,4.8,150,NonSmoker,BH12EF,0

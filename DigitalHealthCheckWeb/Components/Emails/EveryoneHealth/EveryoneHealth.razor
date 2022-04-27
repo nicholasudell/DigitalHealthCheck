@@ -1,0 +1,52 @@
+﻿@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Model;
+@using DigitalHealthCheckWeb.Helpers;
+@inject DigitalHealthCheckCommon.IEveryoneHealthReferralService everyoneHealthService;
+@inherits Pages.Page;
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+        <p>A patient using the Southwark Digital Health Check Service has been assessed as suitable for intervention by Everyone Health, and consented to share their contact details with you. The patient agreed to a referral for: </p>
+
+        @foreach(var referral in Referrals)
+        {
+            <p><strong>@referral</strong></p>
+        }
+
+        <p>Please contact them to offer follow up health advice.</p>
+
+        <p>Their details are:<br/>
+        Name: <strong>@Check.FirstName @Check.Surname</strong
+        @EmailAddress
+        @PhoneNumber
+        </p>
+
+        <p>Thank you,</p>
+        <p>Southwark Council</p>
+        
+    </div>
+</body>
+</html>
+
+@code {
+    RenderFragment EmailAddress => string.IsNullOrEmpty(Check.EmailAddress) ? 
+        null : 
+        (builder) => builder.AddMarkupContent(0, $"<br/>Contact email: <strong>{Check.EmailAddress}</strong>");
+
+    RenderFragment PhoneNumber => string.IsNullOrEmpty(Check.PhoneNumber) ? 
+        null : 
+        (builder) => builder.AddMarkupContent(0, $"<br/>Contact phone: <strong>{Check.PhoneNumber}</strong>");
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    protected IEnumerable<string> Referrals => 
+        everyoneHealthService.ReferralNames(EveryoneHealthReferralInterventions);
+
+    [Parameter]
+    public IEnumerable<DigitalHealthCheckEF.Intervention> EveryoneHealthReferralInterventions { get; set; }
+}

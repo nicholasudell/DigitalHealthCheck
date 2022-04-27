@@ -1,0 +1,179 @@
+﻿<div class="govuk-form-group @FormGroupErrorClass @FormGroup?.Classes">
+
+    @if (FieldSet is not null)
+    {
+        <GDSFieldSet Role="group" DescribedBy="@ActualDescribedBy" Classes="@FieldSet.Classes" @attributes="FieldSet.Attributes" Legend="@FieldSet.Legend">
+            @HintComponnent
+            @ErrorMessageComponent
+            @MainComponent
+        </GDSFieldSet>
+    }
+    else
+    {
+        @HintComponnent
+        @ErrorMessageComponent
+        @MainComponent
+    }
+</div>
+
+@code {
+
+    public class Options //For other components' use
+    {
+        public GDSFormGroup.Options FormGroup { get; set; }
+
+        public string NamePrefix { get; set; }
+
+        public string Name { get; set; }
+
+        public GDSFieldSet.Options FieldSet { get; set; }
+
+        public IList<Item> Items { get; set; }
+
+        public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+        public GDSHint.Options Hint { get; set; }
+
+        public string Id { get; set; }
+
+        public string Classes { get; set; }
+    }
+
+    public class Item
+    {
+        public string Label { get; set; }
+        public string Name { get; set; }
+        public string Id { get; set; }
+        public string Value { get; set; }
+        public string Autocomplete { get; set; }
+        public string Pattern { get; set; }
+        public string Classes { get; set; }
+        public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+        public string InputMode { get; set; }
+    }
+
+    [Parameter]
+    public GDSFormGroup.Options FormGroup { get; set; }
+
+    [Parameter]
+    public string NamePrefix { get; set; }
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public GDSFieldSet.Options FieldSet { get; set; }
+
+    protected string Capitalise(string text) => char.ToUpper(text.First()) + text.Substring(1);
+
+    protected string ActualDescribedBy
+    {
+        get
+        {
+            var descriptions = new[]
+            {
+                    FieldSet?.DescribedBy ?? string.Empty,
+                    UseHint() ? HintId : null,
+                    UseErrorMessage() ? ErrorMessageId : null
+                };
+
+            var validDescriptions = descriptions.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            if (!validDescriptions.Any())
+            {
+                return null;
+            }
+
+            return string.Join(' ', validDescriptions);
+        }
+    }
+
+    [Parameter]
+    public IList<Item> Items { get; set; }
+
+    IList<Item> DefaultItems => new[] {
+        new Item {
+            Name="day",
+            Classes = "govuk-input--width-2",
+        },
+        new Item {
+            Name="month",
+            Classes = "govuk-input--width-2",
+        },
+        new Item {
+            Name="year",
+            Classes = "govuk-input--width-4",
+        }
+    };
+
+    protected RenderFragment HintComponnent => !UseHint() ? null :
+    @<GDSHint Id="@HintId" Classes="@Hint.Classes" @attributes="Hint.Attributes">
+        @if (Hint.Content is null)
+        {
+            @Hint.Text }
+        else
+        {
+            @Hint.Content}
+    </GDSHint>;
+
+protected RenderFragment MainComponent =>
+@<div class="govuk-date-input @Classes"
+      @attributes="InputAttributes"
+      id="@Id">
+    @{ foreach (var item in ActualItems)
+        {
+            <div class="govuk-date-input__item">
+                <GDSInput Label="@(new GDSLabel.Options
+                                               {
+                                                   Text = Capitalise((item.Label ?? item.Name)),
+                                                   Classes = "govuk-date-input__label"
+                                               })"
+                          Id="@(item.Id ?? $"{Id}-{item.Name}")"
+                          Classes="@($"govuk-date-input__input {@item.Classes}")"
+                          Name="@(string.IsNullOrEmpty(NamePrefix) ? item.Name : $"{NamePrefix}-{item.Name}")"
+                          Value="@item.Value"
+                          Type="text"
+                          InputMode="@(string.IsNullOrEmpty(item.InputMode) ? "numeric" : item.InputMode)"
+                          Autocomplete="@item.Autocomplete"
+                          Pattern="@(string.IsNullOrEmpty(item.Pattern) ? "[0-9]*" : item.Pattern)"
+                          @attributes="item.Attributes" />
+            </div>
+        }
+    }
+</div>;
+
+[Parameter(CaptureUnmatchedValues = true)]
+public IDictionary<string, object> InputAttributes { get; set; }
+
+[Parameter]
+public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+[Parameter]
+public GDSHint.Options Hint { get; set; }
+
+[Parameter]
+public string Id { get; set; }
+
+protected string HintId => $"{Id}-hint";
+protected string ErrorMessageId => $"{Id}-error";
+
+[Parameter]
+public string Classes { get; set; }
+
+protected string FormGroupErrorClass => ErrorMessage is not null ? "govuk-form-group--error" : null;
+
+protected RenderFragment ErrorMessageComponent => !UseErrorMessage() ? null :
+@<GDSErrorMessage Id="@ErrorMessageId" Classes="@ErrorMessage.Classes" @attributes="ErrorMessage.Attributes">
+    @if (ErrorMessage.Content is null)
+    {
+        @ErrorMessage.Text }
+    else
+    {
+        @ErrorMessage.Content}
+</GDSErrorMessage>;
+
+protected IList<Item> ActualItems => ((Items?.Any()) ?? false) ? Items : DefaultItems;
+
+bool UseHint() => Hint is not null;
+bool UseErrorMessage() => ErrorMessage is not null;
+}

@@ -1,0 +1,20 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.RiskFactors3Model
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Risk factors page 3 of 3";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.RiskFactors3Page)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-systemicLupusErythematosus="@Model.Model.SystemicLupusErythematosus"
+           param-severeMentalIllness="@Model.Model.SevereMentalIllness"
+           param-atypicalAntipsychoticMedication="@Model.Model.AtypicalAntipsychoticMedication"
+           param-systemicLupusErythematosusError="@Model.SystemicLupusErythematosusError"
+           param-severeMentalIllnessError="@Model.SevereMentalIllnessError"
+           param-atypicalAntipsychoticMedicationError="@Model.AtypicalAntipsychoticMedicationError" />

@@ -1,0 +1,150 @@
+﻿@inherits Page
+<!-- Normally fine not to set the action here,
+    but when you change units, we refocus the units button
+    if you then get a validation error, it continues
+    to focus the units button by default.
+    This ensures that focus is removed on submit.-->
+<form method="post" novalidate action="@($"./HeightAndWeight{BuildQuery(new []{IdQueryParam, NextPageQueryParam, $"useImperial={UseImperial}"})}")">
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Height and weight</h1>
+
+    <p class="govuk-body">Your height and weight is used to calculate risks associated with your heart and circulatory health.</p>
+
+    @if (UseImperial)
+    {
+        <GDSButton PreventDoubleClick="true" id="change-units" Text="Change units to centimetres and kilograms" HRef="@($"./HeightAndWeight{BuildQuery(new []{IdQueryParam, NextPageQueryParam, "useImperial=False"})}#change-units")" />
+
+        <GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text="What is your height?", Classes = "govuk-fieldset__legend--m" })">
+            <GDSInput Id="height-feet"
+                      Classes="govuk-!-width-one-third"
+                      Label="@(new GDSLabel.Options {
+                                   For="height-feet" ,
+                                   Content=VisuallyHiddenLabelContent("What is your height in feet?")
+                        })"
+                      Name="ImperialFeet"
+                      InputMode="numeric"
+                      Pattern="[0-9]*"
+                      Value="@HeightImperialFeet"
+                      Suffix="@(new GDSInput.AffixOptions { Text="feet" })"
+                      ErrorMessage="@HeightErrorImperialFeet.AsErrorMessageComponent()"
+                      Hint="@(new GDSHint.Options
+                {
+                    Text="Please use whole numbers and no decimals. For example, 5 feet and 4 inches."
+                })">
+            </GDSInput>
+            <p class="govuk-body">and</p>
+            <GDSInput Id="height-inches"
+                      Classes="govuk-!-width-one-third"
+                      Label="@(new GDSLabel.Options {
+                                   For="height-inches" ,
+                                   Content=VisuallyHiddenLabelContent("What is your height in inches?")
+                        })"
+                      Name="ImperialInches"
+                      InputMode="numeric"
+                      Pattern="[0-9]*"
+                      Value="@HeightImperialInches"
+                      Suffix="@(new GDSInput.AffixOptions {  Text="inches" })"
+                      ErrorMessage="@HeightErrorImperialInches.AsErrorMessageComponent()" />
+        </GDSFieldSet>
+
+        <GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text="What is your weight?", Classes = "govuk-fieldset__legend--m" })">
+            <p class="govuk-body"></p>
+            <GDSInput Id="weight-stone"
+                      Classes="govuk-!-width-one-third"
+                      Label="@(new GDSLabel.Options {
+                                   For="weight-stone" ,
+                                   Content=VisuallyHiddenLabelContent("What is your weight in stone?")
+                        })"
+                      Name="ImperialStone"
+                      InputMode="numeric"
+                      Pattern="[0-9]*" Value="@WeightImperialStone"
+                      Suffix="@(new GDSInput.AffixOptions {  Text="stone" })"
+                      ErrorMessage="@WeightErrorImperialStone.AsErrorMessageComponent()"
+                      Hint="@(new GDSHint.Options
+                {
+                    Text="Please use whole numbers and no decimals. For example, 13st and 4lb."
+                })" />
+            <p class="govuk-body">and</p>
+            <GDSInput Id="weight-pounds"
+                      Classes="govuk-!-width-one-third"
+                      Label="@(new GDSLabel.Options {
+                                   For="weight-pounds" ,
+                                   Content=VisuallyHiddenLabelContent("What is your weight in pounds?")
+                        })"
+                      Name="ImperialPounds"
+                      InputMode="numeric"
+                      Pattern="[0-9]*"
+                      Value="@WeightImperialPounds"
+                      Suffix="@(new GDSInput.AffixOptions {  Text="pounds" })"
+                      ErrorMessage="@WeightErrorImperialPounds.AsErrorMessageComponent()" />
+        </GDSFieldSet>
+    }
+    else
+    {
+        <GDSButton PreventDoubleClick="true" id="change-units" Text="Change units to feet, inches, stone and pounds" HRef="@($"./HeightAndWeight{BuildQuery(new []{IdQueryParam, NextPageQueryParam, "useImperial=True"})}#change-units")" />
+        <GDSInput Id="height" Classes="govuk-!-width-one-third" Name="MetricHeight" Label="@(new GDSLabel.Options {  Text="What is your height?", For="height", Classes="govuk-label--m" })" Value="@HeightMetric" Suffix="@(new GDSInput.AffixOptions {  Text="cm" })" ErrorMessage="@HeightErrorMetric.AsErrorMessageComponent()" Hint="@(new GDSHint.Options{Text="Please use whole numbers and no decimals. For example, 162cm."})" />
+        <GDSInput Id="weight" Classes="govuk-!-width-one-third" Name="MetricWeight" Label="@(new GDSLabel.Options {  Text="What is your weight?", For="weight", Classes="govuk-label--m" })" Value="@WeightMetric" Suffix="@(new GDSInput.AffixOptions {  Text="kg" })" ErrorMessage="@WeightErrorMetric.AsErrorMessageComponent()" Hint="@(new GDSHint.Options{Text="Please use whole numbers and no decimals. For example, 84kg."})" />
+    }
+
+    <div class="govuk-button-group">
+        <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Submit" />
+        <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="I don't know my height and weight" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="DontKnow" />
+    </div>
+</form>
+
+@code {
+
+    private RenderFragment VisuallyHiddenLabelContent(string content) =>@<span class="govuk-visually-hidden">@content</span>;
+
+[Parameter]
+public string NextPage { get; set; }
+
+private string NextPageQueryParam => NextPage is null ? null : $"next={NextPage}";
+
+[Parameter]
+public string HeightErrorMetric { get; set; }
+
+[Parameter]
+public string WeightErrorMetric { get; set; }
+
+[Parameter]
+public string HeightErrorImperialFeet { get; set; }
+
+[Parameter]
+public string WeightErrorImperialStone { get; set; }
+
+[Parameter]
+public string HeightErrorImperialInches { get; set; }
+
+[Parameter]
+public string WeightErrorImperialPounds { get; set; }
+
+[Parameter]
+public string HeightMetric { get; set; }
+
+[Parameter]
+public string WeightMetric { get; set; }
+
+[Parameter]
+public string HeightImperialFeet { get; set; }
+
+[Parameter]
+public string HeightImperialInches { get; set; }
+
+[Parameter]
+public string WeightImperialStone { get; set; }
+
+[Parameter]
+public string WeightImperialPounds { get; set; }
+
+[Parameter]
+public bool UseImperial { get; set; }
+
+}

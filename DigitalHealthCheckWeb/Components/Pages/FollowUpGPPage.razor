@@ -1,0 +1,136 @@
+﻿@inherits FollowUpRiskPageBase
+@using DigitalHealthCheckCommon
+@using DigitalHealthCheckWeb.Model;
+
+<FollowUp Title=@Title
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to visit my GP clinic",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I am confident about going to my GP clinic",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="@($"Is there anything stopping you from having a follow-up discussion with a healthcare professional{(Urgent ? " urgently" : "")} at your GP clinic?")"
+          BarrierNoneText="I have no barriers"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = $"Do you have plans to go{(Urgent ? " urgently" : "")} to the GP Clinic{(Urgent ? "" : " in the following months")}?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = $"Will you contact your GP clinic{(Urgent ? " urgently" : "")} to arrange a discussion with a healthcare professional?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = $"Would you like to be reminded by email to contact your GP clinic{(Urgent ? " urgently" : "")} to arrange a discussion with a healthcare professional?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName" ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you. These personalised resources will appear on the Follow-up – Actions page.">
+
+    @if (UrgentBloodPressure)
+    {
+        <p class="govuk-body">Your results show that you have very high blood pressure.</p>
+
+        <p class="govuk-body">Please contact your GP clinic urgently for a discussion of your results today. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic for today, please ring 111.</p>
+    }
+    else if (UrgentBodyMassIndex)
+    {
+        <p class="govuk-body">Your results show that you are severely underweight.</p>
+
+        <p class="govuk-body">Please contact your GP clinic urgently for a discussion of your results. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic, please ring 111.</p>
+    }
+    else if (UrgentBloodSugar)
+    {
+        <p class="govuk-body">Your results show that you have extremely high blood sugar.</p>
+
+        <p class="govuk-body">Please contact your GP clinic urgently for a discussion of your results. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic, please ring 111.</p>
+    }
+    else
+    {
+        @if (Result.HeartDisease >= DefaultStatus.Warning && (Result.Diabetes != DefaultStatus.Healthy && Result.BloodSugar is not null && Result.BloodSugar == BloodSugarStatus.Danger))
+        {
+            <p class="govuk-body">Your results show that you have an increased risk of developing heart and circulatory disease and that you might have diabetes.</p>
+        }
+        else if (Result.HeartDisease >= DefaultStatus.Warning && (Result.Diabetes != DefaultStatus.Healthy && (Result.BloodSugar is null || Result.BloodSugar == BloodSugarStatus.Warning)))
+        {
+            <p class="govuk-body">Your results show that you have an increased risk of developing heart and circulatory disease and Type 2 diabetes.</p>
+        }
+        else if (Result.HeartDisease >= DefaultStatus.Warning && Result.Cholesterol != DefaultStatus.Healthy)
+        {
+            <p class="govuk-body">Your results show that both your cholesterol and the risk of developing heart and circulatory diseases are high.</p>
+        }
+        else if (Result.HeartDisease >= DefaultStatus.Warning && (Result.Diabetes == DefaultStatus.Healthy || (Result.BloodSugar is not null && Result.BloodSugar == BloodSugarStatus.Healthy)))
+        {
+            <p class="govuk-body">Your results show that you have an increased risk of developing heart and circulatory disease. </p>
+        }
+        else if (Result.HeartDisease == DefaultStatus.Healthy && (Result.BloodSugar is not null && Result.BloodSugar == BloodSugarStatus.Danger))
+        {
+            <p class="govuk-body">Your results show that you might have diabetes.</p>
+        }
+        else if (Result.HeartDisease == DefaultStatus.Healthy && ((Result.Diabetes != DefaultStatus.Healthy && (Result.BloodSugar is null || Result.BloodSugar == BloodSugarStatus.Warning)) || (Result.BloodSugar is null || Result.BloodSugar == BloodSugarStatus.Warning)))
+        {
+            <p class="govuk-body">Your results show that you have an increased risk of developing Type 2 diabetes.</p>
+        }
+
+        <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.</p>
+
+        <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+    }
+
+    <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a rel="noreferrer noopener" target="_blank" title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool (opens in a new tab)</a>.</p>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public Result Result { get; set; }
+
+    private bool UrgentBloodPressure => Result.BloodPressure == BloodPressureStatus.Severe;
+
+    private bool UrgentBodyMassIndex => Result.BodyMassIndex == BodyMassIndexStatus.SeverelyUnderweight;
+
+    private bool UrgentBloodSugar => Result.BloodSugar == BloodSugarStatus.Severe;
+
+    private bool Urgent => UrgentBloodPressure || UrgentBodyMassIndex || UrgentBloodSugar;
+
+    private string Title
+    {
+        get
+        {
+            if (Urgent)
+            {
+                return "Follow-up – Visit your GP clinic urgently";
+            }
+            else
+            {
+                return "Follow-up – Visit your GP clinic";
+            }
+        }
+    }
+
+}

@@ -1,0 +1,101 @@
+﻿<GDSCookieBanner AriaLabel="Cookies on the NHS Digital Health Check"
+    InputAttributes="@Attributes"
+    Hidden = "true"
+    Messages = "@Messages"></GDSCookieBanner>
+
+@code {
+    private IDictionary<string, object> Attributes => new Dictionary<string, object>()
+    {
+        {"id","cookies-banner"}
+    };
+
+    [Parameter]
+    public string QueryString { get; set; }
+
+    protected RenderFragment BannerHtml = 
+    @<div>
+        <p class="govuk-body">We use some essential cookies to make this service work.</p>
+        <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+    </div>
+    ;
+
+    private IEnumerable<GDSCookieBanner.Message> Messages => new[]{
+        new GDSCookieBanner.Message()
+        {
+            HeadingText = "Cookies on the NHS Digital Health Check",
+            Content = BannerHtml,
+            Actions = new [] {
+                new GDSCookieBanner.Action()
+                {
+                    Text="Accept analytics cookies",
+                    Type=GDSButton.InputType.Button,
+                    InputAttributes = new Dictionary<string,object>()
+                    {
+                        {"id","cookies-accept-button"}
+                    }
+                },
+                new GDSCookieBanner.Action()
+                {
+                    Text="Reject analytics cookies",
+                    Type=GDSButton.InputType.Button,
+                    InputAttributes = new Dictionary<string,object>()
+                    {
+                        {"id","cookies-reject-button"}
+                    }
+                },
+                new GDSCookieBanner.Action()
+                {
+                    Text="View cookies",
+                    Href=$"./Cookies{QueryString}"
+                }
+            },
+            InputAttributes = new Dictionary<string,object>()
+            {
+                {"id","cookies-main-content"}
+            }
+        },
+        new GDSCookieBanner.Message()
+        {
+            Content = 
+    @<p class="govuk-body">You’ve accepted analytics cookies. You can <a class="govuk-link" href="@($"./Cookies{QueryString}")">change your cookie settings</a> at any time.</p>
+    ,
+            Role = "alert",
+            Hidden = true,
+            Actions = new [] {
+                new GDSCookieBanner.Action()
+                {
+                    Text="Hide this message",
+                    InputAttributes = new Dictionary<string,object>()
+                    {
+                        {"id","cookies-accepted-hide-button"}
+                    }
+                }
+            },
+            InputAttributes = new Dictionary<string,object>()
+            {
+                {"id","cookies-accepted-alert"}
+            }
+        },
+        new GDSCookieBanner.Message()
+        {
+            Content = 
+    @<p class="govuk-body">You’ve rejected analytics cookies. You can <a class="govuk-link" href="@($"./Cookies{QueryString}")">change your cookie settings</a> at any time.</p>,
+            Role = "alert",
+            Hidden = true,
+            Actions = new [] {
+                new GDSCookieBanner.Action()
+                {
+                    Text="Hide this message",
+                    InputAttributes = new Dictionary<string,object>()
+                    {
+                        {"id","cookies-rejected-hide-button"}
+                    }
+                }
+            },
+            InputAttributes = new Dictionary<string,object>()
+            {
+                {"id","cookies-rejected-alert"}
+            }
+        }
+    };
+}

@@ -1,0 +1,68 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Physical activity page 3 of 4</h1>
+
+    <h2 class="govuk-heading-m">During the last week, approximately how many hours did you spend on each of the following activities?</h2>
+
+    <GDSRadios Name="Gardening"
+               Items="GardeningItems"
+               IdPrefix="gardening"
+               ErrorMessage="GardeningError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = " Gardening or DIY",
+                    Classes="govuk-label--s"
+                }
+               })" />
+
+    <GDSRadios Name="Housework"
+               Items="HouseworkItems"
+               IdPrefix="housework"
+               ErrorMessage="HouseworkError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = " Housework or childcare",
+                    Classes="govuk-label--s"
+               }
+               })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string GardeningError { get; set; }
+
+    [Parameter]
+    public string HouseworkError { get; set; }
+
+    [Parameter]
+    public string Housework { get; set; }
+
+    [Parameter]
+    public string Gardening { get; set; }
+
+    static IEnumerable<dynamic> Items = new[]{
+        new {Text="None", Value="none" },
+        new {Text="Some but less than 1 hour", Value="lessthanonehour" },
+        new {Text="Between 1 and 3 hours", Value="onetothreehours" },
+        new {Text="3 hours or more", Value="threehoursormore" }
+    };
+
+    protected IList<GDSRadios.Item> GardeningItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, Gardening);
+
+    protected IList<GDSRadios.Item>
+        HouseworkItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, Housework);
+
+}

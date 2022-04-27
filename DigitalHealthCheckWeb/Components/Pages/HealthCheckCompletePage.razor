@@ -1,0 +1,445 @@
+﻿@using DigitalHealthCheckCommon
+@using DigitalHealthCheckEF
+@using DigitalHealthCheckWeb.Model;
+@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<h1 class="govuk-heading-l">NHS Health Check complete</h1>
+@if (Urgent)
+{
+    <GDSPanel TitleText="@($"Thank you {Check.FirstName} for completing your NHS Health Check.")" />
+}
+else
+{
+    <GDSPanel TitleText="@($"Thank you {Check.FirstName} for completing your NHS Health Check.")">
+        You have taken a step towards a healthier life!
+    </GDSPanel>
+}
+
+<form method="post" novalidate>
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+@if (UrgentBloodPressure)
+{
+    <p class="govuk-body">It is essential that you urgently contact your GP clinic to discuss your high blood pressure results today. Do not wait for your GP clinic to contact you. If you are not able to have a discussion with a healthcare professional at your GP clinic for today, please ring 111.</p>
+}
+else if (UrgentBodyMassIndex)
+{
+    <p class="govuk-body">It is essential that you urgently contact your GP clinic to discuss your severely low BMI, if you have not already discussed this with a healthcare professional. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic, please ring 111.</p>
+}
+else if (UrgentBloodSugar)
+{
+    <p class="govuk-body">It is essential that you urgently contact your GP clinic to discuss your extremely high blood sugar level, if you have not already discussed this with a healthcare professional. Do not wait for your GP clinic to contact you. If you are not able to have a discussion with a healthcare professional at your GP clinic, please ring 111.</p>
+}
+
+@if (HasContactMethods && !ErrorList.Any())
+{
+    <p class="govuk-body"><strong>You will be sent a follow-up email that contains a summary of your personalised results and the links to the support services you requested. These services are specifically tailored to your results, your health priorities and the challenges you said you face in changing your lifestyle and health.</strong></p>
+}
+else if (!RequestedNoContact)
+{
+    <p class="govuk-body">If you would like a follow up email and/or SMS summarising your check, including the links you requested, please tell us how best we can contact you.</p>
+
+    
+
+        <p class="govuk-body">Tick the box below to give the service your permission to contact you about your NHS health check results and connect you with relevant information and services.</p>
+
+        
+
+        <GDSCheckboxes Items="Items" IdPrefix="contact" Name="Contact"
+                       Hint="@(new GDSHint.Options
+                        {
+                            Text="Select all options that are relevant to you."
+                        })"
+                       FieldSet="@(new GDSFieldSet.Options
+                        {
+                            Legend = new GDSFieldSet.LegendOptions()
+                            {
+                                Text = "How would you like to be contacted? (optional)",
+                                Classes="govuk-fieldset__legend--s"
+                            }
+                        })" />
+
+        <GDSButton PreventDoubleClick="true" Text="Submit contact details" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="UpdateContactDetails" />
+}
+
+<p class="govuk-body">Your feedback is important to us. It can help to shape our new Digital NHS Health Check service and ultimately help improve the health and wellbeing of others like yourself.</p>
+
+<p class="govuk-body">There will be three short surveys across three months – starting with the one below. Complete all three and be entered into a prize draw to win Decathlon gift vouchers! There are multiple prizes of £100.00, £50.00 and £25.00. You have an estimated 1 in 15 chance of winning.</p>
+
+<p class="govuk-body">Click this link to <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.surveymonkey.co.uk/r/36LL893" title="Complete the first survey">complete the first survey (opens in a new tab)</a>. It will take no more than 5 mins to complete.  </p>
+
+<GDSDetails SummaryText="Links to your support services">
+    @foreach (var intervention in InterventionsOrdered)
+    {
+            <Intervention Url="@intervention.Url" Prompt="@intervention.Text" LinkTitle="@intervention.LinkTitle" LinkDescription="@intervention.LinkDescription" />
+
+            if(Check.PrefersToContactEveryoneHealth == true && EveryoneHealthReferralInterventions.Contains(intervention))
+            {
+                <p class="govuk-body">You asked us to provide you with the phone number to contact the service, you can contact them by calling 0333 005 0159.</p>
+            }
+        }
+
+    @foreach (var customBarrier in CustomBarriers)
+    {
+        <p class="govuk-body">Thank you for sharing a personal barrier you experience to @ConvertBarrierCategory(customBarrier.Category). We will review your feedback and find ways to improve our service offering to meet this need. In the meantime, <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://southwark.everyonehealth.co.uk/" title="check out the Southwark Healthy Lifestyle Service">check out the Southwark Healthy Lifestyle Telephone Support Service (opens in a new tab)</a>.</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Check.BloodPressureFollowUp?.SelectedOption))
+    {
+
+        @switch (Check.BloodPressureFollowUp.SelectedOption)
+        {
+            case "kiosk":
+                <p class="govuk-body">You told us you would like to get your blood pressure checked at a health kiosk.</p>
+                <p class="govuk-body">There is currently a kiosk at The Castle Leisure Centre.<a class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre" rel="noreferrer noopener" target="_blank" title="Find out details about The Castle Leisure Centre on their website"> find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+                <p class="govuk-body">You don’t need to book an appointment.</p>
+
+                <h3 class="govuk-body">The Castle Leisure Centre</h3>
+                <p class="govuk-body">
+                    2 St Gabriel Walk,<br />
+                    Elephant & Castle,<br />
+                    London SE1 6FG<br />
+                    Telephone: 020 7091 4243<br />
+                </p>
+                <p class="govuk-body">Website: <a class="govuk-link" href="https://www.everyoneactive.com/centre/The-Castle-Centre">The Castle Centre</a>.</p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 6:30am to 10pm<br />
+                    Tue: 6:30am to 10pm<br />
+                    Wed: 6:30am to 10pm<br />
+                    Thu: 6:30am to 10pm<br />
+                    Fri: 6:30am to 10pm<br />
+                    Sat: 7:00am to 6pm<br />
+                    Sun: 7:00am to 10pm<br />
+                </p>
+
+                <p class="govuk-body">We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two.</p>
+
+                break;
+            case "leisurecentre":
+                <p class="govuk-body">You told us you would like to get your blood pressure checked at a leisure centre.</p>
+
+                <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+
+                break;
+            case "gp":
+                <p class="govuk-body">You told us you would like to get your blood pressure checked at your GP clinic.</p>
+                <p class="govuk-body">You will need to book an appointment to get your blood pressure measured. If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" href="https://www.nhs.uk/service-search/find-a-gp" rel="noreferrer noopener" target="_blank" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.</p>
+                <p class="govuk-body">We will also email you the link to this tool.</p>
+                break;
+             case "pharmacy":
+                <p class="govuk-body">You told us you would like to get your blood pressure checked at a pharmacy.</p>
+                <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+                <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+                <p class="govuk-body">Location and contact information:</p>
+                <p class="govuk-body">Bonamy Pharmacy<br/>
+                    355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                    0207 740 2523<br/>
+                    pharmacy.fv733@nhs.net<br/>
+                    http://bonamypharmacy.co.uk/<br/>
+                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+                </p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 9am to 7pm<br />
+                    Tue: 9am to 7pm<br />
+                    Wed: 9am to 7pm<br />
+                    Thu: 9am to 7pm<br />
+                    Fri: 9am to 7pm<br />
+                    Sat: 9am to 2pm<br />
+                    Sun: Closed<br />
+                </p>
+                break;
+            case "home":
+                <p class="govuk-body">You told us you would like to get your blood pressure checked at home.</p>
+                <p class="govuk-body">.If you are taking your own blood pressure reading, please take it three times. You may find that your reading will change a little. We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third reading, by adding the numbers together and dividing by two.</p>
+                break;
+            default:
+                break;
+        }
+
+        <p class="govuk-body">Once you have your blood pressure reading, you can return to the ‘Check your Answers’ page directly using <a class="govuk-link" href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Check.CholesterolFollowUp?.SelectedOption))
+    {
+
+        @switch (Check.CholesterolFollowUp.SelectedOption)
+        {
+            case "leisurecentre":
+                <p class="govuk-body">You told us you would like to get your cholesterol checked at a leisure centre.</p>
+
+                <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+
+                break;
+            case "pharmacy":
+                <p class="govuk-body">You told us you would like to get your cholesterol checked at a pharmacy.</p>
+                <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+                <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+                <p class="govuk-body">Location and contact information:</p>
+                <p class="govuk-body">Bonamy Pharmacy<br/>
+                    355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                    0207 740 2523<br/>
+                    pharmacy.fv733@nhs.net<br/>
+                    http://bonamypharmacy.co.uk/<br/>
+                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+                </p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 9am to 7pm<br />
+                    Tue: 9am to 7pm<br />
+                    Wed: 9am to 7pm<br />
+                    Thu: 9am to 7pm<br />
+                    Fri: 9am to 7pm<br />
+                    Sat: 9am to 2pm<br />
+                    Sun: Closed<br />
+                </p>
+                break;
+            case "gp":
+                <p class="govuk-body">You told us you would like to get your cholesterol checked at your GP clinic.</p>
+                <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" href="https://www.nhs.uk/service-search/find-a-gp" rel="noreferrer noopener" target="_blank" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.</p>
+                <p class="govuk-body">We will also email you the link to this tool.</p>
+
+                break;
+            case "home":
+                <p class="govuk-body">You told us you would like to get your cholesterol checked using an at-home finger-prick testing kit.</p>
+                <p class="govuk-body">We will send you an at-home finger-prick testing kit through the mail to the address you provided. This kit enables you to simply take a blood sample for yourself and send it in a premarked package to a lab that will update you with your results.</p>
+                break;
+            default:
+                break;
+        }
+
+        <p class="govuk-body">Once you have your cholesterol reading, you can return to the ‘Check your Answers’ page directly using <a class="govuk-link" href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Check.BloodSugarFollowUp?.SelectedOption))
+    {
+        @switch (Check.BloodSugarFollowUp.SelectedOption)
+        {
+            case "leisurecentre":
+                <p class="govuk-body">You told us you would like to get your blood sugar level checked at a leisure centre.</p>
+
+                <p class="govuk-body">There are five participating council leisure centres in the borough. You will need to <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website (opens in a new tab)</a>.</p>
+
+                break;
+            case "gp":
+                <p class="govuk-body">You told us you would like to get your blood sugar level checked at your GP clinic.</p>
+                <p class="govuk-body">You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                <p class="govuk-body">If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                <p class="govuk-body">If you can’t remember your GP clinic’s contact details, you can find them out by using the <a class="govuk-link" href="https://www.nhs.uk/service-search/find-a-gp" rel="noreferrer noopener" target="_blank" title="NHS find a GP clinic tool">NHS find a GP clinic tool (opens in a new tab)</a>. You can find this information after completing the full NHS Health Check. If you go to make an appointment now, please then return to continue with the NHS Health Check follow-up support.</p>
+                <p class="govuk-body">We will also email you the link to this tool.</p>
+
+                break;
+            case "pharmacy":
+                <p class="govuk-body">You told us you would like to get your blood sugar level checked at a pharmacy.</p>
+                <p class="govuk-body">You can get your measurements taken at Bonamy Pharmacy.</p>
+                <p class="govuk-body">You need to book an appointment by phone, so please call in advance.</p>
+                <p class="govuk-body">Location and contact information:</p>
+                <p class="govuk-body">Bonamy Pharmacy<br/>
+                    355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                    0207 740 2523<br/>
+                    pharmacy.fv733@nhs.net<br/>
+                    http://bonamypharmacy.co.uk/<br/>
+                    <a class="govuk-link" rel="noreferrer noopener" target="_blank" title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in a new tab in Google Maps)</a>
+                </p>
+                <p class="govuk-body">
+                    Opening times:<br />
+                    Mon: 9am to 7pm<br />
+                    Tue: 9am to 7pm<br />
+                    Wed: 9am to 7pm<br />
+                    Thu: 9am to 7pm<br />
+                    Fri: 9am to 7pm<br />
+                    Sat: 9am to 2pm<br />
+                    Sun: Closed<br />
+                </p>
+                break;
+            default:
+                break;
+        }
+
+        <p class="govuk-body">Once you have your blood sugar reading, you can return to the ‘Check your Answers’ page directly using <a class="govuk-link" href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+    }
+</GDSDetails>
+
+<p class="govuk-body">The following unique link will enable you to come back and enter your updated cholesterol, blood pressure, and blood sugar readings as necessary. By updating these readings you can get a more up-to-date and accurate set of results.</p>
+
+<p class="govuk-body"><a class="govuk-link" title="Unique link to amend your health information" href="@($"./CheckYourAnswers{BuildQuery(IdQueryParam)}")">Unique link to amend your health information</a></p>
+
+<p class="govuk-body">We will also include this link and instructions in the email.</p>
+
+<h2 class="govuk-heading-m">Access a printable version</h2>
+
+<p class="govuk-body">
+    <a rel="noreferrer noopener" target="_blank" title="Your digital health check results and support services" href="@($"./PatientEmail{BuildQuery(IdQueryParam)}")" class="govuk-link">Click here to access a printable version of your results and support services (opens in a new tab)</a>
+</p>
+
+@if(Check.GenderAffirmation == true && Check.Variant is not null)
+{
+    <h2 class="govuk-heading-m">Your additional results</h2>
+
+    <p class="govuk-body">@(PrefersNotToDiscloseIdentity? "We recognise that you would prefer not to say your gender identity." : $"We recognise that you are {RichIdentity}.") We @((HasContactMethods && !ErrorList.Any()) ? "just sent an automatic email" : "can send you an email") with the results that reflect your @(CurrentGender? "current gender identity" : "sex assigned at birth") and the follow-up sections you just completed.</p>
+
+    <p class="govuk-body">We can also email you the initially calculated results that were based on your @(CurrentGender? "sex assigned at birth" : "current gender identity"). Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</p>
+
+    <GDSDetails SummaryText="Why would I want to look at both sets of results?">
+        <p class="govuk-body">There is limited research as to whether undergoing gender-affirmation treatments has an impact on your risk of developing heart and circulatory disease, or Type 2 diabetes.</p>
+        <p class="govuk-body">There is currently not enough research to give a precise risk based on the type and duration of your gender-affirmation treatment. The research available suggests that your risk will change from your sex assigned at birth and move towards your current new gender identity over time. You may wish to view results for both your sex assigned at birth and your current gender identity, because your individual results are likely to be between the two. This approximation will be close, because the difference in the two sets of risk results is about 5%.</p>
+        <p class="govuk-body">You have the option to view both results. You can decide whether you would like to view the second set. In any case, we recognise and respect your current gender identity. We also recognise that this can be a difficult question for some people.</p>
+        <p class="govuk-body">You may want to follow up with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society.</p>
+            
+        <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+<p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+<p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+<p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+    </GDSDetails>
+
+    @if (HasContactMethods && !ErrorList.Any())
+    {
+        <GDSButton PreventDoubleClick="true" Text="Email me my other set of results" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="SendSecondEmail" />
+    }
+    <p class="govuk-body">
+        <a rel="noreferrer noopener" target="_blank" title="Your digital health check results and support services using your @(CurrentGender? "sex assigned at birth" : "current gender identity")" href="@($"./PatientEmail{BuildQuery(IdQueryParam,"variant=True")}")" class="govuk-link">Click here to access a printable version of your results and support services using your @(CurrentGender? "sex assigned at birth" : "current gender identity") (opens in a new tab)</a>
+    </p>
+}
+
+</form>
+
+@code {
+
+    public bool PrefersNotToDiscloseIdentity => Check.Identity == "skip";
+
+    public string RichIdentity => Check.Identity switch
+    {
+        "transman" => "a trans man",
+        "transwoman" => "a trans woman",
+        "nonbinary" => "nonbinary",
+        "intersex" => "intersex",
+        "custom" => Check.CustomIdentity,
+        _ => ""
+    };
+
+    bool CurrentGender => Check.SexAtBirth != Check.SexForResults;
+
+    protected RenderFragment SmsInput =>
+    @<GDSInput Id="contact-by-text"
+            Name="SmsNumber"
+            Value="@SMSNumber"
+            Type="tel"
+            Autocomplete="tel"
+            Classes="govuk-input--width-20"
+            Label="@(new GDSLabel.Options
+        {
+            Text="Mobile phone number"
+        })"
+            ErrorMessage="SMSNumberError.AsErrorMessageComponent()" />;
+
+protected RenderFragment EmailInput =>@<GDSInput Id="contact-by-email"
+                                                 Name="EmailAddress"
+                                                 Type="email"
+                                                 Autocomplete="email"
+                                                 Spellcheck="false"
+                                                 Value="@EmailAddress"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="Email address"
+                                                        })"
+                                                 ErrorMessage="EmailAddressError.AsErrorMessageComponent()" />
+        ;
+
+    protected IList<GDSCheckboxes.Item> Items => new[]
+{
+            new GDSCheckboxes.Item
+            {
+                Text="Email",
+                Value="email",
+                ConditionalContent=EmailInput,
+                Checked = Selected?.Contains("email") ?? false
+            },
+            new GDSCheckboxes.Item
+            {
+                Text="Text message",
+                Value="sms",
+                ConditionalContent=SmsInput,
+                Checked = Selected?.Contains("sms") ?? false
+            }
+    }.WithNoneOption("I do not want to be contacted").ToList();
+
+    protected string Url(string page) => $"{BaseUrl}/{page}{BuildQuery(IdQueryParam, $"next=CheckYourAnswers")}";
+
+    protected IEnumerable<DigitalHealthCheckEF.Intervention> InterventionsOrdered => new[]
+{
+        "gp","smoking","weight","alcohol","move","mental","cholesterol","bloodpressure","bloodsugar","improvecholesterol","improvebloodpressure","improvebloodsugar"
+}.SelectMany(x => AllInterventions.OrderBy(y => y.Id).Where(y => y.Category == x));
+
+    protected IEnumerable<DigitalHealthCheckEF.Intervention> AllInterventions => Check.ChosenInterventions ?? new List<DigitalHealthCheckEF.Intervention>();
+
+    protected IEnumerable<DigitalHealthCheckEF.CustomBarrier> CustomBarriers => Check.CustomBarriers ?? new List<DigitalHealthCheckEF.CustomBarrier>();
+
+    [Parameter]
+    public Result Result { get; set; }
+
+    [Parameter]
+    public IEnumerable<DigitalHealthCheckEF.Intervention> EveryoneHealthReferralInterventions { get; set; }
+
+private bool UrgentBloodPressure => Result.BloodPressure == BloodPressureStatus.Severe;
+
+private bool UrgentBodyMassIndex => Result.BodyMassIndex == BodyMassIndexStatus.SeverelyUnderweight;
+
+private bool UrgentBloodSugar => Result.BloodSugar == BloodSugarStatus.Severe;
+
+private bool Urgent => UrgentBloodPressure || UrgentBodyMassIndex || UrgentBloodSugar;
+
+string ConvertBarrierCategory(string category) => category switch
+{
+"gp" => "visiting your GP",
+"smoking" => "stopping smoking",
+"weight" => "maintaining a healthy weight",
+"alcohol" => "drinking less",
+"move" => "moving more",
+"mental" => "improving your mental wellbeing",
+"cholesterol" => "getting your cholesterol levels checked",
+"bloodpressure" => "getting your blood pressure checked",
+"bloodsugar" => "getting your blood sugar levels checked",
+"improvecholesterol" => "improving your cholesterol levels",
+"improvebloodpressure" => "improving your blood pressure",
+"improvebloodsugar" => "improving your blood sugar",
+_ => "improving your health and wellbeing"
+};
+
+[Parameter]
+public HealthCheck Check { get; set; }
+
+[Parameter]
+public IEnumerable<string> Selected { get; set; } = new List<string>();
+
+[Parameter]
+public string SMSNumber { get; set; }
+
+[Parameter]
+public string EmailAddress { get; set; }
+
+[Parameter]
+public string SMSNumberError { get; set; }
+
+[Parameter]
+public string EmailAddressError { get; set; }
+
+[Parameter]
+public string BaseUrl { get; set; }
+
+[Parameter]
+public bool RequestedNoContact { get; set; }
+
+protected bool HasContactMethods => !string.IsNullOrEmpty(EmailAddress) || !string.IsNullOrEmpty(SMSNumber);
+
+protected string PrintableLink => $"{BaseUrl}/CheckYourAnswers{BuildQuery(IdQueryParam)}";
+
+}

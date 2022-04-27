@@ -1,0 +1,53 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pool:
+  vmImage: windows-latest
+
+trigger: none
+
+jobs:
+- job: UnitTests
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+      vstsFeed: 'a7d8157c-026d-49af-b367-fdceee14af27/5764f58e-4df2-488a-8190-56cf928a710c'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'test'
+      projects: 'DigitalHealthCheckCommon.Tests/DigitalHealthCheckCommon.Tests.csproj'
+      testRunTitle: 'Common Project Tests'
+  - task: DotNetCoreCLI@2
+    condition: succeededOrFailed()
+    inputs:
+      command: 'test'
+      projects: 'DigitalHealthCheckTests/DigitalHealthCheckWeb.Tests.csproj'
+      testRunTitle: 'Web Project Tests'
+- job: BlazorTests
+  steps:
+  - task: Npm@1
+    inputs:
+      command: 'ci'
+      workingDir: 'DigitalHealthCheckWeb'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+      vstsFeed: 'a7d8157c-026d-49af-b367-fdceee14af27/5764f58e-4df2-488a-8190-56cf928a710c'
+  - task: Npm@1
+    inputs:
+      command: 'custom'
+      workingDir: 'DigitalHealthCheckWeb'
+      customCommand: 'run build'
+  - task: DotNetCoreCLI@2
+    condition: succeeded()
+    inputs:
+      command: 'test'
+      projects: 'BlazorComponentTests/BlazorComponentTests.csproj'
+      testRunTitle: 'Blazor Component Tests'

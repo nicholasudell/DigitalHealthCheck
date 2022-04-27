@@ -1,0 +1,44 @@
+﻿@using DigitalHealthCheckWeb.Model;
+
+<p style="font-size: 12pt; margin: 0px 0px 4px 8px">
+    <strong>@Item.HeadingText</strong>
+</p>
+<div style="background-color: @(BackgroundFor(Item.Status)); color: @(ForegroundFor(Item.Status)); width:100%; padding:4px 0px 4px 8px;">
+    <strong>@((Item.StatusText ?? StatusText).ToUpper())</strong>
+</div>
+<p style="padding-bottom: 5px; margin: 8px 0px 8px 8px">@Item.Text</p>
+
+@code {
+
+    protected string StatusText => Item.Status switch
+    {
+        FirstParty.TrafficLight.Status.Red => RedText,
+        FirstParty.TrafficLight.Status.Amber => AmberText,
+        _ => GreenText
+    };
+
+    [Parameter]
+    public string RedText { get; set; } = "High risk";
+    [Parameter]
+    public string AmberText { get; set; } = "Moderate risk";
+    [Parameter]
+    public string GreenText { get; set; } = "Low risk";
+
+    [Parameter]
+    public FirstParty.TrafficLight.Item Item { get; set; }
+
+    protected string BackgroundFor(FirstParty.TrafficLight.Status status) => status switch
+    {
+        FirstParty.TrafficLight.Status.Red => "#f6d7d2",
+        FirstParty.TrafficLight.Status.Amber => "#fcd6c3",
+        FirstParty.TrafficLight.Status.Green => "#cce2d8",
+    };
+
+    protected string ForegroundFor(FirstParty.TrafficLight.Status status) => status switch
+    {
+        FirstParty.TrafficLight.Status.Red => "#942514",
+        FirstParty.TrafficLight.Status.Amber => "#6e3619",
+        FirstParty.TrafficLight.Status.Green => "#005a30",
+    };
+
+}

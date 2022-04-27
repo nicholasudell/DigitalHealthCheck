@@ -1,0 +1,523 @@
+﻿@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Helpers;
+
+@inherits Page
+
+<h1 class="govuk-heading-xl">Check your answers</h1>
+
+<h2 class="govuk-heading-l">Your results will be calculated on the next page based on the responses you have entered</h2>
+
+<p class="govuk-body">You can go back and change any of your results by reviewing and amending the details below, but if you do not need to make any changes please scroll to the bottom of the page and submit your measurements.</p>
+
+<h2 class="govuk-heading-l">Your answers</h2>
+
+@foreach (var category in AnswerCategories)
+{
+    <h3 class="govuk-heading-m">@category.HeaderText</h3>
+
+    <p class="govuk-body">@category.SummaryText</p>
+
+    <GDSSummaryList Classes="govuk-!-margin-bottom-9"
+                    Rows="@category.Rows" />
+}
+
+<h2 class="govuk-heading-l">Find out your results</h2>
+<p class="govuk-body">
+    By submitting this information you are confirming that, to the best of your knowledge, the details you are providing are correct.
+</p>
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Text="Accept and calculate results"/>
+</form>
+
+@code {
+
+    class AnswerCategory
+    {
+        public string HeaderText { get; set; }
+
+        public string SummaryText { get; set; }
+
+        public IList<GDSSummaryList.Row> Rows { get; set; }
+    }
+
+    private IList<AnswerCategory> AnswerCategories => new[]
+    {
+        new AnswerCategory
+        {
+             HeaderText="About you",
+             SummaryText="Your personal details",
+             Rows = AboutYou
+        },
+        new AnswerCategory
+        {
+             HeaderText="Smoking",
+             SummaryText="Whether you smoke or not and how much",
+             Rows = Smoking
+        },
+        new AnswerCategory
+        {
+             HeaderText="Alcohol",
+             SummaryText="How much alcohol you drink and your drinking behaviours",
+             Rows = Alcohol
+        },
+        new AnswerCategory
+        {
+             HeaderText="Physical activity",
+             SummaryText="How much you exercise and move",
+             Rows = PhysicalActivity
+        },
+        new AnswerCategory
+        {
+             HeaderText="Diabetes",
+             Rows = Diabetes
+        },
+        new AnswerCategory
+        {
+             HeaderText="Risk factors",
+             SummaryText="Medical conditions that affect your risks",
+             Rows = RiskFactors
+        },
+        new AnswerCategory
+        {
+             HeaderText="Blood pressure and cholesterol",
+             Rows = BloodPressureAndCholesterol
+        },
+        new AnswerCategory
+        {
+             HeaderText="Mental wellbeing",
+             Rows = MentalWellbeing
+        },
+        new AnswerCategory
+        {
+             HeaderText="Your contact details",
+             SummaryText="How we might follow up with you about your check",
+             Rows = ContactDetails
+        }
+    }.ToList();
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    [Parameter]
+    public bool Variant { get; set; }
+
+    protected IList<GDSSummaryList.Row.Item> DefaultItems(string href, string thingToChange) => new[]
+    {
+        new GDSSummaryList.Row.Item
+        {
+            Href = $"{href}{BuildQuery(IdQueryParam, $"next=CheckYourAnswers")}",
+            Text = "Change",
+            VisuallyHiddenText = " " + thingToChange
+        }
+    }.ToList();
+
+    protected GDSSummaryList.Row CreateDefaultRow(string name, string value, string url) =>
+         new GDSSummaryList.Row
+         {
+             Key = new GDSSummaryList.Row.Cell { Text = name, Classes = "govuk-!-width-two-thirds" },
+             Value = new GDSSummaryList.Row.Cell { Text = value == null ? "Not entered" : value.ToTitleCase(), Classes = "govuk-!-width-one-third" },
+             ActionItems = DefaultItems(url, name.ToLower())
+         };
+
+    protected RenderFragment CholesterolFragment => builder =>
+    {
+        builder.AddMarkupContent(0, @"<p class=""govuk-body"">HDL: " + @Check.HdlCholesterol?.ToString("n2") + @"</p><p class=""govuk-body"">Total: " + @Check.TotalCholesterol?.ToString("n2") + "</p>");
+    };
+
+    protected RenderFragment BloodPressureFragment => builder =>
+    {
+        builder.AddMarkupContent(0, @"<p class=""govuk-body"">Systolic: " + @Check.SystolicBloodPressure + @"</p><p class=""govuk-body"">Diastolic: " + @Check.DiastolicBloodPressure + "</p>");
+    };
+
+    string Convert(Ethnicity? ethnicity) =>
+        ethnicity switch
+        {
+            Ethnicity.AsianOther => "Any other Asian background",
+            Ethnicity.BlackOther => "Any other Black, African or Caribbean background",
+            Ethnicity.GypsyOrTraveller => "Gypsy or Irish Traveller",
+            Ethnicity.MixedOther => "Any other Mixed or Multiple ethnic background",
+            Ethnicity.OtherOther => "Any other ethnic group",
+            Ethnicity.WhiteAsian => "White and Asian",
+            Ethnicity.WhiteBlackAfrican => "White and Black African",
+            Ethnicity.WhiteBlackCaribbean => "White and Black Caribbean",
+            Ethnicity.WhiteBritish => "English, Welsh, Scottish, Northern Irish or British",
+            Ethnicity.WhiteOther => "Any other White background",
+            null => null,
+            _ => ethnicity.ToString(),
+        };
+
+    string Convert(SmokingStatus? smoking) =>
+        smoking switch
+        {
+            SmokingStatus.NonSmoker => "Non smoker",
+            SmokingStatus.ExSmoker => "Ex smoker",
+            null => null,
+            _ => $"{smoking} smoker"
+        };
+
+    string Convert(string identity, string customIdentity) =>
+        identity switch
+        {
+            "cis" => "Same as my sex assigned at birth",
+            "transwoman" => "Trans woman",
+            "transman" => "Trans man",
+            "nonbinary" => "Non-binary",
+            "intersex" => "Intersex",
+            "skip" => "Prefer not to say",
+            "custom" => customIdentity
+        };
+
+    string Convert(bool? yesNo) =>
+        yesNo switch
+        {
+            true => "Yes",
+            false => "No",
+            null => null
+        };
+
+    string Convert(AUDITFrequency? frequency) =>
+        frequency switch
+        {
+            AUDITFrequency.LessThanMonthly => "Less than monthly",
+            null => null,
+            _ => frequency.ToString()
+        };
+
+    string Convert(AUDITYesNotInLastYearNo? frequency) =>
+        frequency switch
+        {
+            AUDITYesNotInLastYearNo.NotInLastYear => "Not in the last year",
+            null => null,
+            _ => frequency.ToString()
+        };
+
+    string Convert(AUDITDrinkingFrequency? frequency) =>
+        frequency switch
+        {
+            AUDITDrinkingFrequency.FourTimesWeeklyPlus => "Four times weekly or more",
+            AUDITDrinkingFrequency.TwoToFourPerMonth => "Two to four times per month",
+            AUDITDrinkingFrequency.TwoToThreePerWeek => "Two to three times per week",
+            AUDITDrinkingFrequency.Monthly => "Monthly",
+            AUDITDrinkingFrequency.LessThanMonthly => "Less than monthly",
+            null => null,
+            _ => frequency.ToString()
+        };
+
+    string Convert(GPPAQEmploymentActivity? activity) =>
+    activity switch
+    {
+        GPPAQEmploymentActivity.Definite => "Definite physical activity",
+        GPPAQEmploymentActivity.Sitting => "Mostly sitting",
+        GPPAQEmploymentActivity.Standing => "Mostly standing",
+        GPPAQEmploymentActivity.Unemployed => "Not in employment",
+        GPPAQEmploymentActivity.Vigorous => "Vigorous physical activity",
+        null => null,
+        _ => activity.ToString()
+    };
+
+    string Convert(GPPAQWalkingPace? pace) =>
+        pace switch
+        {
+            null => null,
+            _ => pace.ToString()
+        };
+
+    string Convert(GPPAQActivityLevel? activity) =>
+        activity switch
+        {
+            GPPAQActivityLevel.LessThanOneHour => "Less than one hour",
+            GPPAQActivityLevel.OneToThreeHours => "One to three hours",
+            GPPAQActivityLevel.ThreeHoursOrMore => "Three hours or more",
+            null => null,
+            _ => activity.ToString()
+        };
+
+    string Convert(MentalWellbeingFrequency? frequency) =>
+        frequency switch
+        {
+            MentalWellbeingFrequency.EveryDay => "Every day",
+            MentalWellbeingFrequency.MoreThanHalf => "More than half the days in the last two weeks",
+            MentalWellbeingFrequency.SeveralDays => "Several days in the last two weeks",
+            MentalWellbeingFrequency.NotAtAll => "Not at all",
+            null => null,
+            _ => frequency.ToString()
+        };
+
+    string Convert(YesNoSkip? yesno) =>
+    yesno switch
+    {
+        YesNoSkip.Skip => "Prefer not to say",
+        null => null,
+        _ => yesno.ToString()
+    };
+
+
+    string ConvertEasyToChange(string priority) =>
+        priority switch
+        {
+            "1" => "Disagree",
+            "2" => "Somewhat disagree",
+            "3" => "Neither disagree nor agree",
+            "4" => "Somewhat agree",
+            "5" => "Agree",
+            _ => null
+        };
+
+    private const float KilogramsPerPound = 0.453592f;
+    private const float KilogramsPerStone = 6.35029f;
+    private const float MetersPerInch = 0.0254f;
+    private const float MetersPerFoot = 0.3048f;
+
+    int? ConvertToCm(float? meters) => meters is null ? null : (int)(meters.Value * 100);
+
+    private string ConvertToFeetAndInches(float? meters) =>
+        meters is null ? null : $"{ConvertToFeet(meters.Value)} feet {ConvertToInches(meters.Value)} inches";
+
+    private string ConvertToStoneAndPounds(float? kg) =>
+        kg is null ? null : $"{ConvertToStone(kg.Value)} stone {ConvertToPound(kg.Value)} pounds";
+
+    private int ConvertToPound(float kilograms)
+    {
+        var stone = ConvertToStone(kilograms);
+        var stoneInKg = stone * KilogramsPerStone;
+        var remainder = kilograms - stoneInKg;
+
+        return (int)(remainder / KilogramsPerPound);
+
+    }
+    private int ConvertToStone(float kilograms) => (int)(kilograms / KilogramsPerStone);
+
+    private int ConvertToInches(float meters)
+    {
+        var feet = ConvertToFeet(meters);
+        var feetInMeters = feet * MetersPerFoot;
+        var remainder = meters - feetInMeters;
+
+        return (int)(remainder / MetersPerInch);
+    }
+
+    private int ConvertToFeet(float meters) => (int)(meters / MetersPerFoot);
+
+    protected IList<GDSSummaryList.Row> AboutYou
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Your date of birth", Check.DateOfBirth?.ToString("dd/MM/yyyy"), "Validation"));
+            rows.Add(CreateDefaultRow("Your postcode", Check.Postcode, "Validation"));
+            rows.Add(CreateDefaultRow("Your height", Check.Height is null ? "Unknown" :
+                (Check.PrefersImperialHeightAndWeight == true ?
+                    ConvertToFeetAndInches(Check.Height) :
+                    ConvertToCm(Check.Height)?.ToString() + "cm"),
+                "HeightAndWeight"));
+            rows.Add(CreateDefaultRow("Your weight", Check.Weight is null ? "Unknown" :
+                (Check.PrefersImperialHeightAndWeight == true ?
+                    ConvertToStoneAndPounds(Check.Weight) :
+                    Check.Weight + "kg"),
+                "HeightAndWeight"));
+            rows.Add(CreateDefaultRow("Your sex assigned at birth", Check.SexAtBirth.ToString(), "Sex"));
+            rows.Add(CreateDefaultRow("Your current gender identity", Convert(Check.Identity, Check.CustomIdentity), "Sex"));
+
+            if(Check.Identity != "cis")
+            {
+                rows.Add(CreateDefaultRow("Gender affirmation treatment", Convert(Check.GenderAffirmation), "GenderAffirmation"));
+
+                if(Check.GenderAffirmation == true)
+                {
+                    rows.Add(CreateDefaultRow("The results for this check will be based on", (Variant ? Check.Variant.Sex : Check.SexForResults) == Check.SexAtBirth ? "your sex at birth" : "your current gender identity", "GenderIdentity"));
+                }
+            }
+            rows.Add(CreateDefaultRow("Your ethnicity", Convert(Check.Ethnicity), "Ethnicity"));
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> Smoking
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Your smoking status", Convert(Check.SmokingStatus), "Smoking"));
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> Alcohol
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Whether you drink", Convert(Check.DrinksAlcohol), "DoYouDrinkAlcohol"));
+
+            if (Check.DrinksAlcohol.HasValue && Check.DrinksAlcohol.Value)
+            {
+                rows.Add(CreateDefaultRow("How often you drink a drink containing alcohol", Convert(Check.DrinkingFrequency), "DrinkingFrequency"));
+                rows.Add(CreateDefaultRow("How many units of alcohol you drink on a typical day when you are drinking", Check.TypicalDayAlcoholUnits.ToString(), "AUDIT1"));
+                rows.Add(CreateDefaultRow($"How often you have had {(Check.SexForResults == Sex.Female ? 6 : 8)} or more units of alcohol on a single occasion in the last year", Convert(Check.MSASQ), "AUDIT1"));
+
+                if (!(Check.MSASQ == AUDITFrequency.LessThanMonthly || Check.MSASQ == AUDITFrequency.Never))
+                {
+                    rows.Add(CreateDefaultRow("How often during the last year you found you were not able to stop drinking once you had started", Convert(Check.UnableToStopDrinking), "AUDIT2"));
+                    rows.Add(CreateDefaultRow("How often during the last year you failed to do what was normally expected from you because of your drinking", Convert(Check.FailedResponsibilityDueToAlcohol), "AUDIT2"));
+
+                    rows.Add(CreateDefaultRow("How often during the last year you needed an alcoholic drink in the morning to get yourself going after a heavy drinking session", Convert(Check.NeededToDrinkAlcoholMorningAfter), "AUDIT3"));
+                    rows.Add(CreateDefaultRow("How often during the last year you had a feeling of guilt or remorse after drinking", Convert(Check.GuiltAfterDrinking), "AUDIT3"));
+
+                    rows.Add(CreateDefaultRow("How often during the last year you have been unable to remember what happened the night before because you had been drinking", Convert(Check.MemoryLossAfterDrinking), "AUDIT4"));
+                    rows.Add(CreateDefaultRow("Whether you or somebody else have been injured as a result of your drinking", Convert(Check.InjuryCausedByDrinking), "AUDIT4"));
+
+                    rows.Add(CreateDefaultRow("Whether a relative or friend, doctor or other health worker has been concerned about your drinking or suggested that you cut down", Convert(Check.ContactsConcernedByDrinking), "AUDIT5"));
+                }
+            }
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> PhysicalActivity
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("The type and amount of physical activity involved in your work", Convert(Check.WorkActivity), "PhysicalActivity"));
+
+            rows.Add(CreateDefaultRow("How many hours you spent in the last week on physical activity", Convert(Check.PhysicalActivity), "GPPAQ1"));
+            rows.Add(CreateDefaultRow("How many hours you spent in the last week on cycling", Convert(Check.Cycling), "GPPAQ1"));
+
+            rows.Add(CreateDefaultRow("How many hours you spent in the last week on gardening or DIY", Convert(Check.Gardening), "GPPAQ2"));
+            rows.Add(CreateDefaultRow("How many hours you spent in the last week on housework or childcare", Convert(Check.Housework), "GPPAQ2"));
+
+            rows.Add(CreateDefaultRow("How many hours you spent in the last week walking", Convert(Check.Walking), "GPPAQ3"));
+            rows.Add(CreateDefaultRow("Your walking pace", Convert(Check.WalkingPace), "GPPAQ3"));
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> Diabetes
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Whether a close relative has diabetes", Convert(Check.FamilyHistoryDiabetes), "Diabetes"));
+            rows.Add(CreateDefaultRow("Whether you take regular steroid tablets", Convert(Check.Steroids), "Diabetes"));
+
+            if (Check.SexForResults == Sex.Female)
+            {
+                rows.Add(CreateDefaultRow("Whether you have polycystic ovaries", Convert(Check.PolycysticOvaries), "PolycysticOvariesAndGestationalDiabetes"));
+                rows.Add(CreateDefaultRow("Whether you have gestational diabetes", Convert(Check.GestationalDiabetes), "PolycysticOvariesAndGestationalDiabetes"));
+            }
+
+            rows.Add(CreateDefaultRow("Your HbA1c", Check.KnowYourHbA1c == HaveYouBeenMeasured.Yes ? Check.BloodSugar?.ToString() ?? "Unknown" : "Unknown", "BloodSugar"));
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> RiskFactors
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Whether a close relative has had angina or heart attack before the age of 60", Convert(Check.FamilyHistoryCVD), "RiskFactors1"));
+            rows.Add(CreateDefaultRow("Whether you have chronic kidney disease", Convert(Check.ChronicKidneyDisease), "RiskFactors1"));
+            rows.Add(CreateDefaultRow("Whether you have atrial fibrillation", Convert(Check.AtrialFibrillation), "RiskFactors1"));
+
+            rows.Add(CreateDefaultRow("Whether you are on blood pressure treatment", Convert(Check.BloodPressureTreatment), "RiskFactors2"));
+            rows.Add(CreateDefaultRow("Whether you have migraines", Convert(Check.Migraines), "RiskFactors2"));
+            rows.Add(CreateDefaultRow("Whether you have rheumatoid arthritis", Convert(Check.RheumatoidArthritis), "RiskFactors2"));
+
+            rows.Add(CreateDefaultRow("Whether you have systemic lupus erythematosus (Optional)", Convert(Check.SystemicLupusErythematosus), "RiskFactors3"));
+            rows.Add(CreateDefaultRow("Whether you have severe mental illness (Optional)", Convert(Check.SevereMentalIllness), "RiskFactors3"));
+
+            if (Check.SevereMentalIllness == YesNoSkip.Yes)
+            {
+                rows.Add(CreateDefaultRow("Whether you are on atypical antipsychotic medication", Convert(Check.AtypicalAntipsychoticMedication), "RiskFactors3"));
+            }
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> MentalWellbeing
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            if(Check.SkipMentalHealthQuestions == true)
+            {
+                rows.Add(CreateDefaultRow("This section was skipped.",  "", "MentalWellbeing"));
+
+                return rows;
+            }
+
+            rows.Add(CreateDefaultRow("How often you feel anxious",  Convert(Check.Anxious), "MentalWellbeing"));
+            rows.Add(CreateDefaultRow("How often you feel unable to control worrying", Convert(Check.Control), "MentalWellbeing"));
+            rows.Add(CreateDefaultRow("How often you have felt bothered by feeling down, depressed or hopeless", Convert(Check.FeelingDown), "MentalWellbeing"));
+            rows.Add(CreateDefaultRow("How often you have felt bothered by little interest or pleasure in doing things", Convert(Check.Disinterested), "MentalWellbeing"));
+            rows.Add(CreateDefaultRow("Whether you are under the care of a psychologist or doctor for mental health problems", Convert(Check.UnderCare), "MentalWellbeing"));
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> BloodPressureAndCholesterol
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(new GDSSummaryList.Row
+            {
+                Key = new GDSSummaryList.Row.Cell { Text = "Your blood pressure", Classes = "govuk-!-width-two-thirds" },
+                Value = new GDSSummaryList.Row.Cell
+                {
+                    Text = "Unknown",
+                    Content = Check.KnowYourBloodPressure == HaveYouBeenMeasured.Yes ? BloodPressureFragment : null
+                },
+                ActionItems = DefaultItems("BloodPressure", "your blood pressure")
+            });
+
+            rows.Add(new GDSSummaryList.Row
+            {
+                Key = new GDSSummaryList.Row.Cell { Text = "Your cholesterol", Classes = "govuk-!-width-two-thirds" },
+                Value = new GDSSummaryList.Row.Cell
+                {
+                    Text = "Unknown",
+                    Content = Check.KnowYourCholesterol == HaveYouBeenMeasured.Yes ? CholesterolFragment : null
+                },
+                ActionItems = DefaultItems("Cholesterol", "your cholesterol")
+            });
+
+            return rows;
+        }
+    }
+
+    protected IList<GDSSummaryList.Row> ContactDetails
+    {
+        get
+        {
+            var rows = new List<GDSSummaryList.Row>();
+
+            rows.Add(CreateDefaultRow("Your email address", Check.EmailAddress ?? "Unknown", "Complete"));
+            rows.Add(CreateDefaultRow("Your number for phone calls", Check.PhoneNumber ?? "Unknown", "Complete"));
+            rows.Add(CreateDefaultRow("Your number for text messages", Check.SmsNumber ?? "Unknown", "Complete"));
+
+            return rows;
+        }
+    }
+
+}

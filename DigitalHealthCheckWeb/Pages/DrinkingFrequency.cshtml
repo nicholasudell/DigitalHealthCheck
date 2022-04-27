@@ -1,0 +1,16 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.DrinkingFrequencyModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Alcohol page 2 of 7";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.DrinkingFrequencyPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-frequency="@Model.Model.Frequency"
+           param-frequencyError="@Model.FrequencyError" />

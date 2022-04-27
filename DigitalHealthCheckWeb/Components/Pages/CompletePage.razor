@@ -1,0 +1,133 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Your communication preferences</h1>
+
+    <h2 class="govuk-heading-m">Your results</h2>
+
+    <p class="govuk-body">As this is a medical assessment, your results will automatically be shared with your GP clinic. If your results show that you have a high risk of developing either Type 2 diabetes or heart and circulatory disease, please contact your GP clinic for a non-urgent discussion of your results. If your situation requires urgent action, the service will use the words ‘urgent or urgently’.</p>
+
+    <p class="govuk-body">You can also receive the results of your assessment via email. This will include a link that will allow you to add in new blood pressure, cholesterol or blood sugar results and get an updated assessment. </p>
+
+    <h2 class="govuk-heading-m">Follow-ups and notifications</h2>
+
+    <p class="govuk-body">The second part of this NHS Health Check service also offers follow-up advice and support to help you make steps to improve your health.</p>
+
+    <p class="govuk-body">To receive the above mentioned results and follow-up support from this service, please provide your email below.</p>
+
+    <p class="govuk-body">We may also use your email address and UK mobile telephone number to invite you to feedback your experience using the Digital NHS Health Check.</p>
+
+    <p class="govuk-body">Your UK telephone number will be used if you later opt in to a telephone-based partner service. Your UK mobile phone number will be used if you later opt in for reminders.</p>
+
+    <GDSCheckboxes Items="Items"
+                   IdPrefix="contact"
+                   Name="Contact"
+                   Hint="@(new GDSHint.Options
+                {
+                    Text="Select all options that are relevant to you."
+                })"
+                   FieldSet="@(new GDSFieldSet.Options
+                {
+                    Legend = new GDSFieldSet.LegendOptions()
+                    {
+                        Text = "How would you like to be contacted? (optional)",
+                        Classes="govuk-fieldset__legend--s"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    protected RenderFragment SmsInput =>@<GDSInput Id="contact-by-text"
+                                                   Name="SmsNumber"
+                                                   Value="@SMSNumber"
+                                                   Type="tel"
+                                                   Autocomplete="tel"
+                                                   Classes="govuk-input--width-20"
+                                                   Label="@(new GDSLabel.Options
+                                                {
+                                                    Text="UK mobile telephone number"
+                                                })"
+                                                   ErrorMessage="SMSNumberError.AsErrorMessageComponent()" />;
+
+protected RenderFragment EmailInput =>@<GDSInput Id="contact-by-email"
+                                                 Name="EmailAddress"
+                                                 Type="email"
+                                                 Autocomplete="email"
+                                                 Spellcheck="false"
+                                                 Value="@EmailAddress"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="Email address"
+                                                        })"
+                                                 ErrorMessage="EmailAddressError.AsErrorMessageComponent()" />;
+
+protected RenderFragment PhoneInput =>@<GDSInput Id="contact-by-phone"
+                                                 Name="PhoneNumber"
+                                                 Type="tel"
+                                                 Autocomplete="tel"
+                                                 Value="@PhoneNumber"
+                                                 Classes="govuk-input--width-20"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="UK telephone number"
+                                                        })"
+                                                 ErrorMessage="PhoneNumberError.AsErrorMessageComponent()" />;
+
+protected IList<GDSCheckboxes.Item> Items => new[]
+{
+            new GDSCheckboxes.Item
+            {
+                Text="Email",
+                Value="email",
+                ConditionalContent=EmailInput,
+                Checked = Selected.Contains("email")
+            },
+            new GDSCheckboxes.Item
+            {
+                Text="Phone",
+                Value="phone",
+                ConditionalContent=PhoneInput,
+                Checked = Selected.Contains("phone")
+            },
+            new GDSCheckboxes.Item
+            {
+                Text="Text message",
+                Value="sms",
+                ConditionalContent=SmsInput,
+                Checked = Selected.Contains("sms")
+            }
+    }.ToList();
+
+[Parameter]
+public IEnumerable<string> Selected { get; set; }
+
+[Parameter]
+public string SMSNumber { get; set; }
+
+[Parameter]
+public string PhoneNumber { get; set; }
+
+[Parameter]
+public string EmailAddress { get; set; }
+
+[Parameter]
+public string SMSNumberError { get; set; }
+
+[Parameter]
+public string PhoneNumberError { get; set; }
+
+[Parameter]
+public string EmailAddressError { get; set; }
+
+}

@@ -1,0 +1,29 @@
+﻿@using DigitalHealthCheckEF;
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+        <p>There are @RequestCount new requests for home blood testing kits from the Digital NHS Health Check.</p>
+        <p>You can generate a report by going to <a href="@(Url("Reporting"))">the Digital NHS Health Check reporting dashboard</a>.</p>
+
+        <p>Sincerely,</p>
+        <p>Southwark Public Health Team</p>
+        <p><a href="mailto:publichealth@southwark.gov.uk">publichealth@southwark.gov.uk</a></p>
+        
+    </div>
+</body>
+</html>
+
+@code {
+
+    [Parameter]
+    public int RequestCount { get; set; }
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    protected string Url(string page) => $"{BaseUrl}/{page}";
+}

@@ -1,0 +1,45 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 7 of 7</h1>
+
+    <GDSRadios Name="ConcernedContacts"
+               Items="ConcernedContactsItems"
+               IdPrefix="concerned-contacts"
+               ErrorMessage="ConcernedContactsError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = " Has a relative or friend, doctor or other health worker been concerned about your drinking or suggested that you cut down?",
+               Classes="govuk-label--m"
+               }
+               })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string ConcernedContactsError { get; set; }
+
+    [Parameter]
+    public string ConcernedContacts { get; set; }
+
+    static IEnumerable<dynamic> Items = new[]{
+            new {Text="No", Value="no" },
+            new {Text="Yes, but not in the last year", Value="notInLastYear" },
+            new {Text="Yes, during the last year", Value="yes" }
+        };
+
+    protected IList<GDSRadios.Item> ConcernedContactsItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, ConcernedContacts);
+
+}

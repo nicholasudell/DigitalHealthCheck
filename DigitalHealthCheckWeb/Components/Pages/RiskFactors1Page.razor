@@ -1,0 +1,80 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<h1 class="govuk-heading-l">Risk factors page 1 of 3</h1>
+
+<p class="govuk-body">The following factors influence your risk of heart and circulatory disease. If you don’t know, select no.</p>
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <YesNoRadios Name="FamilyHistoryCVD"
+                 Error="@FamilyHistoryCVDError"
+                 Value="@FamilyHistoryCVD"
+                 IdPrefix="family-history"
+                 Hint="A close family member includes a birth mother, father, sister, or brother."
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = "Has a close family member ever been told that they have angina or had a heart attack under the age of 60?",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <GDSDetails SummaryText="What is angina?">
+        <p class="govuk-body">Angina is chest pain caused by reduced blood flow to the heart muscles. You can <a title="Find out more about angina" rel="noreferrer noopener" target="_blank" href="https://www.bhf.org.uk/informationsupport/conditions/angina" class="govuk-link">find out more about angina (opens in a new tab)</a> on the British Heart Foundation website.</p>
+    </GDSDetails>
+
+    <YesNoRadios Name="ChronicKidneyDisease"
+                 Error="@ChronicKidneyDiseaseError"
+                 Value="@ChronicKidneyDisease"
+                 IdPrefix="chronic-kidney-disease"
+                 Hint="Chronic kidney disease includes stage 3, 4, or 5 kidney disease."
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = "Have you ever been diagnosed with chronic kidney disease?",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <GDSDetails SummaryText="What is chronic kidney disease?">
+        <p class="govuk-body">Chronic kidney disease (CKD) is when your kidneys don’t work as well as they should. Most people are diagnosed with CKD by a blood or urine test. There are five stages of chronic kidney disease, with stage 1 being the least severe in which the kidney function remains normal but results from urine tests suggest kidney disease, and stage 5 CKD being the most severe where your kidneys can reach end-stage kidney failure.  You can <a title="Find out more about chronic kidney disease" rel="noreferrer noopener" target="_blank" href="https://www.kidneycareuk.org/about-kidney-health/conditions/ckd/" class="govuk-link">find out more about chronic kidney disease (opens in a new tab)</a> on the Kidney Care UK website.</p>
+    </GDSDetails>
+
+    <YesNoRadios Name="AtrialFibrillation"
+                 Error="@AtrialFibrillationError"
+                 Value="@AtrialFibrillation"
+                 IdPrefix="atrial-fibrillation"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+            Text = "Have you ever been diagnosed with atrial fibrillation?",
+            Classes="govuk-fieldset__legend--m"
+        })" />
+
+    <GDSDetails SummaryText="What is atrial fibrillation?">
+        <p class="govuk-body">Atrial fibrillation or AF is an abnormal and often irregularly fast heartbeat. You can <a title="Find out more about atrial fibrillation" rel="noreferrer noopener" target="_blank" href="https://www.bhf.org.uk/informationsupport/conditions/atrial-fibrillation" class="govuk-link">find out more about atrial fibrillation (opens in a new tab)</a> on the British Heart Foundation website.</p>
+    </GDSDetails>
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string ChronicKidneyDisease { get; set; }
+
+    [Parameter]
+    public string ChronicKidneyDiseaseError { get; set; }
+
+    [Parameter]
+    public string FamilyHistoryCVD { get; set; }
+
+    [Parameter]
+    public string FamilyHistoryCVDError { get; set; }
+
+    [Parameter]
+    public string AtrialFibrillation { get; set; }
+
+    [Parameter]
+    public string AtrialFibrillationError { get; set; }
+
+}

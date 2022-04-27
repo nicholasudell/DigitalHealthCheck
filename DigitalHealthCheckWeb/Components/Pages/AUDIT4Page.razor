@@ -1,0 +1,71 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 6 of 7</h1>
+
+    <GDSRadios Name="MemoryLoss"
+               Items="MemoryLossItems"
+               IdPrefix="memory-loss"
+               ErrorMessage="MemoryLossError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often during the last year have you been unable to remember what happened the night before because you had been drinking?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSRadios Name="Injured"
+               Items="InjuredItems"
+               IdPrefix="injured"
+               ErrorMessage="InjuredError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Have you or somebody else been injured as a result of your drinking?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string InjuredError { get; set; }
+
+    [Parameter]
+    public string MemoryLossError { get; set; }
+
+    [Parameter]
+    public string MemoryLoss { get; set; }
+
+    [Parameter]
+    public string Injured { get; set; }
+
+    static IEnumerable<dynamic> Items = new[]{
+        new {Text="No", Value="no" },
+        new {Text="Yes, but not in the last year", Value="notInLastYear" },
+        new {Text="Yes, during the last year", Value="yes" }
+    };
+
+    protected IList<GDSRadios.Item> MemoryLossItems => new[]
+    {
+        new {Text="Never", Value="never" },
+        new {Text="Less than monthly", Value="lessThanMonthly" },
+        new {Text="Monthly", Value="monthly" },
+        new {Text="Weekly", Value="weekly" },
+        new {Text="Daily or almost daily", Value="daily" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, MemoryLoss);
+
+    protected IList<GDSRadios.Item>
+    InjuredItems =>
+    Items.AsRadioComponents(x => x.Value, x => x.Text, Injured);
+
+}

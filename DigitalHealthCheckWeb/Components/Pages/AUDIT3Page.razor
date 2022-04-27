@@ -1,0 +1,68 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 5 of 7</h1>
+
+    <GDSRadios Name="MorningAfter"
+               Items="MorningAfterItems"
+               IdPrefix="morning-after"
+               ErrorMessage="MorningAfterError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often during the last year have you needed an alcoholic drink in the morning to get yourself going after a heavy drinking session?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSRadios Name="Guilt"
+               Items="GuiltItems"
+               IdPrefix="guilt"
+               ErrorMessage="GuiltError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often during the last year have you had a feeling of guilt or remorse after drinking?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string GuiltError { get; set; }
+
+    [Parameter]
+    public string MorningAfterError { get; set; }
+
+    [Parameter]
+    public string MorningAfter { get; set; }
+
+    [Parameter]
+    public string Guilt { get; set; }
+
+    static IEnumerable<dynamic>
+    Items = new[]{
+    new {Text="Never", Value="never" },
+    new {Text="Less than monthly", Value="lessThanMonthly" },
+    new {Text="Monthly", Value="monthly" },
+    new {Text="Weekly", Value="weekly" },
+    new {Text="Daily or almost daily", Value="daily" }
+            };
+
+    protected IList<GDSRadios.Item>
+    GuiltItems =>
+    Items.AsRadioComponents(x => x.Value, x => x.Text, Guilt);
+
+    protected IList<GDSRadios.Item> MorningAfterItems =>
+       Items.AsRadioComponents(x => x.Value, x => x.Text, MorningAfter);
+
+}

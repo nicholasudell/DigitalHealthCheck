@@ -1,0 +1,84 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Physical activity page 4 of 4</h1>
+
+    <GDSRadios Name="Walking"
+               IdPrefix="walking"
+               Hint="@(new GDSHint.Options {
+                    Text="Include walking to work, shopping, or for pleasure."
+               })"
+               Items="WalkingItems"
+               ErrorMessage="WalkingError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = "During the last week, approximately how many hours did you spend walking?",
+               Classes="govuk-label--m"
+               }
+               })" />
+
+    <GDSRadios Name="Pace"
+               Items="PaceItems"
+               IdPrefix="pace"
+               ErrorMessage="PaceError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How would you describe your walking pace?",
+                        Classes="govuk-label--m"
+                    }
+               })" />
+
+    <GDSDetails SummaryText="How to describe your walking pace">
+        <p class="govuk-body">
+            Say slow if: you are breathing easily and conversation is easy.
+        </p>
+        <p class="govuk-body">
+            Say steady or brisk if: you are able to talk but notice that your breathing is quicker and deeper, your body is warming up, your face has a healthy glow, and your heart is beating faster than normal but not racing.
+        </p>
+        <p class="govuk-body">
+            Say fast if: you are breathing very hard, are short of breath, you cannot carry on a conversation and your heartbeat feels rapid.
+        </p>
+    </GDSDetails>
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string WalkingError { get; set; }
+
+    [Parameter]
+    public string PaceError { get; set; }
+
+    [Parameter]
+    public string Pace { get; set; }
+
+    [Parameter]
+    public string Walking { get; set; }
+
+    protected IList<GDSRadios.Item>
+    WalkingItems =>
+    new[]{
+    new {Text="None", Value="none" },
+    new {Text="Some but less than 1 hour", Value="lessthanonehour" },
+    new {Text="Between 1 and 3 hours", Value="onetothreehours" },
+    new {Text="3 hours or more", Value="threehoursormore" }
+            }.AsRadioComponents(x => x.Value, x => x.Text, Walking);
+
+    protected IList<GDSRadios.Item>
+        PaceItems =>
+        new[]{
+        new {Text="Slow pace", Value="slow" },
+        new {Text="Steady pace", Value="steady" },
+        new {Text="Brisk pace", Value="brisk" },
+        new {Text="Fast pace", Value="fast" }
+                }.AsRadioComponents(x => x.Value, x => x.Text, Pace);
+}

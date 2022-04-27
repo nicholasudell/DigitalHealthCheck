@@ -1,0 +1,18 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.GPPAQ1Model
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Physical activity page 2 of 4";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.GPPAQ1Page)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-physicalActivity="@Model.Model.PhysicalActivity"
+           param-physicalActivityError="@Model.PhysicalActivityError"
+           param-cycling="@Model.Model.Cycling"
+           param-cyclingError="@Model.CyclingError" />

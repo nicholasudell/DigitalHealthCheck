@@ -1,0 +1,18 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.AUDIT3Model
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Alcohol page 5 of 7";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.AUDIT3Page)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-guilt="@Model.Model.Guilt"
+           param-guiltError="@Model.FeltGuiltError"
+           param-morningAfter="@Model.Model.MorningAfter"
+           param-morningAfterError="@Model.MorningAfterError" />

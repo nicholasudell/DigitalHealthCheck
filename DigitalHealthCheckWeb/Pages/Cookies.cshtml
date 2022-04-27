@@ -1,0 +1,46 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.CookiesPageModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{ViewData["Title"] = "Cookies";}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.CookiesPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-id="@Model.Id" />
+
+<script type="text/javascript">
+    document.getElementById("cookies-submit-preferences").addEventListener("click",()=>{
+        
+        var cookiesAccepted = document.getElementById("cookies-accept").checked;
+
+        setCookie("dhc_cookies_policy", cookiesAccepted ? "accepted" : "rejected", 365);
+
+        var notification = document.getElementById("cookies-updated-notification");
+
+        show("cookies-updated-notification");
+
+        notification.setAttribute("tabIndex",-1);
+        notification.focus();
+
+        // scroll to the top of the page
+        window.scrollTo(0, 0);
+    });
+
+    var prefs = getCookie("dhc_cookies_policy");
+
+    if(prefs === "accepted")
+    {
+        document.getElementById("cookies-accept").checked = true;
+    }
+    else
+    {
+        document.getElementById("cookies-reject").checked = true;
+    }
+
+    hide("cookies-no-js");
+    show("cookies-controls");
+</script>

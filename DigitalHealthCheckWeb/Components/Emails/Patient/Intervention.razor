@@ -1,0 +1,12 @@
+﻿<p style="margin-bottom:8px">You told us '@Prompt', so here is the link to <a href="@Url" title="@LinkTitle">@LinkDescription</a></p>
+
+@code {
+    [Parameter]
+    public string Prompt { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string LinkTitle { get; set; }
+    [Parameter]
+    public string LinkDescription { get; set; }
+}

@@ -1,0 +1,15 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.ResultsModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    Layout = null;
+    var baseUrl = urlBuilder.GetBaseUrl(HttpContext.Request);
+}
+
+<component type="typeof(Components.Emails.GP.GPReport)"
+           render-mode="Static"
+           param-check="@Model.Check"
+           param-result="@Model.Result"
+           param-id="@Model.Id"
+           param-baseUrl="baseUrl" />

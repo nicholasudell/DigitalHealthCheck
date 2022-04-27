@@ -1,0 +1,74 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <input type='hidden' name='ShowGroup' value='True'>
+    <input type='hidden' name='Ethnicity' value='@Ethnicity'>
+
+    <h1 class="govuk-heading-l">Ethnicity</h1>
+
+    <p class="govuk-body">Your ethnicity is used to calculate the risks associated with your heart and circulatory health. Some ethnicities are more likely to get heart and circulatory disease, so this is taken into account in the calculation of your results.</p>
+
+    <p class="govuk-body"></p>
+
+    <GDSRadios Name="EthnicGroup"
+               Items="Ethnicities"
+               IdPrefix="ethnic-group"
+               ErrorMessage="EthnicityError.AsErrorMessageComponent()"
+               Hint="@(new GDSHint.Options { Text = "After answering this general question you will be offered more specific options." })"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "What is your ethnic group?",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string Ethnicity { get; set; }
+
+    [Parameter]
+    public string EthnicityError { get; set; }
+
+    [Parameter]
+    public string EthnicGroup { get; set; }
+
+    protected IList<GDSRadios.Item> Ethnicities => new[]{
+        new
+        {
+            Text="White",
+            Value="white"
+        },
+        new
+        {
+            Text="Mixed or multiple ethnic groups",
+            Value="mixed"
+        },
+        new
+        {
+            Text="Asian or Asian British",
+            Value="asian"
+        },
+        new
+        {
+            Text="Black, African, Caribbean or Black British",
+            Value="black"
+        },
+        new
+        {
+            Text="Other ethnic group",
+            Value="other"
+        }
+    }.AsRadioComponents(x => x.Value, x => x.Text, EthnicGroup);
+}

@@ -1,0 +1,98 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Cholesterol page 2 of 2</h1>
+
+    <p class="govuk-body">If you had your cholesterol levels measured within the last year but cannot remember the numbers, you have two options. You can either go and find those results, or you can get a new measurement.</p>
+
+    <GDSDetails SummaryText="How can I find the results of my last cholesterol measurement?">
+        <p class="govuk-body">The result of your cholesterol measurement is in your GP record.</p>
+        <p class="govuk-body">GP records include information about your medicine, allergies, vaccinations, previous illnesses and test results, hospital discharge summaries, appointment letters and referral letters.</p>
+        <p class="govuk-body">You can access your GP records online through GP online services.</p>
+        <p class="govuk-body">To get your health records online you need to register for GP online services. This is a three-step process that can take from 30 minutes to a couple of hours.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/gps/online-health-and-prescription-services/" title="Visit GP online services">Visit GP online services (opens in new tab)</a></p>
+        <p class="govuk-body">If you have registered for GP online services, you can access your health information through NHS login or the NHS app.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/online-services/nhs-log-in/" title="View health records on NHS login and the NHS app">View health records on NHS login and the NHS app (opens in new tab)</a></p>
+        <p class="govuk-body">Once logged in you need to click on ‘View your GP health record’, where you will find ‘Test results.’</p>
+    </GDSDetails>
+
+    <GDSRadios Name="KnowYourCholesterol"
+               Items="KnowYourCholesterolItems"
+               ErrorMessage="KnowYourCholesterolError.AsErrorMessageComponent()"
+               IdPrefix="know-your-cholesterol"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "How would you like to proceed?",
+                            Classes="govuk-fieldset__legend--m",
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string HdlCholesterolMmoll { get; set; }
+
+    [Parameter]
+    public string HdlCholesterolMmollError { get; set; }
+
+    [Parameter]
+    public string TotalCholesterolMmoll { get; set; }
+
+    [Parameter]
+    public string TotalCholesterolMmollError { get; set; }
+
+    [Parameter]
+    public string KnowYourCholesterolError { get; set; }
+
+    [Parameter]
+    public string KnowYourCholesterol { get; set; }
+
+    private RenderFragment VisuallyHiddenLabelContent(string visible, string hidden) =>@<span>@visible <span class="govuk-visually-hidden">@hidden</span></span>;
+
+    RenderFragment CholesterolInner =>
+    @<GDSFieldSet Legend="@(new GDSFieldSet.LegendOptions { Text = "What are your cholesterol levels in millimoles per litre?" })">
+        <GDSInput Classes="govuk-!-width-one-third"
+                  Name="TotalCholesterolMmoll"
+                  Id="total-cholesterol"
+                  Label="@(new GDSLabel.Options { Content = VisuallyHiddenLabelContent("Total cholesterol","in millimoles per litre") })"
+                  Value="@TotalCholesterolMmoll"
+                  Suffix="@(new GDSInput.AffixOptions { Text = "mmol/L" })"
+                  ErrorMessage="@TotalCholesterolMmollError.AsErrorMessageComponent()" />
+        <GDSInput Classes="govuk-!-width-one-third"
+                  Name="HdlCholesterolMmoll"
+                  Id="hdl-cholesterol"
+                  Label="@(new GDSLabel.Options { Content =  VisuallyHiddenLabelContent("HDL cholesterol","in millimoles per litre") })"
+                  Value="@HdlCholesterolMmoll"
+                  Suffix="@(new GDSInput.AffixOptions { Text = "mmol/L" })"
+                  ErrorMessage="@HdlCholesterolMmollError.AsErrorMessageComponent()" />
+    </GDSFieldSet>;
+
+protected IList<GDSRadios.Item> KnowYourCholesterolItems => new[]{
+        new GDSRadios.Item
+        {
+            Text= "I found my cholesterol measurements",
+            Value="yes",
+            Checked = KnowYourCholesterol == "yes",
+            ConditionalContent = CholesterolInner
+        },
+        new GDSRadios.Item
+        {
+            Text= "I cannot find my cholesterol measurement or I would prefer to get a new measurement",
+            Value="no",
+            Checked = KnowYourCholesterol == "no",
+            ConditionalContent = @<p class="govuk-body"> We will direct you to a way of getting this information. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you.</p>
+        }
+    }.ToList();
+
+}

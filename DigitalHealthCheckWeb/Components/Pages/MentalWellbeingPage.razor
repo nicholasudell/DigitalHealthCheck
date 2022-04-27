@@ -1,0 +1,154 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Mental wellbeing</h1>
+
+    <p class="govuk-body">You will now be asked questions that relate to your mental wellbeing. Your mental wellbeing influences your ability to choose, start and maintain a healthy lifestyle, and in so doing your risk of developing heart and circulatory disease, and Type 2 diabetes.</p>
+
+    <p class="govuk-body">Looking after your mental wellbeing is important, not only when you are feeling low, anxious or stressed, but is something that plays a part in your everyday life.</p>
+
+    <p class="govuk-body">Your responses to the questions below will be used to determine whether you might benefit from support for your mental wellbeing. If you select ‘Improve my mental wellbeing’ as one of your health priorities, you will be provided with web links to helpful mental wellbeing resources and services that are available in Southwark.</p>
+
+    <p class="govuk-body">The next questions are to explore how you are feeling recently. It is understandable that you might experience anxiety or worry sometimes, depending on the situation. We are interested in if these feelings are serious enough to have a marked impact on your daily life.</p>
+
+    <p class="govuk-body">If you do not want to use this digital NHS Health Check service to address your mental wellbeing, feel free to click the “Skip” button at the bottom of this page.</p>
+
+    <GDSDetails SummaryText="If you do not want to use this digital NHS Health Check service to address your mental wellbeing, please read the information below.">
+        <p class="govuk-body">We understand that you prefer not to use this digital wellbeing service. If you have any feedback or suggestions for us, you can send them to takecare@southwark.gov.uk.</p>
+
+        <p class="govuk-body">We’d like to share some non-digital services available in Southwark that can support people's mental health. We recognise it is not always easy to access services that meet your unique needs. We encourage you to follow up with the following services to see what is available and appropriate for your situation.</p>
+
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://talkingtherapiessouthwark.nhs.uk/" title="Access Talking Therapies Southwark for NHS psychological support">Access Talking Therapies Southwark for NHS psychological support (opens in a new tab)</a> from a healthcare professional, and access to self-help resources.</p>
+
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://southwark.everyonehealth.co.uk/" title="Access Healthy Lifestyle Hub telephone service for advice, guidance and options">Access Healthy Lifestyle Hub telephone service for advice, guidance and options (opens in a new tab)</a> for local services and activities for mental health and wellbeing.</p>
+
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.together-uk.org/southwark-wellbeing-hub/get-support/" title="Southwark Wellbeing Hub for signposting support, 1:1 support, peer support and wellbeing workshops">Access Southwark Wellbeing Hub for signposting support, 1:1 support, peer support and wellbeing workshops (opens in a new tab)</a> for mental health and wellbeing.</p>
+
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/" title="Access Crisis support for a 24-hour mental health support line">Access Crisis support for a 24-hour mental health support line (opens in a new tab)</a> by phoning 0800 731 2864.</p>
+    </GDSDetails>
+
+
+    <YesNoRadios Name="FeelingDown"
+                 Error="@FeelingDownError"
+                 Value="@FeelingDown"
+                 IdPrefix="feeling-down"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "During the past month, have you been bothered by feeling down, depressed or hopeless?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <YesNoRadios Name="Disinterested"
+                 Error="@DisinterestedError"
+                 Value="@Disinterested"
+                 IdPrefix="disinterested"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "During the past month, have you often been bothered by having little interest or pleasure in doing things?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <h2 class="govuk-heading-m">Over the last two weeks, how often have you been bothered by the following problems?</h2>
+
+    <GDSRadios Name="Anxious"
+               Items="AnxiousItems"
+               IdPrefix="anxious"
+               ErrorMessage="AnxiousError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = "Feeling nervous, anxious or on edge",
+                    Classes="govuk-label--s"
+                }
+               })" />
+
+    <GDSRadios Name="Control"
+               Items="ControlItems"
+               IdPrefix="control"
+               ErrorMessage="ControlError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                Legend = new GDSFieldSet.LegendOptions {
+                    Text = "Not being able to stop or control worrying",
+                    Classes="govuk-label--s"
+               }
+               })" />
+
+    <YesNoRadios Name="UnderCare"
+                 Error="@UnderCareError"
+                 Value="@UnderCare"
+                 IdPrefix="under-care"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "Are you currently under the care of a psychologist or doctor for mental health problems?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <div class="govuk-button-group">
+        <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Submit"/>
+        <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Text="Skip" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Skip"/>
+    </div>
+    
+</form>
+
+@code {
+
+    [Parameter]
+    public string UnderCare { get; set; }
+
+    [Parameter]
+    public string UnderCareError { get; set; }
+
+    [Parameter]
+    public string Disinterested { get; set; }
+
+    [Parameter]
+    public string DisinterestedError { get; set; }
+
+    [Parameter]
+    public string FeelingDown { get; set; }
+
+    [Parameter]
+    public string FeelingDownError { get; set; }
+
+    [Parameter]
+    public string ControlError { get; set; }
+
+    [Parameter]
+    public string AnxiousError { get; set; }
+
+    [Parameter]
+    public string Anxious { get; set; }
+
+    [Parameter]
+    public string Control { get; set; }
+
+    private struct Response
+    {
+        public string Value { get; private set; }
+
+        public string Text { get; private set; }
+
+        public Response(string value, string text)
+        {
+            this.Value = value;
+            this.Text = text;
+        }
+    }
+
+    private IEnumerable<Response> responses = new[]
+    {
+        new Response("notatall", "Not at all"),
+        new Response("severaldays", "Several days"),
+        new Response("morethanhalf", "More than half the days"),
+        new Response("everyday", "Nearly every day"),
+    };
+
+    protected IList<GDSRadios.Item> AnxiousItems => responses.AsRadioComponents(x => x.Value, x => x.Text, Anxious);
+
+    protected IList<GDSRadios.Item> ControlItems => responses.AsRadioComponents(x => x.Value, x => x.Text, Control);
+
+}

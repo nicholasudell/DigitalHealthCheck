@@ -1,0 +1,56 @@
+﻿@inherits Page
+@using DigitalHealthCheckEF;
+
+<h1 class="govuk-heading-l">Recalculating your results</h1>
+
+@if (CurrentGender)
+{
+    <p class="govuk-body">We will now recalculate your results based on your current gender identity.</p>
+}
+else
+{
+    <p class="govuk-body">We will now recalculate your results based on your sex assigned at birth.</p>
+}
+
+@if (Sex == Sex.Female && !CurrentGender)
+{
+    <p class="govuk-body">A few of the questions will need to change to complete this calculation.</p>
+
+    @if (DrinksAlcohol)
+    {
+        <p class="govuk-body">This includes a question about how much alcohol you consume, because the amount of alcohol considered binge drinking differs based on your sex assigned at birth. There are also additional questions about whether you have experienced polycystic ovaries or gestational diabetes.</p>
+    }
+    else
+    {
+        <p class="govuk-body">There are additional questions about whether you have experienced polycystic ovaries or gestational diabetes.</p>
+    }
+
+    <p class="govuk-body">We will now redirect you to those questions, which provide additional context.</p>
+}
+else
+{
+    <p class="govuk-body">A few of the questions will need to change to complete this calculation.</p>
+
+    @if (DrinksAlcohol)
+    {
+        <p class="govuk-body">This includes a question about how much alcohol you consume, because the amount of alcohol considered binge drinking differs based on your sex assigned at birth.</p>
+
+        <p class="govuk-body">We will now redirect you to that question, which provides additional context.</p>
+    }
+}
+
+<form method="post" novalidate>
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public bool CurrentGender { get; set; }
+
+    [Parameter]
+    public Sex Sex { get; set; }
+    [Parameter]
+    public bool DrinksAlcohol { get; set; }
+}

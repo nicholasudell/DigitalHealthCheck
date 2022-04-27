@@ -1,0 +1,20 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.CholesterolModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Cholesterol";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.CholesterolPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-knowYourCholesterol="@Model.Model.KnowYourCholesterol"
+           param-knowYourCholesterolError="@Model.KnowYourCholesterolError"
+           param-hdlCholesterolMmoll="@Model.Model.HdlCholesterolMmoll"
+           param-hdlCholesterolMmollError="@Model.HdlCholesterolMmollError"
+           param-totalCholesterolMmoll="@Model.Model.TotalCholesterolMmoll"
+           param-totalCholesterolMmollError="@Model.TotalCholesterolMmollError" />

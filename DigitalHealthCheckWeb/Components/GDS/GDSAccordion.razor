@@ -1,0 +1,133 @@
+﻿<div class="govuk-accordion @Classes" data-module="govuk-accordion" id="@Id" @attributes="InputAttributes">
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+
+        if (item.IsFalsey)
+        {
+            //Workaround for the original templates using javascript
+            //falsiness to determine whether to render items.
+            //Ordinarily, we'd not include those in the Items array,
+            //and rely on type safety here but it's specified functionality
+            //that if some falsey items are included, the id must be incremented.
+            //So you could realistically have Item,false,0,Item and
+            //expect the second rendered item to have id-4
+
+            continue;
+        }
+
+        var itemIndex = i + 1;
+
+        <div class="govuk-accordion__section @item.ExpandedClass">
+            <div class="govuk-accordion__section-header">
+                @Header(HeadingLevel ?? 2, TitleInner(item, itemIndex))
+                @if (item.SummaryContent is not null || item.SummaryText is not null)
+                {
+                    <div class="govuk-accordion__section-summary govuk-body" id="@($"{Id}-summary-{itemIndex}")">
+                        @if (item.SummaryContent is null)
+                        {
+                            @item.SummaryText
+                        }
+                        else
+                        {
+                            @item.SummaryContent
+                        }
+                    </div>
+                }
+            </div>
+            <div id="@($"{Id}-content-{itemIndex}")" class="govuk-accordion__section-content" aria-labelledby="@($"{Id}-heading-{itemIndex}")">
+                @if (item.ContentContent is null)
+                {
+                    @item.ContentText
+                }
+                else
+                {
+                    @item.ContentContent
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    protected RenderFragment TitleInner(Item item, int index) =>@<span class="govuk-accordion__section-button" id="@($"{Id}-heading-{index}")">
+        @if (item.HeaderContent is null)
+        {
+            @item.HeaderText
+        }
+        else
+        {
+            @item.HeaderContent
+        }
+    </span>;
+
+public class Options //For other components
+{
+ public IList<Item> Items { get; set; } = new List<Item>();
+
+ public string Id { get; set; }
+
+ public IDictionary<string, object> Attributes { get; set; }
+
+ public string Classes { get; set; }
+
+ public int? HeadingLevel { get; set; }
+}
+
+protected RenderFragment Header(int level, RenderFragment inner)
+{
+ switch (level)
+ {
+     case 1:
+         return @<h1 class="govuk-accordion__section-heading">@inner</h1>;
+case 3:
+return @<h3 class="govuk-accordion__section-heading">@inner</h3>;
+case 4:
+return @<h4 class="govuk-accordion__section-heading">@inner</h4>;
+case 5:
+return @<h5 class="govuk-accordion__section-heading">@inner</h5>;
+case 6:
+return @<h6 class="govuk-accordion__section-heading">@inner</h6>;
+default:
+case 2:
+return@<h2 class="govuk-accordion__section-heading">@inner</h2>;
+}
+}
+
+[Parameter]
+public IList<Item> Items { get; set; } = new List<Item>();
+
+[Parameter]
+public string Id { get; set; }
+
+[Parameter(CaptureUnmatchedValues = true)]
+public IDictionary<string, object> InputAttributes { get; set; }
+
+[Parameter]
+public string Classes { get; set; }
+
+[Parameter]
+public int? HeadingLevel { get; set; }
+
+public class Item
+{
+//Workaround for GDS relying on javascript falsiness in their tests.
+//See large comment above for more info.
+public bool IsFalsey { get; set; }
+
+public string HeaderText { get; set; }
+public RenderFragment HeaderContent { get; set; }
+
+public string SummaryText { get; set; }
+public RenderFragment SummaryContent { get; set; }
+
+public string ContentText { get; set; }
+public RenderFragment ContentContent { get; set; }
+
+public bool Expanded { get; set; }
+
+public string ExpandedClass => Expanded ? "govuk-accordion__section--expanded" : null;
+}
+
+}

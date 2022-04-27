@@ -1,0 +1,16 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.RecalculatingModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Recalculating your results";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.RecalculatingPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-sex="Model.Sex"
+           param-currentGender="Model.CurrentGender"
+           param-drinksAlcohol="Model.DrinksAlcohol" />

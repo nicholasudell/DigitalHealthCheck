@@ -1,0 +1,955 @@
+﻿@using DigitalHealthCheckCommon
+@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Model;
+@using DigitalHealthCheckWeb.Helpers;
+@inherits Pages.Page;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+
+        @if(Preview)
+        {
+            <p>
+                <a onclick="window.print();return false;" href="#">Print this page</a>
+            </p>
+
+            <p>If the button does not work, try the following:</p>
+
+            <p>
+                PC and Mac commands: You can print this page by pressing CTRL+P (PC) or CMD+P (Mac)<br/>
+                Within a browser, option 1: File, Print<br/>
+                Within a browser (mobile), option 2: Share button, Print
+            </p>
+        }
+
+        <p style="font-size: 11pt"><strong>This service is currently in development and testing. Please share any feedback in the survey.</strong></p>
+
+        <table>
+            <tr>
+                <td style="width:100%">
+                    <p style="font-size: 18pt">
+                        <strong>Your Digital NHS Health Check@(Variant? ": Other Results" : ": Results")</strong>
+                    </p>
+                </td>
+                <td style="width:100%">
+                    <p style="font-size: 18pt; text-align:right">
+                        <strong>@CurrentDate</strong>
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        @if (Validated)
+        {
+            <p>Dear @Check.FirstName.ToTitleCase() @Check.Surname.ToTitleCase()</p>
+            <p>Thank you for completing your NHS Health Check, the medical service that assesses your risk of developing heart and circulatory diseases as well as Type 2 diabetes. This service helps you to take control of your health and wellbeing. </p>
+        }
+        else
+        {
+            <p>Hello</p>
+            <p>Thank you for completing your NHS Health Check, the medical service that assesses your risk of developing heart and circulatory diseases as well as Type 2 diabetes. This service helps you to take control of your health and wellbeing.</p>
+        }
+
+        @if (UrgentBloodPressure)
+        {
+            <p>
+                <strong>URGENT ACTION: Please urgently contact your GP clinic for a discussion today.</strong> If you are not able to have a discussion with a healthcare professional at your <strong>GP clinic for today, please ring 111.</strong>
+            </p>
+        }
+        else if (UrgentBodyMassIndex)
+        {
+            <p>
+                <strong>URGENT ACTION: If you are not already receiving care for your severely low BMI please urgently contact your GP clinic.</strong> If you are not able to have a discussion with a healthcare professional at your <strong>GP clinic for today, please ring 111.</strong>
+            </p>
+        }
+        else if (UrgentBloodSugar)
+        {
+            <p><strong>URGENT ACTION: If you are not already receiving care for your extremely high sugar level, please urgently contact your GP clinic.</strong> If you are not able to have a discussion with a healthcare professional at your <strong>GP clinic, please ring 111.</strong></p>
+        }
+
+        <p>Your feedback is important to us. It can help to shape our new Digital NHS Health Check service and ultimately help improve the health and wellbeing of others like yourself.</p>
+
+        <p>There will be three short surveys across three months – starting with the one below. Complete all three and be entered into a prize draw to win Decathlon gift vouchers! There are multiple prizes of £100.00, £50.00 and £25.00. You have an estimated 1 in 15 chance of winning.</p>
+
+        <p>Click this link to <a href="https://www.surveymonkey.co.uk/r/36LL893" title="Complete the first survey">complete the first survey</a>. It will take no more than 5 mins to complete.</p>
+
+        @if (!Validated)
+        {
+            <p>As your details could not be verified, your results have not been shared with your GP clinic. You may wish to do this directly. </p>
+        }
+
+        @if(Check.GenderAffirmation == true)
+        {
+            <p><strong>@(PrefersNotToDiscloseIdentity? "We recognise that you would prefer not to say your gender identity." : $"We recognise that you are {RichIdentity}.") You calculated two sets of results during your digital NHS Health Check. This set of results is based on your @(CurrentGender? "current gender identity" : "sex assigned at birth"). Your individual risk results are likely to be between the two because of your gender-affirmation treatment.</strong></p>
+
+            <p>You can use this link to <a href="@($"{BaseUrl}/Results{BuildQuery(IdQueryParam,"variant="+(!Variant).ToString())}")" title="Return to the results page based on your @(CurrentGender? "sex assigned at birth" : "current gender identity")">return to the results page based on your @(CurrentGender? "sex assigned at birth" : "current gender identity")</a>.</p>
+        }
+
+        <p>You can amend your measurements, including adding up-to-date blood pressure, cholesterol or blood sugar test results by using <a href="@(Url("CheckYourAnswers"))">your unique link to amend your health information</a>.</p>
+        <p>Below you will find the links to the support services that you requested, as well as a summary of your results. Please take a look at these.</p>
+        <p>If you would like further support to help you make changes to your lifestyle or improve your mental wellbeing please call our free healthy lifestyle telephone support service on 0333 005 0159.</p>
+        <p>This service is brought to you by the NHS and Southwark Council public health team. If you have any further questions about the service, please contact: publichealth@southwark.gov.uk.</p>
+
+        <p style="font-size: 16pt"><strong>Your support services:</strong></p>
+
+        <p>These services are specifically tailored to your results, your health priorities and the challenges you said you face in changing your lifestyle and health.</p>
+
+        @foreach (var intervention in InterventionsOrdered)
+        {
+            <DigitalHealthCheckWeb.Components.Emails.Patient.Intervention Url="@intervention.Url" Prompt="@intervention.Text" LinkTitle="@intervention.LinkTitle" LinkDescription="@intervention.LinkDescription" />
+
+            if(Check.PrefersToContactEveryoneHealth == true && EveryoneHealthReferralInterventions.Contains(intervention))
+            {
+                <p>You asked us to provide you with the phone number to contact the service, you can contact them by calling 0333 005 0159.</p>
+            }
+        }
+
+        @foreach (var customBarrier in CustomBarriers)
+        {
+            <p>Thank you for sharing a personal barrier you experience to @ConvertBarrierCategory(customBarrier.Category). We will review your feedback and find ways to improve our service offering to meet this need. In the meantime, please <a href="https://southwark.everyonehealth.co.uk/" title="check out the Southwark Healthy Lifestyle Service">check out the Southwark Healthy Lifestyle Telephone Support Service</a>.</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Check.BloodPressureFollowUp?.SelectedOption))
+        {
+
+            @switch (Check.BloodPressureFollowUp?.SelectedOption)
+            {
+                case "kiosk":
+                    <p>You told us you would like to get your blood pressure checked at a health kiosk.</p>
+                    <p>There is currently a kiosk at The Castle Leisure Centre. <a title="Find out details about The Castle Leisure Centre on their website" href="https://www.everyoneactive.com/centre/The-Castle-Centre">Find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+                    <p>You don’t need to book an appointment.</p>
+
+                    <p style="font-size: 14pt">The Castle Leisure Centre</p>
+                    <p>
+                        2 St Gabriel Walk,<br />
+                        Elephant & Castle,<br />
+                        London SE1 6FG<br />
+                        Telephone: 020 7091 4243<br />
+                    </p>
+                    <p>Website: <a href="https://www.everyoneactive.com/centre/The-Castle-Centre">The Castle Centre</a>.</p>
+                    <p>
+                        Opening times:<br />
+                        Mon: 6:30am - 10pm<br />
+                        Tue: 6:30am - 10pm<br />
+                        Wed: 6:30am - 10pm<br />
+                        Thu: 6:30am - 10pm<br />
+                        Fri: 6:30am - 10pm<br />
+                        Sat: 7:00am - 6pm<br />
+                        Sun: 7:00am - 10pm<br />
+                    </p>
+                    <p>We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third readings by adding the numbers together and dividing by two.</p>
+                    break;
+                case "leisurecentre":
+                    <p>You told us you would like to get your blood pressure checked at a leisure centre.</p>
+
+                    <p >There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                    break;
+                case "gp":
+                    <p>You told us you would like to get your blood pressure checked at your GP clinic.</p>
+                    <p>You will need to book an appointment to get your blood pressure measured. If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                    break;
+                case "pharmacy":
+                    <p>You told us you would like to get your blood pressure checked at a pharmacy.</p>
+                    <p>You can get your measurements taken at Bonamy Pharmacy.</p>
+                    <p>You need to book an appointment by phone, so please call in advance.</p>
+                    <p>Location and contact information:</p>
+                    <p>Bonamy Pharmacy<br/>
+                        355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                        0207 740 2523<br/>
+                        pharmacy.fv733@nhs.net<br/>
+                        http://bonamypharmacy.co.uk/<br/>
+                        <a title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in Google Maps)</a>
+                    </p>
+                    <p>
+                        Opening times:<br />
+                        Mon: 9am to 7pm<br />
+                        Tue: 9am to 7pm<br />
+                        Wed: 9am to 7pm<br />
+                        Thu: 9am to 7pm<br />
+                        Fri: 9am to 7pm<br />
+                        Sat: 9am to 2pm<br />
+                        Sun: Closed<br />
+                    </p>
+                    break;
+                case "home":
+                    <p>You told us you would like to get your blood pressure checked at home. To do this, you will need your own blood pressure monitor. </p>
+                    <p>You can buy your own blood pressure monitor from a chemist. Visit the British Heart Foundation website to <a href="https://www.bhf.org.uk/informationsupport/heart-matters-magazine/medical/tests/blood-pressure-measuring-at-home#Heading2" title="Find out more about choosing your home blood pressure monitor">find out more about choosing your home blood pressure monitor</a>. </p>
+                    <p>If you are taking your own blood pressure reading, please take it three times. You may find that your reading will change a little. We recommend that you do not use the first reading, as this is normally inaccurate. Please use an average of your second and third reading, by adding the numbers together and then dividing by two.</p>
+                    break;
+                default:
+                    break;
+            }
+
+            <p>Once you have your blood pressure reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Check.CholesterolFollowUp?.SelectedOption))
+        {
+
+            @switch (Check.CholesterolFollowUp?.SelectedOption)
+            {
+                case "leisurecentre":
+                    <p>You told us you would like to get your cholesterol checked at a leisure centre.</p>
+
+                    <p >There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                    break;
+                case "pharmacy":
+                    <p>You told us you would like to get your cholesterol checked at a pharmacy.</p>
+                    <p>You can get your measurements taken at Bonamy Pharmacy.</p>
+                    <p>You need to book an appointment by phone, so please call in advance.</p>
+                    <p>Location and contact information:</p>
+                    <p>Bonamy Pharmacy<br/>
+                        355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                        0207 740 2523<br/>
+                        pharmacy.fv733@nhs.net<br/>
+                        http://bonamypharmacy.co.uk/<br/>
+                        <a title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in Google Maps)</a>
+                    </p>
+                    <p>
+                        Opening times:<br />
+                        Mon: 9am to 7pm<br />
+                        Tue: 9am to 7pm<br />
+                        Wed: 9am to 7pm<br />
+                        Thu: 9am to 7pm<br />
+                        Fri: 9am to 7pm<br />
+                        Sat: 9am to 2pm<br />
+                        Sun: Closed<br />
+                    </p>
+                    break;
+                case "gp":
+                    <p>You told us you would like to get your cholesterol checked at your GP clinic.</p>
+                    <p>You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                    <p>If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                    <p>If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                    break;
+                case "home":
+                    <p>You told us you would like to get your cholesterol checked using an at-home finger-prick testing kit.</p>
+                    <p>We will send you an at-home finger-prick testing kit through the mail to the address you provided. This kit enables you to simply take a blood sample for yourself and send it in a premarked package to a lab that will update you with your results.</p>
+                    break;
+                default:
+                    break;
+            }
+
+            <p>Once you have your cholesterol reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Check.BloodSugarFollowUp?.SelectedOption))
+        {
+            @switch (Check.BloodSugarFollowUp?.SelectedOption)
+            {
+                case "leisurecentre":
+                    <p>You told us you would like to get your blood sugar level checked at a leisure centre.</p>
+                    <p>There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                    break;
+                case "pharmacy":
+                    <p>You told us you would like to get your blood sugar level checked at a pharmacy.</p>
+                    <p>You can get your measurements taken at Bonamy Pharmacy.</p>
+                    <p>You need to book an appointment by phone, so please call in advance.</p>
+                    <p>Location and contact information:</p>
+                    <p>Bonamy Pharmacy<br/>
+                        355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                        0207 740 2523<br/>
+                        pharmacy.fv733@nhs.net<br/>
+                        http://bonamypharmacy.co.uk/<br/>
+                        <a title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in Google Maps)</a>
+                    </p>
+                    <p>
+                        Opening times:<br />
+                        Mon: 9am to 7pm<br />
+                        Tue: 9am to 7pm<br />
+                        Wed: 9am to 7pm<br />
+                        Thu: 9am to 7pm<br />
+                        Fri: 9am to 7pm<br />
+                        Sat: 9am to 2pm<br />
+                        Sun: Closed<br />
+                    </p>
+                    break;
+                case "gp":
+                    <p>You told us you would like to get your blood sugar level checked at your GP clinic.</p>
+                    <p>You can contact your GP clinic for an appointment to have your blood sample taken. This may be at your clinic or at one of the centralised phlebotomy services. You will need to explain that this is for your digital NHS Health Check.</p>
+                    <p>If your GP clinic is unable to offer this service, they may redirect you to one of the above community options.</p>
+                    <p>If you can’t remember your GP clinic’s contact details, you can find them out by using the <a title="NHS find a GP clinic tool" href="https://www.nhs.uk/service-search/find-a-gp">NHS find a GP clinic tool</a>.</p>
+                    break;
+                case "home":
+                    <p>You told us you would like to get your blood sugar level checked using an at-home finger-prick testing kit.</p>
+                    <p>We will send you an at-home finger-prick testing kit through the mail to the address you provided. This kit enables you to simply take a blood sample for yourself and send it in a premarked package to a lab that will update you with your results.</p>
+                    break;
+                default:
+                    break;
+
+            }
+
+            <p>Once you have your blood sugar reading, you can return to the ‘Check your Answers’ page directly using <a href="@(Url("CheckYourAnswers"))" title="your unique link to amend your health information">your unique link to amend your health information</a>.</p>
+
+        }
+
+        @if (!string.IsNullOrEmpty(ReminderText))
+        {
+            <p style="font-size: 16pt"><strong>Your reminders:</strong></p>
+
+            <p>You told us you would like to be reminded about:</p>
+
+            if (Check.BloodPressureFollowUp?.BeReminded == true)
+            {
+                <p>Getting your blood pressure checked.</p>
+            }
+            if (Check.ImproveBloodPressureFollowUp?.BeReminded == true)
+            {
+                <p>Improving your blood pressure.</p>
+            }
+            if (Check.BloodSugarFollowUp?.BeReminded == true)
+            {
+                <p>Getting your blood sugar checked.</p>
+            }
+            if (Check.ImproveBloodSugarFollowUp?.BeReminded == true)
+            {
+                <p>Improving your blood sugar.</p>
+            }
+            if (Check.BookGPAppointmentFollowUp?.BeReminded == true)
+            {
+                <p>Making an appointment with your GP clinic.</p>
+            }
+            if (Check.CholesterolFollowUp?.BeReminded == true)
+            {
+                <p>Getting your cholesterol checked.</p>
+            }
+            if (Check.ImproveCholesterolFollowUp?.BeReminded == true)
+            {
+                <p>Improving your cholesterol.</p>
+            }
+            if (Check.DrinkLessFollowUp?.BeReminded == true)
+            {
+                <p>Reducing your alcohol consumption.</p>
+            }
+            if (Check.HealthyWeightFollowUp?.BeReminded == true)
+            {
+                <p>Trying to achieve a healthy weight.</p>
+            }
+            if (Check.MentalWellbeingFollowUp?.BeReminded == true)
+            {
+                <p>Trying to improve your mental wellbeing.</p>
+            }
+            if (Check.MoveMoreFollowUp?.BeReminded == true)
+            {
+                <p>Moving more.</p>
+            }
+            if (Check.QuitSmokingFollowUp?.BeReminded == true)
+            {
+                <p>Setting a quit smoking date.</p>
+            }
+        }
+
+        <p style="font-size: 16pt"><strong>Your results:</strong></p>
+
+        <p style="font-size: 14pt">In a crowd of 100 people with the same risk factors as you, @(QRisk) are likely to have a heart attack or stroke within the next 10 years.</p>
+
+        <p>In other words, you have @(AOrAn(QRisk)) @(QRisk)% chance of having a heart attack or stroke within the next 10 years.</p>
+
+        @switch (Result.HeartDisease)
+        {
+            case DefaultStatus.Healthy:
+
+                switch (BehaviourStatus)
+                {
+                    case TrafficLight.Status.Green:
+                        <p>You are living a healthy lifestyle and have a low risk of developing heart and circulatory diseases in the next 10 years. Keep up the good work and consider health services that might help you continue on this healthy path. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+
+                    case TrafficLight.Status.Amber:
+                        <p>You have a low risk of developing heart and circulatory disease in the next 10 years. However, your current lifestyle choices put you at medium risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+
+                    case TrafficLight.Status.Red:
+                        <p>You have a low risk of developing heart disease in the next 10 years. Your risk is low due to your age, as the risk of getting heart and circulatory disease increases significantly as you get older. Your current lifestyle choices put  you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+                }
+                break;
+
+            case DefaultStatus.Warning:
+
+                switch (BehaviourStatus)
+                {
+                    case TrafficLight.Status.Green:
+                        <p>You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. This is largely due to factors such as your age, family history and medical conditions that you might have. You are doing everything you can and are at a much lower risk because of your healthy behaviours. Keep up the good work. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+
+                    case TrafficLight.Status.Amber:
+                        <p>You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+
+                    case TrafficLight.Status.Red:
+                        <p>You have a medium risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. Your risk of getting heart and circulatory disease will increase as you get older. Your current lifestyle choices put you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+                }
+                break;
+
+            case DefaultStatus.Danger:
+
+                switch (BehaviourStatus)
+                {
+                    case TrafficLight.Status.Green:
+                        <p>You have a high risk of developing heart disease in the next 10 years. This is largely due to factors such as your age, family history and medical conditions. You are doing everything you can and are at much lower risk because of your healthy behaviours. Keep up the good work and please contact your GP clinic for a non-urgent discussion of your results and to access additional support.</p>
+                        break;
+
+                    case TrafficLight.Status.Amber:
+                    case TrafficLight.Status.Red:
+                        <p>You have a high risk of developing heart disease in the next 10 years. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support. Your current lifestyle choices put you at high risk of developing conditions such as heart disease and cancer during your lifetime. Your risk of getting heart disease will increase as you get older, so the actions you take now to live a healthier lifestyle will impact your future health.</p>
+                        break;
+                }
+                break;
+        }
+
+        @{var missing = new List<string>();
+
+            if (Result.BloodSugar is null && (
+                Result.BodyMassIndex == BodyMassIndexStatus.Obese ||
+                Result.BloodPressure == BloodPressureStatus.High ||
+                Result.BloodPressure == BloodPressureStatus.Severe ||
+                Result.Diabetes == DefaultStatus.Danger
+                ))
+            {
+                missing.Add("HbA1c");
+            }
+            if (Result.BloodPressure is null)
+            {
+                missing.Add("blood pressure");
+            }
+            if (Result.Cholesterol is null)
+            {
+                missing.Add("cholesterol");
+            }
+
+            var missingText = "";
+
+            if (missing.Any())
+            {
+
+                if (missing.Count == 1)
+                {
+                    missingText = missing.Single();
+                }
+                else if (missing.Count == 2)
+                {
+                    missingText = $"{missing.First()} and {missing.Last()}";
+                }
+                else
+                {
+                    missingText = $"{missing.First()}, {missing[1]}, and {missing.Last()}";
+                }
+            }
+        }
+
+        @if (missing.Any())
+        {
+            <p>This score was calculated using estimated data where you were unable to provide your @missingText levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+        }
+
+        <p style="font-size: 16pt">Your heart is comparable to the heart of a @HeartAge year old</p>
+
+        <p>You are @Check.Age years old and your risk of getting heart disease is similar to that of a @HeartAge year old.</p>
+
+        @switch (Result.HeartAge)
+        {
+            case DefaultStatus.Healthy:
+                <p>
+                    Your heart age is close to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be lower for you than other people your age who have a less healthy lifestyle. You will also have a lower risk of developing some cancers and dementia. Keep up the good work.
+                </p>
+                break;
+            case DefaultStatus.Warning:
+                <p>
+                    Your heart age is high in comparison to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be higher for you than other people your age who have a healthier lifestyle. You will also have a higher risk of developing some cancers and dementia. You can reduce your risk by improving your lifestyle. In the follow-up section, we will direct you to the relevant information and services.
+                </p>
+
+                <p>
+                    If you lower your risk factors by making improvements to your lifestyle, your heart could feel @(HeartAge - Check.Age) years younger.
+                </p>
+                break;
+            case DefaultStatus.Danger:
+                <p>
+                    Your heart age is very high in comparison to your actual age. This means that as you get older your risk for developing heart and circulatory diseases will be significantly higher for you than other people your age who have a healthier lifestyle. You will also have a higher risk of developing some cancers and dementia. You can reduce your risk by improving your lifestyle. In the follow-up section, we will direct you to the relevant information and services.
+                </p>
+
+                <p>
+                    If you lower your risk factors by making improvements to your lifestyle, your heart could feel @(HeartAge - Check.Age) years younger.
+                </p>
+                break;
+        }
+
+        @if (missing.Any())
+        {
+            <p>This score was calculated using estimated data where you were unable to provide your @missingText levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+        }
+
+        @switch (Result.Diabetes)
+        {
+            case DefaultStatus.Healthy:
+                <p style="font-size: 16pt">You are at low risk of developing Type 2 diabetes</p>
+                <p>In a crowd of 100 people with the same risk factors as you, @QDiabetes are likely to develop Type 2 diabetes within the next 10 years. </p>
+                       <p class="govuk-body">In other words, you have @(AOrAn(QDiabetes)) @(QDiabetes)% chance of developing Type 2 diabetes within the next 10 years.</p>
+                <p>Everyone has some level of risk for developing Type 2 diabetes. Some risk factors cannot be controlled, such as your age or ethnicity. Other risk factors, such as your weight and physical activity levels, can be changed, which is why maintaining a healthy lifestyle is important. </p>
+                break;
+
+            case DefaultStatus.Danger:
+                <p style="font-size: 16pt">You are at a high risk of developing Type 2 diabetes</p>
+                <p>
+                    In a crowd of 100 people with the same risk factors as you, @QDiabetes are likely to develop Type 2 diabetes within the next 10 years.</p> 
+                <p class="govuk-body">In other words, you have @(AOrAn(QDiabetes)) @(QDiabetes)% chance of developing Type 2 diabetes within the next 10 years.</p>
+                    <p>Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. This will include a blood test to check your blood sugar level. You may also be referred to the Diabetes Prevention Programme.
+                </p>
+                break;
+        }
+
+        @if (Result.Diabetes == DefaultStatus.Danger && Check.BloodSugar is null)
+        {
+            <p>This score was calculated using estimated data where you were unable to provide your HbA1c levels. You could make this score more accurate for you personally by completing the tests we request in the follow-up sections of this tool.</p>
+        }
+
+        @switch (Result.MentalWellbeing)
+        {
+            case DefaultStatus.Danger:
+                <p>Your results show that your mental wellbeing score is poor and that you might be struggling more than most people. Many people can relate to where you feel you are right now. If you believe you are experiencing a mental health crisis, you can talk to someone now by calling Southwark’s NHS mental health crisis line on 0800 731 2864 (select option 1). <a rel="noreferrer noopener" target="_blank" title="Find information about mental health crisis support services on the South London and Maudsley NHS mental health website" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/" class="govuk-link">Find information about mental health crisis support services (opens in a new tab)</a> on the South London and Maudsley NHS mental health website.</p>
+                @if (Check.UnderCare == true)
+                {
+                    <p>You reported that you are currently seeing a psychologist or doctor for your mental wellbeing. Please continue to see the healthcare professional who is supporting your mental health; you may wish to discuss your results at your next appointment.</p>
+                }
+                else
+                {
+                    <p>If you are not experiencing a mental health crisis, please contact your GP clinic for a non-urgent discussion about your mental wellbeing.</p>
+                }
+                break;
+            case DefaultStatus.Warning:
+                @if (Check.UnderCare != true)
+                {
+                    <p>Your results show that your mental wellbeing score is OK but not great. You can explore ways in which to improve your mental wellbeing in the follow-up section of the NHS Health Check, such as accessing Southwark’s free talking therapies.</p>
+                }
+                else
+                {
+                    <p>Your results show that your mental wellbeing score is OK but not great.</p>
+
+                    <p>You reported that you are currently seeing a psychologist or doctor for your mental wellbeing. Please continue to see the healthcare professional who is supporting your mental health; you may wish to discuss your results at your next appointment.</p>
+                }
+                break;
+            default:
+                <p>Your initial results show that your mental wellbeing score is good and that you don't seem to have significant problems with your mood or anxiety.</p>
+                break;
+        }
+
+        @foreach (var trafficItem in TrafficLightItems)
+        {
+            <TrafficLightBox Item="@trafficItem" />
+        }
+
+        <p style="font-size: 16pt"><strong>Consent options:</strong></p>
+
+        <p>As a reminder, here is <a href="@(Url("DataProtection"))">our privacy policy</a>.</p>
+        <p>Thank you again for taking the time to take control of your health and wellbeing.</p>
+
+        <p>Best wishes,</p>
+        <p>Southwark Public Health Team</p>
+    </div>
+</body>
+</html>
+
+@code {
+    public bool PrefersNotToDiscloseIdentity => Check.Identity == "skip";
+
+    public string RichIdentity => Check.Identity switch
+    {
+        "transman" => "a trans man",
+        "transwoman" => "a trans woman",
+        "nonbinary" => "nonbinary",
+        "intersex" => "intersex",
+        "custom" => Check.CustomIdentity,
+        _ => ""
+    };
+
+    protected bool CurrentGender => Variant ? 
+        Check.SexAtBirth != Check.Variant.Sex : 
+        Check.SexAtBirth != Check.SexForResults;
+
+    [Parameter]
+    public bool Variant { get; set; }
+
+    protected int QRisk => (int)Math.Round(((Variant ? Check.Variant.QRisk : Check.QRisk).Value),0,MidpointRounding.AwayFromZero);
+    protected int QDiabetes => (int)Math.Round(((Variant ? Check.Variant.QDiabetes : Check.QDiabetes).Value),0,MidpointRounding.AwayFromZero);
+    protected int HeartAge => (Variant ? Check.Variant.HeartAge : Check.HeartAge).Value;
+
+    protected IEnumerable<DigitalHealthCheckEF.Intervention> InterventionsOrdered => new[]
+    {
+        "gp","smoking","weight","alcohol","move","mental","cholesterol","bloodpressure","bloodsugar","improvecholesterol","improvebloodpressure","improvebloodsugar"
+    }.SelectMany(x => AllInterventions.OrderBy(y => y.Id).Where(y => y.Category == x));
+
+    string ConvertBarrierCategory(string category) => category switch
+    {
+        "gp" => "visiting your GP",
+        "smoking" => "stopping smoking",
+        "weight" => "maintaining a healthy weight",
+        "alcohol" => "drinking less",
+        "move" => "moving more",
+        "mental" => "improving your mental wellbeing",
+        "cholesterol" => "getting your cholesterol levels checked",
+        "bloodpressure" => "getting your blood pressure checked",
+        "bloodsugar" => "getting your blood sugar levels checked",
+        "improvecholesterol" => "improving your cholesterol levels",
+        "improvebloodpressure" => "improving your blood pressure",
+        "improvebloodsugar" => "improving your blood sugar",
+        _ => "improving your health and wellbeing"
+    };
+
+    protected string ReminderText => string.Join(", ", Reminders);
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    private bool UrgentBloodPressure => Result.BloodPressure == BloodPressureStatus.Severe;
+
+    private bool UrgentBodyMassIndex => Result.BodyMassIndex == BodyMassIndexStatus.SeverelyUnderweight;
+
+    private bool UrgentBloodSugar => Result.BloodSugar == BloodSugarStatus.Severe;
+
+    protected DefaultStatus OverallStatus => (DefaultStatus)(Math.Max(Math.Max((int)Result.HeartDisease, (int)Result.HeartAge), (int)Result.Diabetes));
+
+    protected bool HighRisk => OverallStatus == DefaultStatus.Danger;
+
+    protected TrafficLight.Status BehaviourStatus => (TrafficLight.Status)TrafficLightItems.Select(x => (int)x.Status).Max();
+
+    protected IEnumerable<DigitalHealthCheckEF.Intervention> AllInterventions => Check.ChosenInterventions ?? new List<DigitalHealthCheckEF.Intervention>();
+
+    protected IEnumerable<DigitalHealthCheckEF.CustomBarrier> CustomBarriers => Check.CustomBarriers ?? new List<DigitalHealthCheckEF.CustomBarrier>();
+
+    protected string CurrentDate => DateTime.Now.ToString("dd/MM/yyyy");
+
+    private IList<string> Scores { get; set; } = new List<string>();
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    protected string Url(string page)
+    {
+        if(page == "CheckYourAnswers")
+        {
+            return $"{BaseUrl}/{page}{BuildQuery(IdQueryParam)}";
+        }
+
+        return $"{BaseUrl}/{page}{BuildQuery(IdQueryParam, $"next=CheckYourAnswers")}";
+    }
+
+    protected IEnumerable<string> Reminders
+    {
+        get
+        {
+            if (Check.BloodPressureFollowUp?.BeReminded == true)
+            {
+                yield return "getting your blood pressure checked";
+            }
+            if (Check.ImproveBloodPressureFollowUp?.BeReminded == true)
+            {
+                yield return "improving your blood pressure";
+            }
+            if (Check.BloodSugarFollowUp?.BeReminded == true)
+            {
+                yield return "getting your blood sugar checked";
+            }
+            if (Check.ImproveBloodSugarFollowUp?.BeReminded == true)
+            {
+                yield return "improving your blood sugar";
+            }
+            if (Check.BookGPAppointmentFollowUp?.BeReminded == true)
+            {
+                yield return "making an appointment with your GP clinic";
+            }
+            if (Check.CholesterolFollowUp?.BeReminded == true)
+            {
+                yield return "getting your cholesterol checked";
+            }
+            if (Check.ImproveCholesterolFollowUp?.BeReminded == true)
+            {
+                yield return "improving your cholesterol";
+            }
+            if (Check.DrinkLessFollowUp?.BeReminded == true)
+            {
+                yield return "reducing your alcohol consumption";
+            }
+            if (Check.HealthyWeightFollowUp?.BeReminded == true)
+            {
+                yield return "trying to achieve a healthy weight";
+            }
+            if (Check.MentalWellbeingFollowUp?.BeReminded == true)
+            {
+                yield return "trying to improve your mental wellbeing";
+            }
+            if (Check.MoveMoreFollowUp?.BeReminded == true)
+            {
+                yield return "moving more";
+            }
+            if (Check.QuitSmokingFollowUp?.BeReminded == true)
+            {
+                yield return "setting a quit smoking date";
+            }
+        }
+    }
+
+    [Parameter]
+    public bool Preview {get;set;}
+
+    [Parameter]
+    public IEnumerable<Measurement> Measurements { get; set; }
+
+    [Parameter]
+    public bool Validated { get; set; }
+
+    protected string Percentage(double val) => val.ToString("n0"); //QRISK and QDIABETES already come out as percentage, so we just trunkate
+
+    TrafficLight.Status Convert(DefaultStatus? status) =>
+            status switch
+            {
+                DefaultStatus.Danger => TrafficLight.Status.Red,
+                DefaultStatus.Warning => TrafficLight.Status.Amber,
+                DefaultStatus.Healthy => TrafficLight.Status.Green,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BloodSugarStatus? status) =>
+            status switch
+            {
+                BloodSugarStatus.Severe => TrafficLight.Status.Red,
+                BloodSugarStatus.Danger => TrafficLight.Status.Red,
+                BloodSugarStatus.Warning => TrafficLight.Status.Amber,
+                BloodSugarStatus.Healthy => TrafficLight.Status.Green,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BodyMassIndexStatus? status) =>
+        status switch
+        {
+            BodyMassIndexStatus.Obese => TrafficLight.Status.Red,
+            BodyMassIndexStatus.SeverelyUnderweight => TrafficLight.Status.Red,
+            BodyMassIndexStatus.Underweight => TrafficLight.Status.Red,
+            BodyMassIndexStatus.Overweight => TrafficLight.Status.Amber,
+            BodyMassIndexStatus.Healthy => TrafficLight.Status.Green,
+            _ => TrafficLight.Status.Red
+        };
+
+    TrafficLight.Status Convert(PhysicalActivityStatus? status) =>
+            status switch
+            {
+                PhysicalActivityStatus.Active => TrafficLight.Status.Green,
+                PhysicalActivityStatus.MostlyActive => TrafficLight.Status.Amber,
+                PhysicalActivityStatus.MostlyInactive => TrafficLight.Status.Red,
+                PhysicalActivityStatus.Sedentary => TrafficLight.Status.Red,
+                _ => TrafficLight.Status.Red
+            };
+
+    TrafficLight.Status Convert(BloodPressureStatus? status) =>
+    status switch
+    {
+        BloodPressureStatus.Severe => TrafficLight.Status.Red,
+        BloodPressureStatus.High => TrafficLight.Status.Red,
+        BloodPressureStatus.SlightlyHigh => TrafficLight.Status.Amber,
+        BloodPressureStatus.Healthy => TrafficLight.Status.Green,
+        BloodPressureStatus.Low => TrafficLight.Status.Amber,
+        _ => TrafficLight.Status.Red
+    };
+
+    [Parameter]
+    public Result Result { get; set; }
+
+    private IList<string> trafficLightSortOrder = new List<string>()
+{
+        "Blood pressure",
+        "Cholesterol",
+        "Total cholesterol",
+        "HDL cholesterol",
+        "Cholesterol ratio",
+        "Smoking",
+        "Alcohol",
+        "Weight",
+        "Diabetes",
+        "Blood sugar",
+        "Physical activity",
+        "Risk factors"
+    };
+
+    public string AOrAn(int number) => number switch
+    {
+        8 => "an",
+        11 => "an",
+        18 => "an",
+        var x when (x >= 80 && x <= 89) => "an",
+        _ => "a"
+    };
+
+    protected IEnumerable<TrafficLight.Item> TrafficLightItems =>
+        TrafficLightItemsUnsorted
+            .OrderByDescending(x => x.Status)
+            .ThenBy(x => trafficLightSortOrder.IndexOf(x.HeadingText));
+
+    private const string UnknownStatusText = "Unknown";
+
+    private IEnumerable<TrafficLight.Item> TrafficLightItemsUnsorted
+    {
+        get
+        {
+            yield return Result.Smoker switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Smoking", Convert(Result.Smoker), "Your results show that you don't smoke or have quit. Well done!"),
+                _ => new TrafficLight.Item("Smoking", Convert(Result.Smoker), "Your results show that you currently smoke. Please consider the stop smoking services we offer in the follow-up section.")
+            };
+
+            yield return Result.Alcohol switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that the amount of alcohol you drink is at a low-risk level. It’s important to keep your alcohol consumption as low as possible."),
+                DefaultStatus.Warning => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that your alcohol use may be harmful to your health. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                _ => new TrafficLight.Item("Alcohol", Convert(Result.Alcohol), "Your results show that you are drinking at a harmful level and may be dependent on alcohol. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.")
+            };
+
+            yield return Result.PhysicalActivity switch
+            {
+                PhysicalActivityStatus.Active => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are physically active. Well done!"),
+                var activity when (activity == PhysicalActivityStatus.MostlyActive && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), " Your results show that you are moderately active. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.MostlyActive && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately active. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Your walking is a great way to keep active. Keep it up."),
+                var activity when (activity == PhysicalActivityStatus.MostlyInactive && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately inactive. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.MostlyInactive && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are moderately inactive. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Your walking is a great way to keep active. Keep it up."),
+                var activity when (activity == PhysicalActivityStatus.Sedentary && !Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are inactive. Please consider increasing your activity."),
+                var activity when (activity == PhysicalActivityStatus.Sedentary && Result.Walking) => new TrafficLight.Item("Physical activity", Convert(Result.PhysicalActivity), "Your results show that you are inactive. As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Walking is a great way to stay active. Keep it up.")
+            };
+
+            yield return Result.BodyMassIndex switch
+            {
+                BodyMassIndexStatus.SeverelyUnderweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are severely underweight which means that you are undernourished. If you are not already receiving care for this please contact your GP clinic urgently. If you are not able to make urgent contact with your GP clinic, please ring 111."),
+                BodyMassIndexStatus.Underweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are underweight which means that you might be undernourished. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                BodyMassIndexStatus.Healthy => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are a healthy weight."),
+                BodyMassIndexStatus.Overweight => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are overweight. If you want to lose weight please consider the diet and physical activity services we offer in the follow-up section."),
+                _ => new TrafficLight.Item("Weight", Convert(Result.BodyMassIndex), "Your results show that you are obese. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support.")
+            };
+
+            yield return Result.BloodPressure switch
+            {
+                BloodPressureStatus.Low => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that your blood pressure is a little low. Normally this is not a problem and can in fact reflect being very healthy. Sometimes, however, this can make people feel dizzy or unwell. If you feel unwell please contact your GP clinic."),
+                BloodPressureStatus.Healthy => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have the ideal blood pressure. Well done!"),
+                BloodPressureStatus.SlightlyHigh => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that your blood pressure is only just within the normal range. Improving your lifestyle, such as moving more, can help you to lower it."),
+                BloodPressureStatus.High => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have high blood pressure. Please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                BloodPressureStatus.Severe => new TrafficLight.Item("Blood pressure", Convert(Result.BloodPressure), "Your results show that you have very high blood pressure. Please contact your GP clinic urgently for a discussion of your results today. If you are not able to make urgent contact with your GP clinic today, please ring 111."),
+                _ => new TrafficLight.Item("Blood pressure", TrafficLight.Status.Red, "You don't know your blood pressure. Please have it checked. It is important that you have your blood pressure checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            yield return Result.Cholesterol switch
+            {
+                var cholesterol when (cholesterol == DefaultStatus.Healthy && Result.HeartDisease == DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Green, "Your results show that you have healthy cholesterol levels. "),
+                var cholesterol when (cholesterol == DefaultStatus.Healthy && Result.HeartDisease != DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that your cholesterol is in the normal range. However, because your overall risk of developing heart and circulatory disease is high, please contact your GP clinic for a non-urgent discussion of your results and to access additional support."),
+                var cholesterol when (cholesterol == DefaultStatus.Warning && Result.HeartDisease == DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Amber, "Your results show that your cholesterol is higher than it should be, however, at this stage, medicines are not normally needed to help bring it down. Please consider the healthy lifestyle services we offer in the follow-up section, particularly moving more and healthy weight for dietary support."),
+                var cholesterol when (cholesterol == DefaultStatus.Warning && Result.HeartDisease != DefaultStatus.Healthy) => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that both your cholesterol and the risk of developing heart and circulatory diseases are high. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                DefaultStatus.Danger => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "Your results show that your cholesterol is high. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                _ => new TrafficLight.Item("Cholesterol", TrafficLight.Status.Red, "You don't know your cholesterol levels. Please have them checked. It is important that you have your cholesterol levels checked as you may be at an increased risk of developing heart and circulatory disease. We will direct you to a way of getting this blood test done.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            yield return Result.Diabetes switch
+            {
+                DefaultStatus.Healthy => new TrafficLight.Item("Diabetes", Convert(Result.Diabetes), "Your results show that you are at a low risk of developing diabetes"),
+                _ => new TrafficLight.Item("Diabetes", Convert(Result.Diabetes), "Your results show that you might be at risk of developing diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.")
+            };
+
+            yield return Result.BloodSugar switch
+            {
+                BloodSugarStatus.Healthy => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that you have normal blood sugar levels. Well done!"),
+                BloodSugarStatus.Warning => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that you are at risk of developing diabetes.  Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                var bloodsugar when (bloodsugar == BloodSugarStatus.Danger && Result.Diabetes != DefaultStatus.Danger) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "Your results show that you might have diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                var bloodsugar when (bloodsugar == BloodSugarStatus.Danger && Result.Diabetes == DefaultStatus.Danger) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "Your results show that you are at high risk of developing diabetes. Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support."),
+                BloodSugarStatus.Severe => new TrafficLight.Item("Blood sugar", Convert(Result.BloodSugar), "Your results show that your blood sugar level is extremely high. If you are not already receiving support for this from a healthcare professional please contact your GP clinic urgently. If you are not able to make urgent contact with your GP clinic, please ring 111. If you do not do this you could be seriously endangering your health."),
+                var bloodsugar when (bloodsugar is null && (
+                    Result.BodyMassIndex >= BodyMassIndexStatus.Overweight ||
+                    Result.BloodPressure >= BloodPressureStatus.High ||
+                    Result.Diabetes == DefaultStatus.Danger)) => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Red, "You do not know your blood sugar level. Please have it checked. It is important that you have your blood sugar level checked as you may be at an increased risk of Type 2 diabetes. We will direct you to a way of getting this blood test done.")
+                    {
+                        StatusText = UnknownStatusText
+                    },
+                null => new TrafficLight.Item("Blood sugar", TrafficLight.Status.Amber, "You do not know your blood sugar level.")
+                {
+                    StatusText = UnknownStatusText
+                }
+            };
+
+            var riskFactors = new List<string>();
+
+            if (Check.FamilyHistoryCVD == true)
+            {
+                riskFactors.Add("angina or heart attack in a close family member under the age of 60");
+            }
+
+            if (Check.ChronicKidneyDisease == true)
+            {
+                riskFactors.Add("chronic kidney disease");
+            }
+
+            if (Check.AtrialFibrillation == true)
+            {
+                riskFactors.Add("atrial fibrillation");
+            }
+
+            if (Check.BloodPressureTreatment == true)
+            {
+                riskFactors.Add("you are on blood pressure treatment");
+            }
+
+            if (Check.Migraines == true)
+            {
+                riskFactors.Add("migraines");
+            }
+
+            if (Check.RheumatoidArthritis == true)
+            {
+                riskFactors.Add("rheumatoid arthritis");
+            }
+
+            if (Check.SystemicLupusErythematosus == YesNoSkip.Yes)
+            {
+                riskFactors.Add("systemic lupus erythematosus");
+            }
+
+            if (Check.SevereMentalIllness == YesNoSkip.Yes)
+            {
+                riskFactors.Add("severe mental illness");
+            }
+
+            if (Check.AtypicalAntipsychoticMedication == YesNoSkip.Yes)
+            {
+                riskFactors.Add("you are on atypical antipsychotic medication");
+            }
+
+            if (riskFactors.Any())
+            {
+                var hasModifiableBehaviours = (Result.BodyMassIndex != BodyMassIndexStatus.Healthy ||
+                    Result.Alcohol != DefaultStatus.Healthy ||
+                    Result.Smoker != DefaultStatus.Healthy ||
+                    Result.PhysicalActivity != PhysicalActivityStatus.Active ||
+                    (Result.BloodPressure is not null && Result.BloodPressure != BloodPressureStatus.Healthy) ||
+                    (Result.Cholesterol is not null && Result.Cholesterol != DefaultStatus.Healthy) ||
+                    (Result.BloodSugar is not null && Result.BloodSugar != BloodSugarStatus.Healthy));
+
+                var secondLine = hasModifiableBehaviours ?
+                    "While it is not possible to change these risk factors, you can reduce your risk by living a healthier lifestyle. Please consider the services we offer in the follow-up section." :
+                    "While it is not possible to change these risk factors, you can keep your risk as low as possible by maintaining your healthy lifestyle. Please consider the services we offer in the follow-up section.";
+
+                yield return new TrafficLight.Item("Risk factors", TrafficLight.Status.Red, $"Your results show that you have the following risk factors: {string.Join(", ", riskFactors)}. {secondLine}");
+            }
+        }
+    }
+
+    [Parameter]
+    public IEnumerable<DigitalHealthCheckEF.Intervention> EveryoneHealthReferralInterventions { get; set; }
+
+    private bool ShouldShowExtraTextForUnknownBloodSugar =>
+        Result.BloodPressure == BloodPressureStatus.High ||
+        Result.BloodPressure == BloodPressureStatus.Severe ||
+        Result.BodyMassIndex == BodyMassIndexStatus.Obese ||
+        Result.Diabetes == DefaultStatus.Danger;
+}

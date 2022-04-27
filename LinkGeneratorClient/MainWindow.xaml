@@ -1,0 +1,93 @@
+﻿<Window x:Class="LinkGeneratorClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LinkGeneratorClient"
+        mc:Ignorable="d"
+        Title="NHS Digital Health Check Link Generator" Height="720" Width="1280">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Tools">
+                <MenuItem x:Name="Decrypt" Header="_Decrypt Configuration File" Click="Decrypt_Click"/>
+                <MenuItem x:Name="Encrypt" Header="_Encrypt Configuration File" Click="Encrypt_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Margin="4" Grid.Row="0">
+            <Run>Please select an input file to start generating invite links for the Digital Health Check.</Run><LineBreak/>
+            <LineBreak/>
+            <Run>Input files should be in Comma Separated Variables (.csv) format, with a row for headers and one row per patient. Each row should have the following columns, and the headers must appear exactly as entered below: </Run><LineBreak/>
+            <LineBreak/>
+
+            <Run FontWeight="Bold">Postcode</Run>: The patient's current postcode without spaces.<LineBreak/>
+            <Run FontWeight="Bold">Surname</Run>: The patient's surname.<LineBreak/>
+            <Run FontWeight="Bold">DateOfBirth</Run>: The patient's date of birth, in dd/mm/yyyy format.<LineBreak/>
+            <Run FontWeight="Bold">NHSNumber</Run>: The patient's NHS number.<LineBreak/>
+            <Run FontWeight="Bold">GPSurgery</Run>: The name of your GP surgery.<LineBreak/>
+            <Run FontWeight="Bold">GPODS</Run>: ODS (Practice Code) of the surgery.<LineBreak/>
+            <Run FontWeight="Bold">GPEmail</Run>: The email address for your GP surgery that is set up to receive reports from the NHS Digital Health Check. <Run FontWeight="UltraBlack">This must be a secure mailbox.</Run><LineBreak/>
+        </TextBlock>
+        <Grid Grid.Row="1" Margin="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0">Input file:</TextBlock>
+            <TextBox Margin="4,0" x:Name="InputFilePath" Grid.Column="1" IsEnabled="False"></TextBox>
+            <Button Padding="12,0" x:Name="ChooseInputFile" Grid.Column="2" Click="ChooseInputFile_Click">...</Button>
+        </Grid>
+        <TextBlock x:Name="InputFileValidationError" Grid.Row="2" Margin="4" Background="#FEE" Foreground="#A00" Visibility="Collapsed">
+            An error has occurred!
+        </TextBlock>
+        <TextBlock x:Name="InputFileValidationFine" Grid.Row="2" Margin="4" Visibility="Collapsed">
+            File validation is successful. Use the button below to generate the unique invite links for each patient. This will not send the invites out.
+        </TextBlock>
+        
+        <Button x:Name="GenerateLinks" Grid.Row="3" HorizontalAlignment="Center" Margin="0,4" Padding="8,2" Click="GenerateLinks_Click" Visibility="Collapsed">Generate Unique Links</Button>
+        
+        <TextBlock x:Name="GeneratorError" Grid.Row="4" Margin="4" Background="#FEE" Foreground="#A00" Visibility="Collapsed">
+            An error has occurred!
+        </TextBlock>
+        <TextBlock x:Name="GeneratorFine" Grid.Row="4" Margin="4" Visibility="Collapsed">Unique link generation has completed. Please verify the output below. You can also save this file for reference or manual upload.</TextBlock>
+        <DataGrid x:Name="GeneratedLinks" Grid.Row="5" Visibility="Collapsed" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Surname" Width="auto" Binding="{Binding Surname}"/>
+                <DataGridTextColumn Header="Postcode" Width="auto" Binding="{Binding Postcode}"/>
+                    <DataGridTextColumn Header="NHS Number" Width="auto" Binding="{Binding NHSNumber}"/>
+                    <DataGridTextColumn Header="Date of Birth" Width="auto" Binding="{Binding DateOfBirth, StringFormat=\{0:dd/MM/yyyy\}}"/>
+                    <DataGridTextColumn Header="GP Email" Width="auto" Binding="{Binding GPEmail}"/>
+                <DataGridTextColumn Header="GP Surgery" Width="auto" Binding="{Binding GPSurgery}"/>
+                <DataGridTextColumn Header="GP ODS Code" Width="auto" Binding="{Binding GPODS}"/>
+                <DataGridTextColumn Header="Url" Width="auto" Binding="{Binding Url}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock x:Name="SendMessageError" Grid.Row="6" Margin="4" Background="#FEE" Foreground="#A00" Visibility="Collapsed">
+            An error has occurred!
+        </TextBlock>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Center" Grid.Row="7">
+            <Button x:Name="SaveGeneratedLinks" Margin="4" Padding="8,2" Click="SaveGeneratedLinks_Click" Visibility="Collapsed">Save Generated Links</Button>
+            <Button x:Name="SendInvites" Margin="4" Padding="8,2" IsEnabled="False"  Visibility="Collapsed" Click="SendInvites_Click">Send Patient Invites</Button>
+        </StackPanel>
+
+        <TextBlock x:Name="SendMessageFine" Grid.Row="8" Margin="4,4,4,16" Visibility="Collapsed">
+            Messages sent successfully.
+        </TextBlock>
+
+    </Grid>
+    </DockPanel>
+</Window>

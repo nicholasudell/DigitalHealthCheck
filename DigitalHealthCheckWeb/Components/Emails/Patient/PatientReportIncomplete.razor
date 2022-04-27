@@ -1,0 +1,155 @@
+﻿@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Model;
+@using DigitalHealthCheckWeb.Helpers;
+@inherits Pages.Page;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+
+        <p style="font-size: 11pt"><strong>This service is currently in development and testing. Please share any feedback in the survey.</strong></p>
+
+        <table>
+            <tr>
+                <td style="width:100%">
+                    <p style="font-size: 18pt">
+                        <strong>Your Digital NHS Health Check Next Steps</strong>
+                    </p>
+                </td>
+                <td style="width:100%">
+                    <p style="font-size: 18pt; text-align:right">
+                        <strong>@CurrentDate</strong>
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        @if (Validated)
+        {
+            <p>Dear @Check.FirstName.ToTitleCase() @Check.Surname.ToTitleCase()</p>
+        }
+        else
+        {
+            <p>Hello</p>
+        }
+
+        <p>Thank you for starting your NHS Health Check, the medical service that assesses your risk of developing heart and circulatory disease as well as Type 2 diabetes. This service helps you to take control of your health and wellbeing. </p>
+        <p>You can amend your measurements, including adding up-to-date height, weight, blood pressure, cholesterol or blood sugar test results by using your <a href="@(Url("CheckYourAnswers"))">unique link to amend your health information</a>.</p>
+        <p>Below you will find your selected links to ways of getting your health data measured. Please take a look at these.</p>
+        <p>This service is brought to you by the NHS and Southwark Council public health team. If you have any further questions about the service, please contact: <a href="mailto:publichealth@southwark.gov.uk">publichealth@southwark.gov.uk</a>.</p>
+
+        <p style="font-size: 16pt"><strong>Your selected links to ways of getting your health data measured:</strong></p>
+
+        @switch (Check.HeightAndWeightFollowUp.SelectedOption)
+        {
+            case "kiosk":
+                <p>You told us you would like to get your height and weight checked at a health kiosk.</p>
+                <p>There is currently a kiosk at The Castle Leisure Centre. <a title="Find out details about The Castle Leisure Centre on their website" href="https://www.everyoneactive.com/centre/The-Castle-Centre">Find out details about The Castle Leisure Centre on their website (opens in a new tab)</a>.</p>
+                <p>You don’t need to book an appointment.</p>
+
+                <p style="font-size: 14pt">The Castle Leisure Centre</p>
+                <p>
+                    2 St Gabriel Walk,<br />
+                    Elephant & Castle,<br />
+                    London SE1 6FG<br />
+                    Telephone: 020 7091 4243<br />
+                </p>
+                <p>Website: <a href="https://www.everyoneactive.com/centre/The-Castle-Centre">The Castle Centre</a>.</p>
+                <p>
+                    Opening times:<br />
+                    Mon: 6:30am - 10pm<br />
+                    Tue: 6:30am - 10pm<br />
+                    Wed: 6:30am - 10pm<br />
+                    Thu: 6:30am - 10pm<br />
+                    Fri: 6:30am - 10pm<br />
+                    Sat: 7:00am - 6pm<br />
+                    Sun: 7:00am - 10pm<br />
+                </p>
+                break;
+            case "leisurecentre":
+                <p>You told us you would like to get your height and weight checked at a leisure centre.</p>
+
+                <p >There are five participating council leisure centres in the borough. You will need to <a title="Book an appointment via their website" href="https://outlook.office365.com/owa/calendar/DigitalHealthCheckSouthwark@everyonehealth.co.uk/bookings/">book an appointment via their website</a>.</p>
+                break;
+            case "pharmacy":
+                <p>You told us you would like to get your height and weight checked at a pharmacy.</p>
+                <p>You can get your measurements taken at Bonamy Pharmacy.</p>
+                <p>We will also email you the addresses and phone numbers for these locations. </p>
+                <p>You need to book an appointment by phone, so please call in advance.</p>
+                <p>Location and contact information:</p>
+                <p>Bonamy Pharmacy<br/>
+                    355 Rotherhithe New Road, Bermondsey, SE16 3HF<br/>
+                    0207 740 2523<br/>
+                    pharmacy.fv733@nhs.net<br/>
+                    http://bonamypharmacy.co.uk/<br/>
+                    <a title="Get directions" href="https://www.google.com/maps/search/Bonamy+Pharmacy+355+ROTHERHITHE+NEW+ROAD+BERMONDSEY+SOUTHWARK+LONDON++SE16+3HF/@@51.48645782470703,-0.0625559389591217,17z">Get directions (opens in Google Maps)</a>
+                    </p>
+                    <p>
+                        Opening times:<br />
+                        Mon: 9am to 7pm<br />
+                        Tue: 9am to 7pm<br />
+                        Wed: 9am to 7pm<br />
+                        Thu: 9am to 7pm<br />
+                        Fri: 9am to 7pm<br />
+                        Sat: 9am to 2pm<br />
+                        Sun: Closed<br />
+                    </p>
+                break;
+            case "home":
+                <p>You told us you would like to measure your height and weight at home.</p>
+                break;
+            default:
+                break;
+        }
+
+        <p>If you don’t currently have the measurements for your blood pressure, cholesterol and blood sugar levels, now would also be a good time to get this information.</p>
+
+        <p>By including all of these measurements you will get the most accurate, personalised risk assessment and follow-up recommendations.</p>
+
+        <p>The following unique link will enable you to come back and enter your updated height and weight, cholesterol, blood pressure and blood sugar readings as necessary.</p>
+
+        <a href="@(Url("CheckYourAnswers"))" title="Unique link to amend your health information">Unique link</a>
+
+        @if (Check.HeightAndWeightFollowUp.BeReminded == true)
+        {
+            <p style="font-size: 16pt"><strong>Your reminders:</strong></p>
+
+            <p>You told us you would like to be reminded about getting your height and weight measured.</p>
+        }
+
+        <p style="font-size: 16pt"><strong>Consent options:</strong></p>
+
+        <p>As a reminder, here is <a href="@(Url("DataProtection"))">our privacy policy</a>.</p>
+        <p>Thank you again for taking the time to take control of your health and wellbeing.</p>
+
+        <p>Best wishes,</p>
+        <p>Southwark Public Health Team</p>
+    </div>
+</body>
+</html>
+
+@code {
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    protected string CurrentDate => DateTime.Now.ToString("dd/MM/yyyy");
+
+    [Parameter]
+    public bool Validated { get; set; }
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    protected string Url(string page)
+    {
+        if(page == "CheckYourAnswers")
+        {
+            return $"{BaseUrl}/{page}{BuildQuery(IdQueryParam)}";
+        }
+
+        return $"{BaseUrl}/{page}{BuildQuery(IdQueryParam, $"next=CheckYourAnswers")}";
+    }
+}

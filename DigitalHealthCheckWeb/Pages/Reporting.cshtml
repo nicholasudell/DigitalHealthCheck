@@ -1,0 +1,29 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.ReportingModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Reporting";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.ReportingPage)"
+           render-mode="Static"
+           param-errorList="@Model.ErrorList"
+           param-fromDateError="@Model.FromDateError"
+           param-fromDateDay="@Model.Model.FromDateDay"
+           param-fromDateDayInvalid="@Model.FromDateDayInvalid"
+           param-fromDateMonth="@Model.Model.FromDateMonth"
+           param-fromDateMonthInvalid="@Model.FromDateMonthInvalid"
+           param-fromDateYear="@Model.Model.FromDateYear"
+           param-fromDateYearInvalid="@Model.FromDateYearInvalid"
+           param-toDateError="@Model.ToDateError"
+           param-toDateDay="@Model.Model.ToDateDay"
+           param-toDateDayInvalid="@Model.ToDateDayInvalid"
+           param-toDateMonth="@Model.Model.ToDateMonth"
+           param-toDateMonthInvalid="@Model.ToDateMonthInvalid"
+           param-toDateYear="@Model.Model.ToDateYear"
+           param-toDateYearInvalid="@Model.ToDateYearInvalid"
+           param-reportKey="@Model.Model.ReportKey"
+           param-antiForgery="@antiForgeryToken" />

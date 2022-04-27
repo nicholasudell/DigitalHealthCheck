@@ -1,0 +1,170 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <h1 class="govuk-heading-l">Validation</h1>
+
+    <p class="govuk-body">
+        This step allows us to share your results with your GP clinic.
+    </p>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <GDSInput Label="@(new GDSLabel.Options
+                       {
+                            Text="What is your postcode?",
+                            Classes="govuk-label--m"
+                       })"
+              Hint="@(new GDSHint.Options
+                      {
+                          Text="Enter the postcode of the address where you live. This influences your risk score."
+                      })"
+              ErrorMessage="@PostcodeError.AsErrorMessageComponent()"
+              Name="Postcode"
+              Autocomplete="postal-code"
+              Classes="govuk-input--width-10"
+              Id="postcode"
+              Value="@Postcode" />
+
+    <GDSInput Label="@(new GDSLabel.Options
+                       {
+                            Text="What is your first name?",
+                            Classes="govuk-label--m"
+                       })"
+              Hint="@(new GDSHint.Options
+                      {
+                          Text="This is used for personalisation."
+                      })"
+              ErrorMessage="@FirstnameError.AsErrorMessageComponent()"
+              Name="FirstName"
+              Autocomplete="given-name"
+              Spellcheck="false"
+              Id="firstname"
+              Value="@Firstname" />
+
+    <GDSInput Label="@(new GDSLabel.Options
+                       {
+                            Text="What is your surname?",
+                            Classes="govuk-label--m"
+                       })"
+              Hint="@(new GDSHint.Options
+                      {
+                          Text="This is used for validation."
+                      })"
+              ErrorMessage="@SurnameError.AsErrorMessageComponent()"
+              Name="Surname"
+              Autocomplete="family-name"
+              Spellcheck="false"
+              Id="surname"
+              Value="@Surname" />
+
+    <GDSDateInput FieldSet="@(
+                  new GDSFieldSet.Options
+                  {
+                      Legend = new GDSFieldSet.LegendOptions
+                      {
+                          Text = "What is your date of birth?",
+                          Classes = "govuk-fieldset__legend--m"
+                      }
+                  })"
+                  Hint="@(
+                    new GDSHint.Options
+                    {
+                        Text="This influences your risk score and is used for verification purposes. For example, 27 3 1982"
+                    }
+                  )"
+                  ErrorMessage="@(DateOfBirthError.AsErrorMessageComponent())"
+                  Items="@(
+                        new []
+                        {
+                            new GDSDateInput.Item {
+                                Name="DayOfBirth",
+                                Id="day-of-birth",
+                                Value=DayOfBirth,
+                                Classes = $"govuk-input--width-2 {(DayOfBirthInvalid ? "govuk-input--error" : "")}",
+                                Label="Day",
+                                Autocomplete="bday-day"
+                            },
+                            new GDSDateInput.Item {
+                                Name="MonthOfBirth",
+                                Id="month-of-birth",
+                                Value=MonthOfBirth,
+                                Classes = $"govuk-input--width-2 {(MonthOfBirthInvalid ? "govuk-input--error" : "")}",
+                                Label="Month",
+                                Autocomplete="bday-month"
+                            },
+                            new GDSDateInput.Item {
+                                Name="YearOfBirth",
+                                Id="year-of-birth",
+                                Value=YearOfBirth,
+                                Classes = $"govuk-input--width-4 {(YearOfBirthInvalid ? "govuk-input--error" : "")}",
+                                Label="Year",
+                                Autocomplete="bday-year"
+                            }
+                        }.ToList()
+                  )"
+                  Id="date-of-birth" />
+
+    @if (CouldNotValidate)
+    {
+        <div class="govuk-button-group">
+            <GDSButton PreventDoubleClick="true" Text="Retry and continue" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Retry" />
+            <GDSButton PreventDoubleClick="true" Text="Skip validation" Classes="govuk-button--secondary" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Skip" />
+        </div>
+    }
+    else
+    {
+        <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Continue" />
+    }
+</form>
+
+@code {
+
+    [Parameter]
+    public string Postcode { get; set; }
+
+    [Parameter]
+    public string PostcodeError { get; set; }
+
+    [Parameter]
+    public string Surname { get; set; }
+
+    [Parameter]
+    public string SurnameError { get; set; }
+
+    [Parameter]
+    public string Firstname { get; set; }
+
+    [Parameter]
+    public string FirstnameError { get; set; }
+
+    [Parameter]
+    public string DateOfBirthError { get; set; }
+
+    [Parameter]
+    public string DayOfBirth { get; set; }
+
+    [Parameter]
+    public string MonthOfBirth { get; set; }
+
+    [Parameter]
+    public string YearOfBirth { get; set; }
+
+    [Parameter]
+    public bool CouldNotValidate { get; set; }
+
+    [Parameter]
+    public bool DayOfBirthInvalid { get; set; }
+
+    [Parameter]
+    public bool MonthOfBirthInvalid { get; set; }
+
+    [Parameter]
+    public bool YearOfBirthInvalid { get; set; }
+
+}

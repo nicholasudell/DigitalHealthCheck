@@ -1,0 +1,116 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Cholesterol"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to improve my cholesterol levels",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I'm confident in making a plan to improve my cholesterol levels",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="Is there anything stopping you from improving your cholesterol levels?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to improve your cholesterol levels in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start improving your cholesterol levels?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to start improving your cholesterol levels?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+          ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from improving your cholesterol levels. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    @if (Status == DefaultStatus.Healthy && HeartDiseaseStatus != DefaultStatus.Danger)
+    {
+        <p class="govuk-body">Well done! Keep up the good work. </p>
+        <p class="govuk-body">Keep your cholesterol low with regular exercise, not smoking, managing your alcohol intake and a healthy diet low in fats. </p>
+
+    }
+    else if (Status == DefaultStatus.Healthy && HeartDiseaseStatus == DefaultStatus.Danger)
+    {
+        <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.</p>
+        <p class="govuk-body">Reduce your cholesterol with regular exercise, not smoking, managing your alcohol intake and a healthy diet low in fats. </p>
+        <p class="govuk-body">Please consider the healthy lifestyle services we offer in the follow-up section.</p>
+    }
+    else if (Status == DefaultStatus.Warning && HeartDiseaseStatus != DefaultStatus.Danger)
+    {
+        <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.</p>
+        <p class="govuk-body">Reduce your cholesterol with regular exercise, not smoking, managing your alcohol intake and a healthy diet low in fats. </p>
+        <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+    }
+    else if (Status == DefaultStatus.Warning && HeartDiseaseStatus == DefaultStatus.Danger)
+    {
+        <p class="govuk-body">Please book a routine appointment at your GP clinic to discuss your results and to access additional support.</p>
+        <p class="govuk-body">Reduce your cholesterol with regular exercise, not smoking, managing your alcohol intake and a healthy diet low in fats.</p>
+        <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+    }
+    else if (Status == DefaultStatus.Danger)
+    {
+        <p class="govuk-body">Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support.</p>
+        <p class="govuk-body">Reduce your cholesterol with regular exercise, not smoking, managing your alcohol intake and a healthy diet low in fats. </p>
+        <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section. </p>
+    }
+
+    <GDSDetails SummaryText="The benefits of healthy cholesterol levels">
+        <ul class="govuk-list--bullet govuk-list">
+            <li>Maintains healthy blood vessels</li>
+            <li>Reduces the risk of strokes and heart attacks</li>
+            <li>Helps lower risk of dementia</li>
+            <li>Reduces the risk of heart and circulatory disease, kidney disease and diabetic eye disease</li>
+            <li>The good news is that a healthy lifestyle can help to manage your cholesterol levels – some people may also need medication</li>
+            <li>You can <a class="govuk-link" href="https://www.nhs.uk/conditions/high-cholesterol/" rel="noreferrer noopener" target="_blank" title="Find out more about managing your cholesterol">find out more about managing your cholesterol levels (opens in a new tab)</a> on the NHS website.</li>
+        </ul>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public DefaultStatus Status { get; set; }
+
+    [Parameter]
+    public DefaultStatus HeartDiseaseStatus { get; set; }
+
+    private string Summary => Status switch
+    {
+        var cholesterol when (cholesterol == DefaultStatus.Healthy && HeartDiseaseStatus == DefaultStatus.Healthy) => "Your results show that you have healthy cholesterol levels. ",
+        var cholesterol when (cholesterol == DefaultStatus.Healthy && HeartDiseaseStatus != DefaultStatus.Healthy) => "Your results show that your cholesterol is a normal range. However, your overall risk of developing heart and circulatory disease in the next 10 years is high.",
+        var cholesterol when (cholesterol == DefaultStatus.Warning && HeartDiseaseStatus == DefaultStatus.Healthy) => "Your results show that cholesterol is higher than it should be. ",
+        var cholesterol when (cholesterol == DefaultStatus.Warning && HeartDiseaseStatus != DefaultStatus.Healthy) => "Your results show that both your cholesterol and your risk of developing heart and circulatory diseases are high. ",
+        DefaultStatus.Danger => "Your results show that your cholesterol is high.",
+    };
+
+}

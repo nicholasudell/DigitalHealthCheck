@@ -1,0 +1,66 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 4 of 7</h1>
+
+    <GDSRadios Name="UnableToStop"
+               Items="UnableToStopItems"
+               IdPrefix="unable-to-stop"
+               ErrorMessage="UnableToStopError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often during the last year have you found that you were not able to stop drinking once you had started?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSRadios Name="FailedResponsibility"
+               Items="ResponsibilityItems"
+               IdPrefix="failed-responsibility"
+               ErrorMessage="FailedResponsibilityError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How often during the last year have you failed to do what was normally expected from you because of your drinking?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string FailedResponsibilityError { get; set; }
+
+    [Parameter]
+    public string UnableToStopError { get; set; }
+
+    [Parameter]
+    public string UnableToStopFrequency { get; set; }
+
+    [Parameter]
+    public string FailedResponsibility { get; set; }
+
+    static IEnumerable<dynamic> Items = new[]{
+        new {Text="Never", Value="never" },
+         new {Text="Less than monthly", Value="lessThanMonthly" },
+         new {Text="Monthly", Value="monthly" },
+         new {Text="Weekly", Value="weekly" },
+         new {Text="Daily or almost daily", Value="daily" }
+    };
+
+    protected IList<GDSRadios.Item> ResponsibilityItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, FailedResponsibility);
+
+    protected IList<GDSRadios.Item> UnableToStopItems =>
+        Items.AsRadioComponents(x => x.Value, x => x.Text, UnableToStopFrequency);
+
+}

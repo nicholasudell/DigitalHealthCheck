@@ -1,0 +1,71 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  NODE_ENV: 'Development'
+
+steps:
+- task: Npm@1
+  displayName: NPM install
+  inputs:
+    command: 'ci'
+    workingDir: 'DigitalHealthCheckWeb'
+- task: DotNetCoreCLI@2
+  displayName: Create tools manifest
+  inputs:
+    command: custom
+    custom: 'new'
+    arguments: tool-manifest
+- task: DotNetCoreCLI@2
+  displayName: Install EF
+  inputs:
+    command: custom
+    custom: 'tool'
+    arguments: install dotnet-ef
+- task: DotNetCoreCLI@2
+  displayName: Dotnet restore
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+    feedsToUse: 'select'
+    vstsFeed: 'a7d8157c-026d-49af-b367-fdceee14af27/5764f58e-4df2-488a-8190-56cf928a710c'
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'DigitalHealthCheckWeb'
+    customCommand: 'run build'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '-p:PublishProfile=Production -c Release -o $(Build.ArtifactStagingDirectory)'
+    modifyOutputPath: false
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: |
+      LinkGeneratorClient\LinkGeneratorClient.csproj
+      GenerateLinks\GenerateLinks.csproj
+      DigitalHealthCheckService\DigitalHealthCheckService.csproj
+    arguments: '-p:PublishProfile=Production -c Release -o $(Build.ArtifactStagingDirectory)'
+- task: DotNetCoreCLI@2
+  displayName: Build EF migrations
+  inputs:
+    command: 'custom'
+    custom: 'ef'
+    arguments: 'migrations script --idempotent -o $(Build.ArtifactStagingDirectory)/migrations.sql'
+    workingDirectory: 'DigitalHealthCheckEF'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'DHC-prod'
+    publishLocation: 'Container'

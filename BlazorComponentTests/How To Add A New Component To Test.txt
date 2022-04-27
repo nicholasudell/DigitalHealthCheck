@@ -1,0 +1,8 @@
+﻿The tests in the project are for automatic HTML conformation tests against Government Design System (GDS) fixtures.
+To add a new GDS component and its fixtures to be tested, complete the following steps:
+
+1) Add a Linked File Reference in this project under Fixtures/<componentName>/ to the GDS component's fixture.json file. This can be found at <solutionRoot>\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\<componentName>\fixtures.json
+2) In the Linked File properties, set Build Action to None, and Copy To Output Directory to Copy Always
+3) Create a subclass of ComponentFactory<T> in the Factories folder and implemnent the abstract method AssignParameters. Use the ButtonFactory class as a reference.
+4) Open ComponentTests.cs and add a new line to the `fixtures` Dictionary at the top of the file. The format should be { "componentName", new ComponentFactory() } Make sure "componentName" matches the name of the folder you created under Fixtures/ in this project. For ComponentFactory, use the new subclass of ComponentFactory you just wrote.
+5) Rebuild and run all tests, the new component's fixtures should be automatically loaded and added as individual tests to the test explorer.

@@ -1,0 +1,109 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Blood Pressure"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to improve my blood pressure",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                       {
+                           Text = "I'm confident in making a plan to improve my blood pressure",
+                           Error = ConfidentToChangeError,
+                           Value = ConfidentToChange,
+                       })"
+          BarrierHeader="Is there anything stopping you from improving your blood pressure?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to improve your blood pressure in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start improving your blood pressure?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to improve your blood pressure?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName"
+          ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from improving your blood pressure. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    <p class="govuk-body">Blood pressure is a measure of the force that your heart uses to pump blood around your body. High blood pressure, or hypertension, rarely has noticeable symptoms. But if untreated, it increases your risk of serious problems such as heart attacks and strokes.</p>
+
+    @switch (Status)
+    {
+        case BloodPressureStatus.Low:
+            <p class="govuk-body">Low blood pressures can sometimes make people feel dizzy or unwell. If you feel unwell please contact your GP clinic.</p>
+            break;
+        case BloodPressureStatus.Healthy:
+            <p class="govuk-body">Well done! Keep up an active and healthy lifestyle to keep your blood pressure low. </p>
+            break;
+        case BloodPressureStatus.SlightlyHigh:
+            <p class="govuk-body">Improving your lifestyle, such as moving more, can help you to lower your blood pressure. </p>
+            <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+            break;
+        case BloodPressureStatus.High:
+            <p class="govuk-body">Please contact your GP clinic for a non-urgent discussion of your results and to access additional support. You will also need a blood test to check your blood sugar level.</p>
+            <p class="govuk-body">Improving your lifestyle, such as moving more, can help you to lower your blood pressure. </p>
+            <p class="govuk-body">Please consider the healthy lifestyle support services we offer in the follow-up section.</p>
+            break;
+        case BloodPressureStatus.Severe:
+            <p class="govuk-body">Please urgently contact your GP clinic for a discussion today. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic for today, please ring 111.</p>
+            break;
+        default:
+            <p class="govuk-body">You don’t know your blood pressure. Please have it checked. We will show you where you can get this done. </p>
+            break;
+    }
+
+    <GDSDetails SummaryText="The benefits of healthy pressure levels">
+        <ul class="govuk-list--bullet govuk-list">
+            <li>Maintains healthy blood vessels</li>
+            <li>Reduces the risk of strokes and heart attacks</li>
+            <li>Helps lower risk of dementia</li>
+            <li>Reduces the risk of heart and circulatory disease, kidney disease and diabetic eye disease</li>
+            <li>The good news is that a healthy lifestyle can help to manage your cholesterol levels – some people may also need medication. </li>
+            <li>You can <a class="govuk-link" href="https://www.nhs.uk/conditions/high-blood-pressure-hypertension/prevention/" rel="noreferrer noopener" target="_blank" title="Find out more about managing your blood pressure">find out more about managing your blood pressure (opens in a new tab)</a> on the NHS website.</li>
+        </ul>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public BloodPressureStatus Status { get; set; }
+
+    public string Summary => Status switch
+    {
+        BloodPressureStatus.Low => "Your results show you have low blood pressure.",
+        BloodPressureStatus.Healthy => "Your results show you have the ideal blood pressure.",
+        BloodPressureStatus.SlightlyHigh => "Your results show that your blood pressure is only just within the normal range. ",
+        BloodPressureStatus.High => "Your results show you have high blood pressure.",
+        BloodPressureStatus.Severe => "Your results show that you have very high blood pressure. "
+    };
+
+}

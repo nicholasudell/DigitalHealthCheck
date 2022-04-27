@@ -1,0 +1,15 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.HealthCheckInCompleteModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    Layout = null;
+    var baseUrl = urlBuilder.GetBaseUrl(HttpContext.Request);
+}
+
+<component type="typeof(Components.Emails.Patient.PatientReportIncomplete)"
+           render-mode="Static"
+           param-check="@Model.Check"
+           param-validated="@Model.Validated"
+           param-id="@Model.Id"
+           param-baseUrl="baseUrl" />

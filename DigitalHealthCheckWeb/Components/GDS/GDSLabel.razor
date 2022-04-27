@@ -1,0 +1,66 @@
+﻿@if (ChildContent is null && string.IsNullOrEmpty(Text))
+{
+}
+else
+{
+    @if (IsPageHeading)
+    {
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label @Classes" @attributes="InputAttributes" for="@For">
+                @if (ChildContent is null)
+                {
+                    @Text }
+                else
+                {
+                    @ChildContent}
+            </label>
+        </h1>
+    }
+    else
+    {
+        <label class="govuk-label @Classes" @attributes="InputAttributes" for="@For">
+            @if (ChildContent is null)
+            {
+                @Text }
+            else
+            {
+                @ChildContent}
+        </label>
+    }
+}
+
+@code {
+
+    public class Options //For other components
+    {
+        public string Text { get; set; }
+
+        public RenderFragment Content { get; set; }
+
+        public string For { get; set; }
+
+        public bool IsPageHeading { get; set; }
+
+        public string Classes { get; set; }
+
+        public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+    }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string For { get; set; }
+
+    [Parameter]
+    public bool IsPageHeading { get; set; }
+}

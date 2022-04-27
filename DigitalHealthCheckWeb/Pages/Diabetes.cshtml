@@ -1,0 +1,18 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.DiabetesModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Diabetes page 1 of 3";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.DiabetesPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-familyHistory="@Model.Model.FamilyHistory"
+           param-steroids="@Model.Model.Steroids"
+           param-familyHistoryError="@Model.FamilyHistoryError"
+           param-steroidsError="@Model.SteroidsError" />

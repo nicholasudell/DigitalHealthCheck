@@ -1,0 +1,20 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.RiskFactors2Model
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Risk factors page 2 of 3";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.RiskFactors2Page)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-bloodPressureTreatment="@Model.Model.BloodPressureTreatment"
+           param-migraines="@Model.Model.Migraines"
+           param-rheumatoidArthritis="@Model.Model.RheumatoidArthritis"
+           param-bloodPressureTreatmentError="@Model.BloodPressureTreatmentError"
+           param-migrainesError="@Model.MigrainesError"
+           param-rheumatoidArthritisError="@Model.RheumatoidArthritisError" />

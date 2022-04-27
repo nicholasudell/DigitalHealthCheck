@@ -1,0 +1,100 @@
+﻿<div class="govuk-error-summary @Classes" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
+     @attributes="InputAttributes" data-module="govuk-error-summary">
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+        @if (Title?.UseBody ?? false)
+        {
+            @Title?.Body
+        }
+        else
+        {
+            @Title?.Text
+        }
+    </h2>
+    <div class="govuk-error-summary__body">
+        @if (Description is not null && (!string.IsNullOrEmpty(Description.Text) || Description.Body is not null))
+        {
+            <p>
+                @if (Description?.UseBody ?? false)
+                {
+                    @Description?.Body
+                }
+                else
+                {
+                    @Description?.Text
+                }
+            </p>
+        }
+        <ul class="govuk-list govuk-error-summary__list">
+            @foreach (var item in ErrorList)
+            {
+                <li>
+                    @if (!string.IsNullOrEmpty(item.Href))
+                    {
+                        <a href="@item.Href" @attributes="item.Attributes">
+                            @if (item.Content?.UseBody ?? false)
+                            {
+                                @item.Content?.Body
+                            }
+                            else
+                            {
+                                @item.Content?.Text
+                            }
+                        </a>
+                    }
+                    else
+                    {
+                        @if (item.Content?.UseBody ?? false)
+                        {
+                            @item.Content?.Body
+                        }
+                        else
+                        {
+                            @item.Content?.Text
+                        }
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+
+    public class Options //For other components
+    {
+        public IDictionary<string, object> Attributes { get; set; }
+
+        public string Classes { get; set; }
+
+        public Content Title { get; set; }
+
+        public Content Description { get; set; }
+
+        public IEnumerable<Item> ErrorList { get; set; }
+    }
+
+    public class Item
+    {
+        public Content Content { get; set; }
+
+        public string Href { get; set; }
+
+        public IDictionary<string, object> Attributes { get; set; }
+    }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public Content Title { get; set; }
+
+    [Parameter]
+    public Content Description { get; set; }
+
+    [Parameter]
+    public IEnumerable<Item> ErrorList { get; set; }
+
+}

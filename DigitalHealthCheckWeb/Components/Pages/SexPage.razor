@@ -1,0 +1,142 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Gender identity and sex assigned at birth</h1>
+
+    <p class="govuk-body">Information about sex assigned at birth, in combination with other personalised factors, is used to calculate your risk of developing heart and circulatory disease, and Type 2 diabetes. Unfortunately, it is not possible to calculate your risk without this information.</p>
+    <p class="govuk-body">Being asked about sex assigned at birth can be difficult for some people. Please read the additional information in the expanders below to understand the reasons for being asked.</p>
+    <p class="govuk-body">If you choose not to proceed, you may instead want to follow up with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, and the Beaumont Society.</p>
+
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+    <p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+
+    <WhyAreWeAskingAboutSex></WhyAreWeAskingAboutSex>
+
+    <WhatIfIDontIdentifyWithSexAtBirth></WhatIfIDontIdentifyWithSexAtBirth>
+
+    <WhatIfIAmUndergoingGenderAffirmationTreatment></WhatIfIAmUndergoingGenderAffirmationTreatment>
+
+    <IfYouDontWantToAnswerAboutGenderIdentity></IfYouDontWantToAnswerAboutGenderIdentity>
+
+    <GDSRadios Name="Sex"
+               Items="Sexes"
+               ErrorMessage="SexError.AsErrorMessageComponent()"
+               IdPrefix="sex"
+               Hint="@(
+                new GDSHint.Options
+                {
+                     Text="A question about gender identity will follow."
+                })"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "What is the sex you were assigned at birth?",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSRadios Name="Identity"
+               Items="IdentityItems"
+               ErrorMessage="IdentityError.AsErrorMessageComponent()"
+               IdPrefix="identity"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "What is your gender identity?",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string SexError { get; set; }
+
+    [Parameter]
+    public string Sex { get; set; }
+
+    [Parameter]
+    public string Identity { get; set; }
+
+    [Parameter]
+    public string IdentityError { get; set; }
+
+    [Parameter]
+    public string CustomIdentity { get; set; }
+
+    [Parameter]
+    public string CustomIdentityError { get; set; }
+
+    protected IList<GDSRadios.Item> Sexes => new[]
+    {
+        "Female",
+        "Male"
+    }.AsRadioComponents(x => x.ToLowerInvariant(), x => x, Sex);
+
+    protected IList<GDSRadios.Item> IdentityItems => new[]{
+        new GDSRadios.Item
+        {
+            Text = "Same as my sex assigned at birth",
+            Value = "cis",
+            Checked = Identity == "cis"
+        },
+        new GDSRadios.Item
+        {
+            Text = "Trans woman",
+            Value = "transwoman",
+            Checked = Identity == "transwoman"
+        },
+        new GDSRadios.Item
+        {
+            Text = "Trans man",
+            Value = "transman",
+            Checked = Identity == "transman"
+        },
+        new GDSRadios.Item
+        {
+            Text = "Non-binary",
+            Value = "nonbinary",
+            Checked = Identity == "nonbinary"
+        },
+        new GDSRadios.Item
+        {
+            Text = "Intersex",
+            Value = "intersex",
+            Checked = Identity == "intersex"
+        },
+        new GDSRadios.Item
+        {
+            Text = "In my own words",
+            Value = "custom",
+            Checked = Identity == "custom",
+            ConditionalContent = @<GDSInput Id="custom-identity"
+                                            Name="CustomIdentity"
+                                            Value="@CustomIdentity"
+                                            Label="@(new GDSLabel.Options
+                                            {
+                                                Text="Gender identity"
+                                            })"
+                                            ErrorMessage="CustomIdentityError.AsErrorMessageComponent()" />
+        },
+        new GDSRadios.Item
+        {
+            Text = "Prefer not to say",
+            Value = "skip",
+            Checked = Identity == "skip"
+        }
+    };
+
+}

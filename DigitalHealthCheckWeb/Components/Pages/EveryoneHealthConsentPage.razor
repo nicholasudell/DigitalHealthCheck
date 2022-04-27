@@ -1,0 +1,115 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Preferred contact for telephone consultation</h1>
+
+    <p class="govuk-body">You have selected:</p>
+
+    @foreach(var referralIntervention in ReferralInterventions)
+    {
+        <p class="govuk-body">@referralIntervention</p>
+
+        if(referralIntervention != ReferralInterventions.Last())
+        {
+            <p class="govuk-body">And</p>    
+        }
+    }
+
+    <GDSCheckboxes 
+               Name="ContactMethod"
+               IdPrefix="contact-method"
+               Items="Items"
+               ErrorMessage="Error.AsErrorMessageComponent()"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How would you like to connect with the telephone consultation?",
+                        Classes="govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    protected RenderFragment EmailInput =>@<GDSInput Id="contact-by-email"
+                                                 Name="EmailAddress"
+                                                 Type="email"
+                                                 Autocomplete="email"
+                                                 Spellcheck="false"
+                                                 Value="@EmailAddress"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="Email address"
+                                                        })"
+                                                 ErrorMessage="EmailAddressError.AsErrorMessageComponent()" />;
+
+protected RenderFragment PhoneInput =>@<GDSInput Id="contact-by-phone"
+                                                 Name="PhoneNumber"
+                                                 Type="tel"
+                                                 Autocomplete="tel"
+                                                 Value="@PhoneNumber"
+                                                 Classes="govuk-input--width-20"
+                                                 Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text="UK telephone number"
+                                                        })"
+                                                 ErrorMessage="PhoneNumberError.AsErrorMessageComponent()" />;
+
+
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string PhoneNumber { get; set; }
+
+    [Parameter]
+    public string EmailAddress { get; set; }
+
+    [Parameter]
+    public string PhoneNumberError { get; set; }
+
+    [Parameter]
+    public string EmailAddressError { get; set; }
+
+    [Parameter]
+    public bool? ConsentToContact { get; set; }
+
+    [Parameter]
+    public bool? WillContactMyself { get; set; }
+
+    [Parameter]
+    public IList<string> ReferralInterventions { get; set; }
+
+    [Parameter]
+    public bool ContactDetailsMissing { get; set; }
+
+    protected IList<GDSCheckboxes.Item> Items => new[]{
+        new GDSCheckboxes.Item
+        {
+            Text="I consent to The Southwark Healthy Lifestyle Hub contacting me directly using my telephone number and email address", 
+            Value="contactMe",
+            Checked = ConsentToContact == true,
+            ConditionalContent = (builder) => {
+                EmailInput(builder);
+                PhoneInput(builder);
+            }
+        },
+        new GDSCheckboxes.Item
+        {
+            Text="Please provide me with the phone number to contact the service.",
+            Value="giveMeNumber",
+            Checked = WillContactMyself == true
+        }
+    };
+
+}

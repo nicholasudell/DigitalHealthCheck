@@ -1,0 +1,122 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Moving more"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It's important for me to move more",
+                                   Error=ImportantToChangeError,
+                                   Value = ImportantToChange
+                               })"
+          ConfidentToChange="@(new FollowUp.Question
+                        {
+                            Text = "I'm confident in making a plan to be more active",
+                            Error = ConfidentToChangeError,
+                            Value = ConfidentToChange,
+                        })"
+          BarrierHeader="Is there anything stopping you from moving more?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to move more in the following months?",
+                                   Error=DoYouHavePlansError,
+                                   Value = DoYouHavePlans,
+                               })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start moving more?",
+                                   Error=SetADateError,
+                                   Value = SetADate,
+                               })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to move more?",
+                                   Error=BeRemindedError,
+                                   Value = BeReminded,
+                               })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          OtherBarrier="@OtherBarrier"
+          BarriersError="@BarriersError"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName" ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from moving more. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    @if (PhysicalActivityStatus != PhysicalActivityStatus.Active && Walking)
+    {
+        <p class="govuk-body">As so many people overestimate the amount they walk, the calculation doesn’t take walking into account when assessing your risk of developing heart and circulatory disease. Your walking is a great way to stay active. Keep it up.</p>
+    }
+
+    <p class="govuk-body">@CallToAction</p>
+
+    <GDSDetails SummaryText="What type of physical activity should I do, and how much?">
+        <p class="govuk-body">The adult health recommendations for physical activity are that each week we should all achieve at least: </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>150 minutes of moderate intensity or 75 minutes of vigorous intensity physical activity</li>
+            <li>two strength activities</li>
+            <li>two balance activities</li>
+            <li>reduce the amount of time spent being inactive (sitting or lying down)</li>
+        </ul>
+
+        <p class="govuk-body">It doesn’t matter what type of physical activity you do, whether it is walking, football, swimming or dancing, you can always walk a little further or a little faster to benefit your health and wellbeing. Just gradually build up the amount that you do in an activity that you enjoy. All movement counts.</p>
+
+        <p class="govuk-body">What is moderate physical activity?</p>
+        <p class="govuk-body">You will know when you are working at a moderate intensity as you will be able to talk but notice that your breathing is quicker and deeper, your body is warming up, your face has a healthy glow, and your heart will be beating faster than normal but not racing.</p>
+
+        <p class="govuk-body">What is vigorous physical activity?</p>
+        <p class="govuk-body">You will know when you are working at a vigorous intensity as you will be breathing very hard, you will be short of breath, you cannot carry on a conversation and your heartbeat will feel rapid.</p>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="Benefits of a healthy level of physical activity">
+        <p class="govuk-body">Moving more, more often, can help you to: </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>boost self-esteem, mood, sleep quality and energy</li>
+            <li>manage depression, stress and anxiety</li>
+            <li>manage back pain, prevent falls and maintain independence</li>
+            <li>reduce your risk of major illnesses, such as heart disease, stroke, Type 2 diabetes and cancer by up to 50%</li>
+            <li>lower your risk of early death by up to 30%</li>
+            <li>reduce risk of dementia and Alzheimer's disease</li>
+        </ul>
+
+        <p class="govuk-body">You can <a class="govuk-link" title="Find out more about the health benefits of exercise" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/live-well/exercise/exercise-health-benefits/">find out more about the health benefits of exercise (opens in a new tab)</a> on the NHS website.</p>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public PhysicalActivityStatus PhysicalActivityStatus { get; set; }
+
+    [Parameter]
+    public bool Walking { get; set; }
+
+    string ActivityLevel => PhysicalActivityStatus switch
+    {
+        PhysicalActivityStatus.Active => "physically active. Well done!",
+        PhysicalActivityStatus.MostlyActive => "moderately active. Please consider increasing your activity.",
+        PhysicalActivityStatus.MostlyInactive => "moderately inactive. Please consider increasing your activity.",
+        PhysicalActivityStatus.Sedentary => "inactive. Please consider increasing your activity.",
+    };
+
+    string Summary => $"Your results show that you are {ActivityLevel}";
+
+    string CallToAction => PhysicalActivityStatus switch
+    {
+        PhysicalActivityStatus.Active => "Well done! Staying physically active is one of the best things that you can do for your long-term health and wellbeing.  ",
+        PhysicalActivityStatus.MostlyActive => "Please consider gradually building up the amount of movement that you do in an activity you enjoy. Please also consider the physical activity support services we offer in the follow-up section.",
+        PhysicalActivityStatus.MostlyInactive or PhysicalActivityStatus.Sedentary => "Please consider gradually building up the amount of movement that you do in an activity you enjoy. Every minute counts. Make some simple changes to move more every day to keep your heart healthy. Please also consider the physical activity support services we offer in the follow-up section. ",
+    };
+
+}

@@ -1,0 +1,78 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Risk factors page 2 of 3</h1>
+
+    <YesNoRadios Name="BloodPressureTreatment"
+                 Error="@BloodPressureTreatmentError"
+                 IdPrefix="blood-pressure-treatment"
+                 Value="@BloodPressureTreatment"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "Are you on blood pressure treatment?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <YesNoRadios Name="Migraines"
+                 Error="@MigrainesError"
+                 IdPrefix="migraines"
+                 Value="@Migraines"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "Have you ever been diagnosed with migraine?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <GDSDetails SummaryText="What is migraine?">
+        <p class="govuk-body">Not all severe headaches are migraines. Migraine is a long-term health condition that can occur in the form of migraine attacks. These attacks can occur frequently, up to several times a week, or occasionally, sometimes years apart.  A migraine is often a type of moderate or severe headache, felt as a throbbing pain at one side of the head. Other symptoms can include: feeling sick or being sick; an increased sensitivity to light, sound and smells; seeing flashing lights and fatigue. You can <a rel="noreferrer noopener" target="_blank" title="Find out more about migraines" class="govuk-link" href="https://www.nhs.uk/conditions/migraine/">find out more about migraine (opens in a new tab)</a> on the NHS website. People who have migraines are thought to have a higher risk of stroke. Women who have migraines are also thought to have a higher risk of cardiovascular disease.</p>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="What is the difference between a headache and migraine?">
+        <p class="govuk-body">A headache is usually felt through the forehead or scalp of the head and is an aching or dull pain. A migraine is usually felt on one side of the head and is an intense, throbbing pain. This pain is often accompanied by other symptoms including: feeling sick or being sick; increased sensitivity to light, sound and smells; seeing flashing lights and fatigue. </p>
+    </GDSDetails>
+
+    <YesNoRadios Name="RheumatoidArthritis"
+                 Error="@RheumatoidArthritisError"
+                 IdPrefix="rheumatoid-arthritis"
+                 Value="@RheumatoidArthritis"
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                    Text = "Have you been diagnosed with rheumatoid arthritis?",
+                    Classes="govuk-fieldset__legend--m"
+                })" />
+
+    <GDSDetails SummaryText="What is rheumatoid arthritis and what is the difference between rheumatoid arthritis and other types of arthritis?">
+        <p class="govuk-body">There are several types of arthritis, the most common being osteoarthritis and rheumatoid arthritis. Although the symptoms of osteoarthritis and rheumatoid arthritis can be similar, they are different conditions.</p>
+        <p class="govuk-body">Rheumatoid arthritis is an autoimmune disease. This means that the immune system (the body’s own defence system) attacks the body instead of the foreign cells that get into the body. Rheumatoid arthritis attacks the protective layer of cells around your joints and often targets several joints at once. This causes symptoms such as: fever; fatigue; loss of appetite; swelling in and around the joints; pain and stiffness in the joints; arthritis in paired joints (eg, both hips, both knees); and anemia (low iron levels in the blood). Rheumatoid arthritis is usually diagnosed by healthcare professionals using a combination of physical examination and specific tests (such as blood tests). You are normally under the care of a specialist rheumatology team.</p>
+        <p class="govuk-body">Osteoarthritis occurs when the cartilage (a spongy layer that provides cushioning between the bones) starts to wear away. It is the most common form of arthritis because it is often caused by wear over a lifetime. It is most commonly found in the hands, knees, hips and spine.</p>
+    </GDSDetails>
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string RheumatoidArthritis { get; set; }
+
+    [Parameter]
+    public string RheumatoidArthritisError { get; set; }
+
+    [Parameter]
+    public string BloodPressureTreatment { get; set; }
+
+    [Parameter]
+    public string BloodPressureTreatmentError { get; set; }
+
+    [Parameter]
+    public string Migraines { get; set; }
+
+    [Parameter]
+    public string MigrainesError { get; set; }
+
+}

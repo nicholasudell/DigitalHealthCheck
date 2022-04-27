@@ -1,0 +1,40 @@
+﻿<GDSRadios Classes="govuk-radios--inline"
+           Name="@Name"
+           Items="@Items"
+           IdPrefix="@IdPrefix"
+           ErrorMessage="@Error.AsErrorMessageComponent()"
+           Hint="@HintOptions"
+           FieldSet="@(new GDSFieldSet.Options { Legend = Legend })" />
+@code {
+
+    [Parameter]
+    public GDSFieldSet.LegendOptions Legend { get; set; }
+
+    [Parameter]
+    public string Hint { get; set; }
+
+    protected GDSHint.Options HintOptions => !string.IsNullOrEmpty(Hint) ?
+        new GDSHint.Options
+        {
+            Text = Hint
+        } : null;
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public string IdPrefix { get; set; }
+
+    protected IList<GDSRadios.Item> Items => new[]
+    {
+        "Yes",
+        "No"
+    }.AsRadioComponents(x => x.ToLowerInvariant(), x => x, Value);
+
+}

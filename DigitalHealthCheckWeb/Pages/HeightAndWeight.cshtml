@@ -1,0 +1,29 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.HeightAndWeightModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Height and weight";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.HeightAndWeightPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-id="@Model.Id"
+           param-heightErrorMetric="@Model.ErrorMetricHeight"
+           param-weightErrorMetric="@Model.ErrorMetricWeight"
+           param-heightErrorImperialFeet="@Model.ErrorImperialFeet"
+           param-weightErrorImperialStone="@Model.ErrorImperialStone"
+           param-heightErrorImperialInches="@Model.ErrorImperialInches"
+           param-weightErrorImperialPounds="@Model.ErrorImperialPounds"
+           param-heightMetric="@Model.Model?.MetricHeight"
+           param-weightMetric="@Model.Model?.MetricWeight"
+           param-heightImperialFeet="@Model.Model?.ImperialFeet"
+           param-heightImperialInches="@Model.Model?.ImperialInches"
+           param-weightImperialStone="@Model.Model?.ImperialStone"
+           param-weightImperialPounds="@Model.Model?.ImperialPounds"
+           param-useImperial="@Model.UseImperial"
+           param-nextPage="@Model.NextPage" />

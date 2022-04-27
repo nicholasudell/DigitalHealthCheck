@@ -1,0 +1,218 @@
+﻿<div class="govuk-form-group @FormGroupError @FormGroupClasses ">
+    <GDSLabel Text="@Label?.Text" Classes="@Label?.Classes" For="@Id" IsPageHeading="Label?.IsPageHeading ?? false" @attributes="Label?.Attributes">
+        @if (Label?.Content is null)
+        {
+            @Label?.Text
+        }
+        else
+        {
+            @Label?.Content
+        }
+    </GDSLabel>
+    @if (UseHint())
+    {
+        <GDSHint Id="@HintId" Classes="@Hint.Classes" @attributes="Hint.Attributes">
+            @if (Hint.Content is null)
+            {
+                @Hint.Text
+            }
+            else
+            {
+                @Hint.Content
+            }
+        </GDSHint>
+    }
+    @if (UseErrorMessage())
+    {
+        <GDSErrorMessage Id="@ErrorMessageId" Classes="@ErrorMessage.Classes" @attributes="ErrorMessage.Attributes">
+            @if (ErrorMessage.Content is null)
+            {
+                @ErrorMessage.Text
+            }
+            else
+            {
+                @ErrorMessage.Content
+            }
+        </GDSErrorMessage>
+    }
+
+    @if (RenderPrefix() || RenderSuffix())
+    {
+        <div class="govuk-input__wrapper">
+            @if (RenderPrefix())
+            {
+                <div class="govuk-input__prefix @Prefix.Classes" aria-hidden="true" @attributes="Prefix.Attributes">
+                    @if (Prefix.Content is null)
+                    {
+                        @Prefix.Text
+                    }
+                    else
+                    {
+                        @Prefix.Content
+                    }
+                </div>
+            }
+
+            <input class="govuk-input @Classes @InputError" id="@Id" name="@Name" type="@ActualType" spellcheck="@ActualSpellcheck" value="@Value" aria-describedBy="@ActualDescribedBy" autocomplete="@Autocomplete" pattern="@Pattern" inputmode="@InputMode" @attributes="@InputAttributes" />
+
+            @if (RenderSuffix())
+            {
+                <div class="govuk-input__suffix @Suffix.Classes" aria-hidden="true" @attributes="Suffix.Attributes">
+                    @if (Suffix.Content is null)
+                    {
+                        @Suffix.Text
+                    }
+                    else
+                    {
+                        @Suffix.Content
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <input class="govuk-input @Classes @InputError" id="@Id" name="@Name" type="@ActualType" spellcheck="@ActualSpellcheck" value="@Value" aria-describedBy="@ActualDescribedBy" autocomplete="@Autocomplete" pattern="@Pattern" inputmode="@InputMode" @attributes="@InputAttributes" />
+    }
+</div>
+
+@code {
+
+    public class Options // For other components
+    {
+        public GDSLabel.Options Label { get; set; }
+
+        public GDSHint.Options Hint { get; set; }
+
+        public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+        public AffixOptions Prefix { get; set; }
+
+        public AffixOptions Suffix { get; set; }
+
+        public IDictionary<string, object> InputAttributes { get; set; }
+
+        public string Classes { get; set; }
+
+        public string Value { get; set; }
+
+        public string Pattern { get; set; }
+
+        public string InputMode { get; set; }
+
+        public string Autocomplete { get; set; }
+
+        public bool? Spellcheck { get; set; }
+
+        public string Name { get; set; }
+
+        public string Type { get; set; } = "text";
+
+        public string Id { get; set; }
+
+        public string FormGroupClasses { get; set; }
+
+        public string DescribedBy { get; set; }
+    }
+
+    public class AffixOptions
+    {
+        public string Classes { get; set; }
+
+        public string Text { get; set; }
+
+        public RenderFragment Content { get; set; }
+
+        public IDictionary<string, object> Attributes { get; set; }
+    }
+
+    [Parameter]
+    public GDSLabel.Options Label { get; set; }
+
+    [Parameter]
+    public GDSHint.Options Hint { get; set; }
+
+    [Parameter]
+    public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+    [Parameter]
+    public AffixOptions Prefix { get; set; }
+
+    [Parameter]
+    public AffixOptions Suffix { get; set; }
+
+    protected string HintId => $"{Id}-hint";
+
+    protected string ErrorMessageId => $"{Id}-error";
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]
+    public string Pattern { get; set; }
+    [Parameter]
+    public string InputMode { get; set; }
+
+    [Parameter]
+    public string Autocomplete { get; set; }
+
+    [Parameter]
+    public bool? Spellcheck { get; set; }
+
+    // Convert this to string because Razor doesn't show tags when the value is false.
+    protected string ActualSpellcheck => Spellcheck.HasValue ? (Spellcheck.Value.ToString().ToLower()) : null;
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    protected string ActualType => string.IsNullOrEmpty(Type) ? "text" : Type;
+
+    [Parameter]
+    public string Id { get; set; }
+
+    protected bool UseHint() => Hint is not null;
+
+    protected bool UseErrorMessage() => ErrorMessage is not null;
+
+    [Parameter]
+    public string FormGroupClasses { get; set; }
+
+    [Parameter]
+    public string DescribedBy { get; set; }
+
+    protected string ActualDescribedBy
+    {
+        get
+        {
+            var descriptions = new[]
+            {
+                DescribedBy,
+                UseHint() ? HintId : null,
+                UseErrorMessage() ? ErrorMessageId : null
+            };
+
+            var validDescriptions = descriptions.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            if (!validDescriptions.Any())
+            {
+                return null;
+            }
+
+            return string.Join(' ', validDescriptions);
+        }
+    }
+
+    protected string FormGroupError => UseErrorMessage() ? "govuk-form-group--error" : null;
+    protected string InputError => UseErrorMessage() ? "govuk-input--error" : null;
+
+    public bool RenderPrefix() => Prefix is not null;
+
+    public bool RenderSuffix() => Suffix is not null;
+}

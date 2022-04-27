@@ -1,0 +1,52 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+<h1 class="govuk-heading-l">Diabetes page 1 of 3</h1>
+
+<p class="govuk-body">The following questions are used to calculate the risks associated with diabetes.</p>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <YesNoRadios Name="FamilyHistory"
+                 Error="@FamilyHistoryError"
+                 IdPrefix="family-history"
+                 Hint="A close family member means your birth mother, father, brother or sister. If you are unsure, select no."
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                            Text = "Has a close family member ever been told that they have Type 2 diabetes?",
+                            Classes="govuk-fieldset__legend--m"
+                        })"
+                 Value="@FamilyHistory" />
+
+    <YesNoRadios Name="Steroids"
+                 Error="@SteroidsError"
+                 IdPrefix="steroids"
+                 Hint="For example, prednisolone or dexamethasone. These steroids are used to treat a wide range of health problems, such as the many conditions which cause inflammation, and are only available on prescription. These steroids are not prescribed for muscle growth. If you only take regular steroids through an inhaler, please answer no to this question. This question does not include steroids taken as part of hormone replacement therapy or other gender-affirmation treatments."
+                 Legend="@(new GDSFieldSet.LegendOptions {
+                            Text = "Have you been prescribed/regularly take steroid tablets?",
+                            Classes="govuk-fieldset__legend--m"
+                        })"
+                 Value="@Steroids" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string FamilyHistoryError { get; set; }
+
+    [Parameter]
+    public string FamilyHistory { get; set; }
+
+    [Parameter]
+    public string SteroidsError { get; set; }
+
+    [Parameter]
+    public string Steroids { get; set; }
+
+}

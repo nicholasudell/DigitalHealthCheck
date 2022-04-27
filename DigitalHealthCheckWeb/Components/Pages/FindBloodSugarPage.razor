@@ -1,0 +1,82 @@
+﻿@inherits Page
+
+<h1 class="govuk-heading-l">Diabetes page 4 of 4</h1>
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <p class="govuk-body">If you had your blood sugar level measured within the last six months but cannot remember the number, you have two options. You can either go and find those results, or you can get a new measurement.</p>
+
+    <GDSDetails SummaryText="How can I find the results of my last blood sugar measurement?">
+        <p class="govuk-body">The result of your blood sugar measurement is in your GP record.</p>
+        <p class="govuk-body">GP records include information about your medicine, allergies, vaccinations, previous illnesses and test results, hospital discharge summaries, appointment letters and referral letters.</p>
+        <p class="govuk-body">You can access your GP records online through GP online services.</p>
+        <p class="govuk-body">To get your health records online you need to register for GP online services. This is a three-step process that can take from 30 minutes to a couple of hours.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/gps/online-health-and-prescription-services/" title="Visit GP online services">Visit GP online services (opens in new tab)</a></p>
+        <p class="govuk-body">If you have registered for GP online services, you can access your health information through NHS login or the NHS app.</p>
+        <p class="govuk-body"><a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/nhs-services/online-services/nhs-log-in/" title="View health records on NHS login and the NHS app">View health records on NHS login and the NHS app (opens in new tab)</a></p>
+        <p class="govuk-body">Once logged in you need to click on ‘View your GP health record’, where you will find ‘Test results.’</p>
+    </GDSDetails>
+
+    <GDSRadios Name="KnowYourHbA1c"
+               Items="KnowYourHbA1cItems"
+               ErrorMessage="KnowYourHbA1cError.AsErrorMessageComponent()"
+               IdPrefix="know-your-hba1c"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = "How would you like to proceed?",
+                            Classes="govuk-fieldset__legend--m",
+                            IsPageHeading=false
+                        }
+                    })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string HbA1c { get; set; }
+
+    [Parameter]
+    public string HbA1cError { get; set; }
+
+    [Parameter]
+    public string KnowYourHbA1cError { get; set; }
+
+    [Parameter]
+    public string KnowYourHbA1c { get; set; }
+
+    RenderFragment HbA1cInner =>
+    @<GDSInput Classes="govuk-!-width-one-third"
+               Name="HbA1c"
+               Id="hba1c"
+               Label="@(new GDSLabel.Options { Text = "What is your HbA1c in millimoles per mole?" })"
+               Value="@HbA1c"
+               Suffix="@(new GDSInput.AffixOptions { Text = "mmol/mol" })"
+               ErrorMessage="@HbA1cError.AsErrorMessageComponent()" />;
+
+protected IList<GDSRadios.Item> KnowYourHbA1cItems => new[]{
+        new GDSRadios.Item
+        {
+            Text= "I found my blood sugar measurement",
+            Value="yes",
+            Checked = KnowYourHbA1c == "yes",
+            ConditionalContent = HbA1cInner
+        },
+           new GDSRadios.Item
+        {
+            Text= "I cannot find my blood sugar measurement or I would prefer to get a new measurement",
+            Value="no",
+            Checked = KnowYourHbA1c == "no",
+            ConditionalContent = @<p class="govuk-body">We will direct you to a way of getting this information if your final NHS Health Check results show that you would benefit from having your blood sugar level measured. In the meantime, this tool will use a national average. However, your other answers will ensure that the final result is tailored to you.</p>
+        }
+    }.ToList();
+
+}

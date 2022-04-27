@@ -1,0 +1,22 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.CalculatingModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Calculating your results";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.CalculatingPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-id="@Model.Id"
+           param-variant="@Model.Variant"/>
+
+<script>
+    setTimeout(function () {
+        location.reload(true);
+    }, 5000);
+</script>

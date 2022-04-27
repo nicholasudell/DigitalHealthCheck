@@ -1,0 +1,93 @@
+﻿@inherits Page
+
+@if (ErrorList.Any())
+{
+    <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+}
+
+<form method="post" novalidate>
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Gender identity and sex assigned at birth page 3 of 3</h1>
+
+    @if(PrefersNotToDiscloseIdentity)
+    {
+        <p class="govuk-body">We recognise that you would prefer not to say your gender identity.</p>
+    }
+    else
+    {
+        <p class="govuk-body">
+            We recognise that you are @RichIdentity.
+        </p>
+    }
+
+    <p class="govuk-body">You have also reported that you have undergone or are currently undergoing gender-affirmation treatment.</p>
+    <p class="govuk-body">The tool is limited because it only allows for binary sex options. You will be given the option to see results for both your current gender identity and your sex assigned at birth. Your individual results are likely to be between the two because of your gender-affirmation treatment.</p>
+
+    <GDSDetails SummaryText="Why would I want to look at both sets of results?">
+        <p class="govuk-body">There is limited research as to whether undergoing gender affirmation treatments has an impact on your risk of developing heart and circulatory disease, or Type 2 diabetes.</p>
+        <p class="govuk-body">There is currently not enough research to give a precise risk score based on the type and duration of your gender-affirmation treatment. The research available suggests that your risk will change from your sex assigned at birth and move towards your current gender identity over time. You may wish to view results for both your sex assigned at birth and your current gender identity, because your individual results are likely to be between the two. Results are close approximations, with generally only a 5% difference between risk scores for your current gender identity and your sex assigned at birth.</p>
+        <p class="govuk-body">You will be given the option to view both results. You can decide which you would like to see first, and whether you would like to view the second set. In any case, we recognise and respect your current gender identity.</p>
+        <p class="govuk-body">You may want to follow up with a healthcare provider, including someone at your GP clinic, an endocrine or gender identity team (if you are able to access one), or one of the specialist services recommended by trans and non-binary communties such as Dean Street, CliniQ, or the Beaumont Society. </p>
+
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.dean.st/" title="Access Dean Street for advice from clinicians and counsellors">access Dean Street for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://cliniq.org.uk/" title="Access CliniQ for advice from clinicians and counsellors">access CliniQ for advice from clinicians and counsellors (opens in a new tab)</a>.</p>
+    <p class="govuk-body">You can <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.beaumontsociety.org.uk/" title="Access the Beaumont Society for links to relevant support services">access the Beaumont Society for links to relevant support services (opens in a new tab)</a>.</p>
+
+    <p class="govuk-body">(Note that this should not be interpreted as an endorsement of the named specialist services by Southwark Council. Please see the Terms and Conditions for more detail.) </p>
+    </GDSDetails>
+
+    <WhyAreWeAskingAboutSex></WhyAreWeAskingAboutSex>
+
+    <WhatIfIDontIdentifyWithSexAtBirth></WhatIfIDontIdentifyWithSexAtBirth>
+
+    <IfYouDontWantToAnswerAboutGenderIdentity></IfYouDontWantToAnswerAboutGenderIdentity>
+
+    <GDSRadios Name="SexForResults"
+               Items="Identities"
+               ErrorMessage="SexForResultsError.AsErrorMessageComponent()"
+               IdPrefix="sex"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Which result would you prefer to view first?",
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string SexForResultsError { get; set; }
+
+    [Parameter]
+    public string SexForResults { get; set; }
+
+    protected IList<GDSRadios.Item> Identities => new[]
+    {
+        new { Name = "My sex assigned at birth", Value = "birth" },
+        new { Name = "My current gender identity", Value = "current" },
+    }.AsRadioComponents(x => x.Value, x =>x.Name, SexForResults);
+
+    [Parameter]
+    public string Identity { get; set; }
+
+    public bool PrefersNotToDiscloseIdentity => Identity == "skip";
+
+    [Parameter]
+    public string CustomIdentity { get; set; }
+
+    public string RichIdentity => Identity switch
+    {
+        "transman" => "a trans man",
+        "transwoman" => "a trans woman",
+        "nonbinary" => "nonbinary",
+        "intersex" => "intersex",
+        "custom" => CustomIdentity,
+        _ => ""
+    };
+
+}

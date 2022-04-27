@@ -1,0 +1,15 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.UnsubscribeModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Unsubscribe";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.UnsubscribePage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-success="@Model.Success"
+           param-id="@Model.Id"/>

@@ -1,0 +1,18 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.GenderAffirmationModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Gender identity and sex assigned at birth page 2 of 3";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.GenderAffirmationPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-genderAffirmation="@Model.Model.GenderAffirmation"
+           param-genderAffirmationError="@Model.GenderAffirmationError"
+           param-identity="@Model.Identity"
+           param-customIdentity="@Model.CustomIdentity" />

@@ -1,0 +1,382 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">@Title</h1>
+
+    @ChildContent
+
+    <GDSRadios Name="ImportantToChange"
+               IdPrefix="important-to-change"
+               Items="@ImportantToChangeItems"
+               ErrorMessage="@ImportantToChange.Error.AsErrorMessageComponent()"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = ImportantToChange.Text,
+                            Classes = "govuk-fieldset__legend--m"
+                        }
+                    })"
+               Hint="@(new GDSHint.Options
+                    {
+                         Text="Choose from range - 1 least to 5 most"
+                    })" />
+
+    <GDSRadios Name="ConfidentToChange"
+               IdPrefix="confident-to-change"
+               Items="@ConfidentToChangeItems"
+               ErrorMessage="@ConfidentToChange.Error.AsErrorMessageComponent()"
+               FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = ConfidentToChange.Text,
+                            Classes = "govuk-fieldset__legend--m"
+                        }
+                    })"
+               Hint="@(new GDSHint.Options
+                    {
+                         Text="Choose from range - 1 least to 5 most"
+                    })" />
+
+    @PreOptionsContent
+
+    @if (AllOptions != null)
+    {
+
+        <GDSRadios Name="SelectedOption"
+                   IdPrefix="options"
+                   Items="OptionRadios"
+                   ErrorMessage="SelectedOptionError.AsErrorMessageComponent()"
+                   FieldSet="@(
+                new GDSFieldSet.Options
+                {
+                    Legend = new GDSFieldSet.LegendOptions
+                    {
+                        Text = OptionsHeader,
+                        Classes = "govuk-fieldset__legend--m"
+                    }
+                })" />
+    }
+
+    @PostOptionsContent
+
+    <GDSCheckboxes Name="Barriers"
+                   IdPrefix="barriers"
+                   Items="BarrierCheckboxes"
+                   FieldSet="@(
+                    new GDSFieldSet.Options {
+                        Legend = new GDSFieldSet.LegendOptions {
+                            Text = $"{BarrierHeader} (optional)",
+                            Classes = "govuk-fieldset__legend--m"
+                        }
+                    })"
+                   Hint="@(new GDSHint.Options
+                    {
+                         Content = BarrierHintContent
+                    })" />
+
+    <YesNoRadios Legend="@(new GDSFieldSet.LegendOptions {
+                            Text = DoYouHavePlans.Text,
+                            Classes = "govuk-fieldset__legend--m"
+                        })"
+                 IdPrefix="do-you-have-plans"
+                 Error="@DoYouHavePlans.Error"
+                 Value="@DoYouHavePlans.Value"
+                 Name="DoYouHavePlans" />
+
+    <YesNoRadios Legend="@(new GDSFieldSet.LegendOptions {
+                            Text = SetADate.Text,
+                            Classes = "govuk-fieldset__legend--m"
+                        })"
+                 IdPrefix="set-a-date"
+                 Error="@SetADate.Error"
+                 Value="@SetADate.Value"
+                 Name="SetADate" />
+
+    <GDSRadios Name="BeReminded"
+               Classes="@BeRemindedClasses"
+               Items="@BeRemindedItems"
+               IdPrefix="be-reminded"
+               ErrorMessage="@BeReminded.Error.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options { Legend = new GDSFieldSet.LegendOptions
+                        {
+                            Text = BeReminded.Text,
+                            Classes = "govuk-fieldset__legend--m"
+                        }
+                        })" />
+
+    <p class="govuk-body">At the end of this service, you will be provided with a unique link that will enable you to come back and enter your updated @MeasurementName reading.</p>
+
+    <p class="govuk-body">Alternatively, you can also go and get this reading now and come back using this link: <a class="govuk-link" title="Your unique link to amend your health information" href="@UniqueLink">Your unique link to amend your health information</a></p>
+
+    @if (IsFinalFollowUp)
+    {
+        <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Actions" Text="Follow up - Actions" />
+    }
+    else if (ShowSkipFollowUps)
+    {
+        <h2 class="govuk-heading-m">Follow up on the results of your NHS Health Check</h2>
+        <p class="govuk-body">You can either follow up with the next most risky health priority as suggested by your detailed results, or you can skip forward to the next steps and consider actions for your personally selected priorities.</p>
+        <div class="govuk-button-group">
+            <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Next" Text="@($"Follow up - {NextHealthPriorityName}")" />
+            <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" Name="SubmitAction" Value="Actions" Text="Follow up - Actions" />
+        </div>
+
+    }
+    else
+    {
+        <h2 class="govuk-heading-m">Follow up on the results of your NHS Health Check</h2>
+        <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Name="SubmitAction" Value="Next" Text="@($"Follow up - {NextHealthPriorityNumericName} Health Priority")" />
+    }
+</form>
+
+@code {
+
+    [Parameter]
+    public string BarrierHint { get; set; }
+
+    private RenderFragment BarrierHintContent =>@<div>
+        <p class="govuk-body">@BarrierHint</p>
+        <p class="govuk-body">Select as many as you want that describe your situation.</p>
+    </div>;
+
+public class Option : IEquatable<Option>
+{
+  public string Text { get; set; }
+
+  public string Value { get; set; }
+
+  public RenderFragment Content { get; set; }
+
+  public bool Equals(Option other) =>
+      other is not null &&
+      string.Equals(other.Value, Value, StringComparison.OrdinalIgnoreCase);
+
+  public override bool Equals(object obj) => obj is Option other && this.Equals(other);
+
+  public override int GetHashCode() => Value.GetHashCode();
+}
+
+public class Question
+{
+  public string Text { get; set; }
+  public string Error { get; set; }
+  public string Value { get; set; }
+}
+
+string[] PriorityNumericNames = new[]
+{
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "seventh",
+        "eighth",
+        "ninth"
+    };
+
+    protected string BeRemindedClasses => AskForEmailAddress ?
+            string.Empty :
+            "govuk-radios--inline";
+
+[Parameter]
+public string MeasurementName { get; set; }
+
+[Parameter]
+public string BarrierNoneText { get; set; } = "I have no barriers";
+
+[Parameter]
+public string BarrierOtherText { get; set; } = "Other (I will record my own barriers)";
+
+[Parameter]
+public string OtherBarrier { get; set; }
+
+[Parameter]
+public string BarrierHeader { get; set; }
+
+[Parameter]
+public IList<Barrier> AllBarriers { get; set; }
+
+[Parameter]
+public IList<Barrier> SelectedBarriers { get; set; }
+
+protected IList<GDSCheckboxes.Item> BarrierCheckboxes =>
+AllBarriers.AsCheckboxComponents(x => x.Value, x => x.Text, x => SelectedBarriers.Contains(x))
+  .Concat(new[]
+  {
+                new GDSCheckboxes.Item
+                {
+                     Divider = "or"
+                },
+                new GDSCheckboxes.Item
+                {
+                    Text=BarrierOtherText,
+                    Value="other",
+                    Checked = !string.IsNullOrEmpty(OtherBarrier) || !string.IsNullOrEmpty(BarriersError),
+                    ConditionalContent = @<GDSCharacterCount Id="other-barrier"
+                                                             TextArea="@(new GDSTextArea.Options
+                                                            {
+                                                                Name="OtherBarrier",
+                                                                 Id="other-barrier",
+                                                                  Value=OtherBarrier,
+                                                                  Label=new GDSLabel.Options
+                                                                    {
+                                                                           For="other-barrier",
+                                                                            Text="My barriers",
+                                                                            Classes="govuk-label--s"
+                                                                    },
+                                                                  ErrorMessage=BarriersError.AsErrorMessageComponent(),
+                                                            })"
+                                                             MaxLength="300"
+                                                             Hint="@(new GDSHint.Options
+                                                                     {
+                                                                         Text="Do not include personal or financial information like your National Insurance number or credit card details."
+                                                                     })" />
+                }
+                                    })
+                                    .WithNoneOption(BarrierNoneText)
+                                    .ToList();
+
+        [Parameter]
+        public string BarriersError { get; set; }
+
+        protected string NextHealthPriorityNumericName => PriorityNumericNames[NextHealthPriorityNumber - 1];
+
+        [Parameter]
+        public bool AskForEmailAddress { get; set; }
+
+        [Parameter]
+        public string BaseUrl { get; set; }
+
+        [Parameter]
+        public int NextHealthPriorityNumber { get; set; }
+
+        [Parameter]
+        public string NextHealthPriorityName { get; set; }
+
+        [Parameter]
+        public bool IsFinalFollowUp { get; set; }
+
+        [Parameter]
+        public bool ShowSkipFollowUps { get; set; }
+
+        [Parameter]
+        public string Title { get; set; }
+
+        [Parameter]
+        public RenderFragment ChildContent { get; set; }
+
+        [Parameter]
+        public Question ImportantToChange { get; set; }
+
+        [Parameter]
+        public Question ConfidentToChange { get; set; }
+
+        [Parameter]
+        public RenderFragment PreOptionsContent { get; set; }
+
+        [Parameter]
+        public RenderFragment PostOptionsContent { get; set; }
+
+        [Parameter]
+        public string ReturnPage { get; set; }
+
+        protected string UniqueLink => $"./{ReturnPage}{BuildQuery(IdQueryParam, "next=CheckYourAnswers")}";
+        protected string PrintableLink => $"{BaseUrl}/{ReturnPage}{BuildQuery(IdQueryParam, "next=CheckYourAnswers")}";
+
+        [Parameter]
+        public string OptionsHeader { get; set; }
+
+        [Parameter]
+        public IList<Option> AllOptions { get; set; }
+
+        [Parameter]
+        public string SelectedOption { get; set; }
+
+        protected IList<GDSRadios.Item> OptionRadios =>
+            AllOptions.Select(x => new GDSRadios.Item
+            {
+                Text = x.Text,
+                Value = x.Value,
+                Checked = x.Value == SelectedOption,
+                ConditionalContent = x.Content
+            }).ToList();
+
+        [Parameter]
+        public string SelectedOptionError { get; set; }
+
+        [Parameter]
+        public Question DoYouHavePlans { get; set; }
+
+        [Parameter]
+        public Question SetADate { get; set; }
+
+        [Parameter]
+        public Question BeReminded { get; set; }
+
+        [Parameter]
+        public Question EmailAddress { get; set; }
+
+        private struct Response
+        {
+            public string Value { get; private set; }
+
+            public string Text { get; private set; }
+
+            public Response(string value, string text)
+            {
+                this.Value = value;
+                this.Text = text;
+            }
+        }
+
+        private IEnumerable<Response> responses = new[]
+    {
+        new Response("1", "1- Disagree"),
+        new Response("2", "2- Somewhat disagree"),
+        new Response("3", "3- Neither disagree nor agree"),
+        new Response("4", "4- Somewhat agree"),
+        new Response("5", "5- Agree")
+    };
+
+        protected IList<GDSRadios.Item> ImportantToChangeItems => responses.AsRadioComponents(x => x.Value, x => x.Text, ImportantToChange.Value);
+        protected IList<GDSRadios.Item> ConfidentToChangeItems => responses.AsRadioComponents(x => x.Value, x => x.Text, ConfidentToChange.Value);
+
+        protected RenderFragment EmailInput =>@<GDSInput Id="contact-by-email"
+                                                         Name="EmailAddress"
+                                                         Type="email"
+                                                         Autocomplete="email"
+                                                         Spellcheck="false"
+                                                         Value="@EmailAddress.Value"
+                                                         Label="@(new GDSLabel.Options
+                                                        {
+                                                            Text=EmailAddress.Text
+                                                        })"
+                                                         ErrorMessage="EmailAddress.Error.AsErrorMessageComponent()" />;
+
+protected IList<GDSRadios.Item> BeRemindedItems => new[]
+{
+        new GDSRadios.Item
+        {
+            Text = "Yes",
+            Value="yes",
+            Checked = BeReminded.Value == "yes",
+            ConditionalContent = AskForEmailAddress ? EmailInput : null
+        },
+        new GDSRadios.Item
+        {
+            Text = "No",
+            Value="no",
+            Checked = BeReminded.Value == "no",
+        }
+    };
+}

@@ -1,0 +1,17 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.CheckYourAnswersModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Check your answers";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.CheckYourAnswersPage)"
+           render-mode="Static"
+           param-id="@Model.Id"
+           param-variant="@Model.Variant"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-check="@Model.Check" />

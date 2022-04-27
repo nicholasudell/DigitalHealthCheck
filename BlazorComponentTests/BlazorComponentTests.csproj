@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\button\fixtures.json" Link="Fixtures\button\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\input\fixtures.json" Link="Fixtures\input\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\hint\fixtures.json" Link="Fixtures\hint\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\error-message\fixtures.json" Link="Fixtures\error-message\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\label\fixtures.json" Link="Fixtures\label\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\radios\fixtures.json" Link="Fixtures\radios\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\fieldset\fixtures.json" Link="Fixtures\fieldset\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\details\fixtures.json" Link="Fixtures\details\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\checkboxes\fixtures.json" Link="Fixtures\checkboxes\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\date-input\fixtures.json" Link="Fixtures\date-input\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\summary-list\fixtures.json" Link="Fixtures\summary-list\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\panel\fixtures.json" Link="Fixtures\panel\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\tag\fixtures.json" Link="Fixtures\tag\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\accordion\fixtures.json" Link="Fixtures\accordion\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\error-summary\fixtures.json" Link="Fixtures\error-summary\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\textarea\fixtures.json" Link="Fixtures\textarea\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\character-count\fixtures.json" Link="Fixtures\character-count\fixtures.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+	  <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\cookie-banner\fixtures.json" Link="Fixtures\cookie-banner\fixtures.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Include="..\DigitalHealthCheckWeb\node_modules\govuk-frontend\govuk\components\notification-banner\fixtures.json" Link="Fixtures\notification-banner\fixtures.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="bunit" Version="1.1.5" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DigitalHealthCheckWeb\DigitalHealthCheckWeb.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Fixtures\" />
+  </ItemGroup>
+
+</Project>

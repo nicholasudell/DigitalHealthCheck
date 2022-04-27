@@ -1,0 +1,80 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Alcohol page 3 of 7</h1>
+
+    <GDSRadios Name="Units"
+               Items="UnitsItems"
+               IdPrefix="units"
+               ErrorMessage="@UnitsError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "How many units of alcohol do you drink on a typical day when you are drinking?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <AlcoholUnits Sex="@Sex" />
+
+    <GDSRadios Name="msasq"
+               Items="@Items"
+               IdPrefix="msasq"
+               ErrorMessage="@MSASQError.AsErrorMessageComponent()"
+               FieldSet="@(new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = $"How often have you had {UnitLimit} or more units of alcohol on a single occasion in the last year?",
+                        Classes="govuk-label--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string UnitsError { get; set; }
+
+    [Parameter]
+    public DigitalHealthCheckEF.Sex Sex { get; set; }
+
+    private int UnitLimit => Sex switch
+    {
+        DigitalHealthCheckEF.Sex.Male => 8,
+        DigitalHealthCheckEF.Sex.Female => 6
+    };
+
+    [Parameter]
+    public string Units { get; set; }
+
+    [Parameter]
+    public string MSASQError { get; set; }
+
+    [Parameter]
+    public string MSASQ { get; set; }
+
+    protected IList<GDSRadios.Item> UnitsItems => new[]{
+        new {Text="1-2", Value="2" },
+         new {Text="3-4", Value="4" },
+         new {Text="5-6", Value="6" },
+         new {Text="7-9", Value="9" },
+         new {Text="10+", Value="10" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, Units);
+
+    protected IList<GDSRadios.Item> Items => new[]{
+        new {Text="Never", Value="never" },
+         new {Text="Less than monthly", Value="lessThanMonthly" },
+         new {Text="Monthly", Value="monthly" },
+         new {Text="Weekly", Value="weekly" },
+         new {Text="Daily or almost daily", Value="daily" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, MSASQ);
+
+}

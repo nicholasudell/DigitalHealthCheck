@@ -1,0 +1,41 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Smoking page 2 of 2</h1>
+
+    <GDSRadios Name="everSmoked"
+               IdPrefix="ever-smoked"
+               Items="Items"
+               ErrorMessage="Error.AsErrorMessageComponent()"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = "Did you used to smoke tobacco before?",
+                        Classes="govuk-fieldset__legend--m"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+    [Parameter]
+    public string Error { get; set; }
+
+    [Parameter]
+    public string EverSmoked { get; set; }
+
+    protected IList<GDSRadios.Item> Items => new[]{
+        new {Text="Non-smoker (never smoked)", Value="no" },
+        new {Text="Ex-smoker (previously smoked)", Value="yes" }
+    }.AsRadioComponents(x => x.Value, x => x.Text, EverSmoked);
+
+}

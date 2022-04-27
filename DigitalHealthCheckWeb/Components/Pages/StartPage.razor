@@ -1,0 +1,103 @@
+﻿@inherits Page
+<h1 class="govuk-heading-l">NHS Health Check</h1>
+
+<p class="govuk-body-l">The NHS Health Check is a free checkup of your heart and circulatory health</p>
+
+<p class="govuk-body">You have been invited by your GP clinic to undertake this remote medical assessment. Your results will automatically be shared with your GP clinic.</p>
+
+<h2 class="govuk-heading-m">Use this service to:</h2>
+
+<ul class="govuk-list govuk-list--bullet">
+    <li>understand your risk of developing heart and circulatory diseases, as well as Type 2 diabetes</li>
+    <li>understand your mental wellbeing</li>
+    <li>find personalised information and support that can help you lead a longer, healthier life</li>
+    <li>access clinical follow-up and support services, if needed</li>
+    <li>on average, this service takes 20 minutes to complete</li>
+</ul>
+
+<form method="post">
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+    @if (!FirstTime)
+    {
+        <div class="govuk-button-group">
+            <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Text="Start Now" IsStartButton="true" />
+            <GDSButton PreventDoubleClick="true" Classes="govuk-button--secondary" HRef="@($"./{ContinuePage}{BuildQuery(IdQueryParam)}")" Text="Skip to where I left off" />
+        </div>
+    }
+    else
+    {
+        <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Text="Start Now" IsStartButton="true" />
+    }
+</form>
+
+<p class="govuk-body">This new remote service is an additional option to the current face-to-face service. You can also <a class="govuk-link" title="NHS Find a GP clinic tool" rel="noreferrer noopener" target="_blank" href="https://www.nhs.uk/service-search/find-a-gp">access this service via your local GP Clinic (opens in a new tab)</a>. </p>
+
+<GDSDetails SummaryText="How will the NHS Health Check help me?">
+    <p class="govuk-body">Your NHS Health Check can detect potential health problems before they do real damage and help you find ways to lower the risks.</p>
+
+    <p class="govuk-body">Using the same method as a GP, this tool can estimate how likely it is that you will develop these health problems. It will warn you of the risk of developing cardiovascular disease in the next 10 years, and the probability of developing it over the course of your lifetime by estimating your ‘heart age’. It will also identify whether you are at a high risk of developing Type 2 diabetes.</p>
+
+    <p class="govuk-body">It will then show you how small changes can help you reduce these risks, or signpost you to a medical follow-up.</p>
+</GDSDetails>
+
+<GDSDetails SummaryText="What follow-ups might I need?">
+
+    <p class="govuk-body">Depending on your situation, the NHS Health Check tool may give you information about the follow-up tests needed to get a clearer picture of your health and where you can access these tests, such as leisure centres and pharmacies. The information provided may include:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>getting your blood pressure tested</li>
+        <li>having a test to measure your cholesterol or blood sugar levels</li>
+        <li>contacting your GP clinic for a discussion with a healthcare professional</li>
+    </ul>
+
+    <p class="govuk-body">Your results will automatically be shared with your GP clinic. </p>
+
+</GDSDetails>
+
+<GDSDetails SummaryText="What support is available to help me?">
+    <p class="govuk-body">
+        Along with helping you understand your health information, you will also get directed to information and services to help improve your overall health. This could include:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>help to quit smoking</li>
+        <li>support for weight management and moving more</li>
+        <li>resources to improve mental wellbeing</li>
+    </ul>
+</GDSDetails>
+
+<GDSDetails SummaryText="Tell us about your health measurements or get new ones">
+    <p class="govuk-body">This service will ask you about your height and weight, as well as your cholesterol, blood pressure and blood sugar level. If you had these measurements taken in the past six months, please have them at hand. If you do not know this information, or if the measurements were taken more than six months ago, we will direct you to ways to find this information or ways to get new measurements.</p>
+</GDSDetails>
+
+<p class="govuk-body">We will process your data securely and legally; further information is available in the <a class="govuk-link" title="Southwark NHS Health Check privacy statement" href="@($"./DataProtection{BuildQuery(IdQueryParam)}")">full privacy statement.</a></p>
+
+<GDSDetails SummaryText="Who is eligible for the NHS Health Check?">
+
+    <p class="govuk-body">The check is for people aged 40 to 74 who do not have any of the following pre-existing conditions:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>heart disease</li>
+        <li>chronic kidney disease</li>
+        <li>diabetes</li>
+        <li>high blood pressure (hypertension)</li>
+        <li>atrial fibrillation</li>
+        <li>transient ischaemic attack</li>
+        <li>inherited high cholesterol (familial hypercholesterolemia)</li>
+        <li>heart failure</li>
+        <li>peripheral arterial disease</li>
+        <li>stroke</li>
+        <li>you are currently being prescribed statins to lower cholesterol</li>
+        <li>previous checks have found that you have a 20% or higher risk of getting cardiovascular disease over the next 10 years</li>
+    </ul>
+
+</GDSDetails>
+
+<p class="govuk-body">Disclaimer: This service measures your future risk of heart and circulatory diseases and Type 2 diabetes. It does not provide a medical diagnosis of Type 2 diabetes or heart and circulatory diseases. If you feel unwell you should seek clinical support from a healthcare professional by contacting your GP clinic, NHS 111 or, if it is an emergency, 999.</p>
+
+@code {
+    [Parameter]
+    public bool FirstTime { get; set; } = true;
+    [Parameter]
+    public string ContinuePage { get; set; } = "CheckYourAnswers";
+}

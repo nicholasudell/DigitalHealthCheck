@@ -1,0 +1,111 @@
+﻿@using DigitalHealthCheckCommon
+@using Model;
+@inherits FollowUpRiskPageBase
+
+<FollowUp Title="Follow-up – Healthy weight"
+          ImportantToChange="@(new FollowUp.Question
+                               {
+                                   Text = "It is important for me to have a healthy weight",
+          Error=ImportantToChangeError,
+          Value=ImportantToChange
+          })"
+          ConfidentToChange="@(new FollowUp.Question
+                        {
+                            Text = "I am confident about achieving a healthy weight",
+          Error=ConfidentToChangeError,
+          Value=ConfidentToChange,
+          })"
+          BarrierHeader="Is there anything stopping you from reaching a healthy weight?"
+          DoYouHavePlans="@(new FollowUp.Question
+                               {
+                                    Text = "Do you have plans to try to achieve a healthy weight in the following months?",
+          Error=DoYouHavePlansError,
+          Value=DoYouHavePlans,
+          })"
+          SetADate="@(new FollowUp.Question
+                               {
+                                    Text = "Will you set a date to start trying to achieve a healthy weight?",
+          Error=SetADateError,
+          Value=SetADate,
+          })"
+          BeReminded="@(new FollowUp.Question
+                               {
+                                    Text = "Would you like to be reminded by email to start trying to achieve a healthy weight?",
+          Error=BeRemindedError,
+          Value=BeReminded,
+          })"
+          EmailAddress="@(new FollowUp.Question
+                        {
+                              Text="Email address",
+                              Error = EmailAddressError,
+                              Value = EmailAddress
+                        })"
+          AskForEmailAddress="@AskForEmailAddress"
+          AntiForgery="@AntiForgery"
+          AllBarriers="@AllBarriers"
+          BarriersError="@BarriersError"
+          OtherBarrier="@OtherBarrier"
+          SelectedBarriers="@SelectedBarriersAsBarrierTypes"
+          ShowSkipFollowUps="@ShowSkipFollowUps"
+          IsFinalFollowUp="@IsFinalFollowUp"
+          NextHealthPriorityNumber="@NextHealthPriorityNumber" NextHealthPriorityName="@NextHealthPriorityName" ErrorList="@ErrorList"
+          BarrierHint="Based on your selections below, this NHS Health Check will offer you tailored information and services that could help you overcome whatever is currently stopping you from reaching a healthy weight. These personalised resources will appear on the Follow-up – Actions page.">
+    <p class="govuk-body">@Summary</p>
+
+    <p class="govuk-body">@CallToAction</p>
+
+    <GDSDetails SummaryText="What is Body Mass Index?">
+        <p class="govuk-body">Body Mass Index (BMI) is a calculation used to see whether you are a healthy weight for your height. A healthy BMI varies according to ethnicity. </p>
+        <p class="govuk-body">BMI is a useful measurement for most people aged over 18. But there are limitations, including:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>Adults with a very athletic build (for example, professional athletes) could show as overweight. This is because muscle weighs more than fat and the BMI does not take this into account.</li>
+            <li>If you’re pregnant, the BMI does not apply. You should seek advice from your doctor or midwife on what a healthy weight is</li>
+        </ul>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="Benefits of being a healthy weight">
+        <ul class="govuk-list govuk-list--bullet">
+            <li>Live longer in better health</li>
+            <li>Reduces your risk of heart and circulatory diseases, Type 2 diabetes and some cancers</li>
+            <li>Have healthier joints</li>
+            <li>Have more energy</li>
+            <li>Reduces musculoskeletal pain and better manages musculoskeletal conditions (Musculoskeletal conditions affect the joints, bones and muscles, and also includes rarer autoimmune diseases and back pain)</li>
+            <li>Improves mood and self-esteem</li>
+            <li>Better sleep</li>
+            <li>Improves digestion</li>
+            <li>Healthier skin, teeth and hair</li>
+        </ul>
+    </GDSDetails>
+
+    <GDSDetails SummaryText="Why haven’t we asked for more details about what you eat?">
+
+    <p class="govuk-body">We recognise that diet is a leading risk factor for heart disease and diabetes. We thought about adding diet into this service. However, a risk prediction algorithm that includes diet has not been created and validated for the English population. Instead, we use the validated QRISK3 algorithm that is recommended by NICE. This algorithm also includes information about blood pressure, body weight and cholesterol, which are all factors that explain the link between poor diet and subsequent disease. We hope that by including these factors, we partly capture the health differences between people with high and poor-quality diets. You can <a class="govuk-link" href="https://www.nhs.uk/live-well/eat-well/the-eatwell-guide/" rel="noreferrer noopener" target="_blank" title="learn more about healthy eating on the Eat Well website">learn more about healthy eating on the Eat Well website (opens in a new tab)</a>.</p>
+    </GDSDetails>
+</FollowUp>
+
+@code
+{
+    [Parameter]
+    public BodyMassIndexStatus WeightStatus { get; set; }
+
+    string WeightSummary => WeightStatus switch
+    {
+        BodyMassIndexStatus.SeverelyUnderweight => "severely underweight.",
+        BodyMassIndexStatus.Underweight => "underweight.",
+        BodyMassIndexStatus.Healthy => "a healthy weight.",
+        BodyMassIndexStatus.Overweight => "overweight.",
+        BodyMassIndexStatus.Obese => "obese, please make an appointment to see a professional health practitioner with your GP clinic.",
+    };
+
+    string Summary => $"Your results show that you are {WeightSummary}";
+
+    string CallToAction => WeightStatus switch
+    {
+        BodyMassIndexStatus.SeverelyUnderweight => "Please contact your GP clinic urgently. Do not wait for your GP clinic to contact you. If you are not able to have an urgent discussion with a healthcare professional at your GP clinic, please ring 111.",
+        BodyMassIndexStatus.Underweight => "Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support. ",
+        BodyMassIndexStatus.Healthy => "Keep up the good work. Maintain a healthy diet and the physical activity levels to stay in the healthy weight range. ",
+        BodyMassIndexStatus.Overweight => "Move more and eat a healthier diet to reach the healthy weight range. Please consider the diet and physical activity services we offer in the follow-up section.",
+        BodyMassIndexStatus.Obese => "Please contact your GP clinic for a non-urgent appointment to discuss your results and access additional support. You may also have a high risk of developing diabetes. A blood test is required to confirm this. Move more and eat a healthier diet to lose weight. Please consider the diet and physical activity services we offer in the follow-up section.",
+    };
+
+}

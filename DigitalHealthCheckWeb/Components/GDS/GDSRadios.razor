@@ -1,0 +1,266 @@
+﻿<div class="govuk-form-group @FormGroupErrorClass @FormGroup?.Classes">
+    @if (FieldSet is not null)
+    {
+        <GDSFieldSet DescribedBy="@ActualDescribedBy" Classes="@FieldSet.Classes" @attributes="FieldSet.Attributes" Legend="@FieldSet.Legend">
+            @HintComponnent
+            @ErrorMessageComponent
+            @MainComponent
+        </GDSFieldSet>
+    }
+    else
+    {
+        @HintComponnent
+        @ErrorMessageComponent
+        @MainComponent
+    }
+</div>
+
+@code {
+
+    // Create these fragments here, because then they can access instance properties.
+
+    protected RenderFragment HintComponnent => !UseHint() ? null :
+    @<GDSHint Id="@HintId" Classes="@Hint.Classes" @attributes="Hint.Attributes">
+        @if (Hint.Content is null)
+        {
+            @Hint.Text
+        }
+        else
+        {
+            @Hint.Content
+        }
+    </GDSHint>;
+
+protected RenderFragment ErrorMessageComponent => !UseErrorMessage() ? null :
+@<GDSErrorMessage Id="@ErrorMessageId" Classes="@ErrorMessage.Classes" @attributes="ErrorMessage.Attributes">
+    @if (ErrorMessage.Content is null)
+    {
+        @ErrorMessage.Text
+    }
+    else
+    {
+        @ErrorMessage.Content
+    }
+</GDSErrorMessage>;
+
+protected RenderFragment MainComponent =>
+@<div class="govuk-radios @Classes @ConditionalClass"
+      @attributes="InputAttributes"
+      data-module="@ConditionalDataModule">
+    @{
+        if (Items is not null)
+        {
+            for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+
+                if (item.IsFalsey)
+                {
+                    //Workaround for the original templates using javascript
+                    //falsiness to determine whether to render items.
+                    //Ordinarily, we'd not include those in the Items array,
+                    //and rely on type safety here but it's specified functionality
+                    //that if some falsey items are included, the id must be incremented.
+                    //So you could realistically have Item,false,0,Item and
+                    //expect the second rendered item to have id-4
+
+                    continue;
+                }
+
+                string id;
+
+                if (!string.IsNullOrEmpty(item.Id))
+                {
+                    id = item.Id;
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        id = ActualIdPrefix;
+                    }
+                    else
+                    {
+                        id = $"{ActualIdPrefix}-{i + 1}";
+                    }
+                }
+
+                var conditionalId = $"conditional-{id}";
+
+                if (!string.IsNullOrEmpty(item.Divider))
+                {
+                    <div class="govuk-radios__divider">@item.Divider</div>
+                }
+                else
+                {
+                    var itemHintId = $"{id}-item-hint";
+                    var ariaDescribedBy = item.UseHint() ? itemHintId : null;
+
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="@id" name="@Name" type="radio" value="@item.Value" checked="@item.ActualChecked" disabled="@item.ActualDisabled" data-aria-controls="@(item.ConditionalContent is not null ? conditionalId : null)" aria-describedby="@(item.UseHint() ? itemHintId : null)" @attributes="item.Attributes" />
+                        <GDSLabel Text="@item.Text" Classes="@item.LabelClasses" For="@id" IsPageHeading="item.Label?.IsPageHeading ?? false" @attributes="item.Label?.Attributes">
+                            @if (item.Content is null)
+                            {
+                                @item.Text
+                            }
+                            else
+                            {
+                                @item.Content
+                            }
+                        </GDSLabel>
+
+                        @if (item.UseHint())
+                        {
+                            <GDSHint Id="@itemHintId" Classes="@item.HintClasses" @attributes="item.Hint.Attributes">
+                                @if (item.Hint.Content is null)
+                                {
+                                    @item.Hint.Text
+                                }
+                                else
+                                {
+                                    @item.Hint.Content
+                                }
+                            </GDSHint>
+                        }
+                    </div>
+                    @if (item.ConditionalContent is not null)
+                    {
+                        <div class="govuk-radios__conditional @item.ConditionalRadioHiddenClass" id="@conditionalId">
+                            @if (item.ConditionalContent is not null)
+                            {
+                                @item.ConditionalContent
+                            }
+                        </div>
+                    }
+                }
+            }
+        }
+    }
+</div>;
+
+public class Options // For other components
+{
+public GDSFieldSet.Options FieldSet { get; set; }
+
+public GDSLabel.Options Label { get; set; }
+
+public GDSHint.Options Hint { get; set; }
+
+public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+public GDSFormGroup.Options FormGroup { get; set; }
+
+public string IdPrefix { get; set; }
+
+public IDictionary<string, object> InputAttributes { get; set; }
+
+public string Name { get; set; }
+
+public IList<Item> Items { get; set; }
+
+public string Classes { get; set; }
+
+public RenderFragment Content { get; set; }
+}
+
+bool IsConditional() => Items is not null && Items.Any(x => x.ConditionalContent is not null);
+
+string ConditionalClass => IsConditional() ? "govuk-radios--conditional" : null;
+string ConditionalDataModule => IsConditional() ? "govuk-radios" : null;
+
+[Parameter]
+public GDSFieldSet.Options FieldSet { get; set; }
+
+[Parameter]
+public GDSLabel.Options Label { get; set; }
+
+[Parameter]
+public GDSHint.Options Hint { get; set; }
+
+[Parameter]
+public GDSErrorMessage.Options ErrorMessage { get; set; }
+
+[Parameter]
+public GDSFormGroup.Options FormGroup { get; set; }
+
+protected string HintId => $"{ActualIdPrefix}-hint";
+protected string ErrorMessageId => $"{ActualIdPrefix}-error";
+
+public class Item
+{
+public string Text { get; set; }
+public RenderFragment Content { get; set; }
+public string Id { get; set; }
+public string Value { get; set; }
+public GDSLabel.Options Label { get; set; }
+public GDSHint.Options Hint { get; set; }
+public string Divider { get; set; }
+public bool Checked { get; set; }
+public string Conditional { get; set; }
+public RenderFragment ConditionalContent { get; set; }
+public bool Disabled { get; set; }
+public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+
+//Workaround for GDS relying on javascript falsiness in their tests.
+//See large comment above for more info.
+public bool IsFalsey { get; set; }
+
+public bool UseHint() => Hint is not null && (!string.IsNullOrEmpty(Hint.Text) || Hint.Content is not null);
+
+public string ActualChecked => Checked ? "checked" : null;
+public string ActualDisabled => Disabled ? "disabled" : null;
+public string ConditionalAriaControls => ConditionalContent is not null ? $"condtional-{Id}" : null;
+public string AriaDescribedBy => ConditionalContent is not null ? "govuk-radios" : null;
+public string ConditionalRadioHiddenClass => !Checked ? "govuk-radios__conditional--hidden" : null;
+public string HintClasses => "govuk-radios__hint " + Hint?.Classes;
+public string LabelClasses => "govuk-radios__label " + Label?.Classes;
+}
+
+bool UseHint() => Hint is not null;
+bool UseErrorMessage() => ErrorMessage is not null;
+
+protected string ActualDescribedBy
+{
+get
+{
+  var descriptions = new[]
+  {
+                FieldSet?.DescribedBy,
+                UseHint() ? HintId : null,
+                UseErrorMessage() ? ErrorMessageId : null
+            };
+
+  var validDescriptions = descriptions.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+  if (!validDescriptions.Any())
+  {
+      return null;
+  }
+
+  return string.Join(' ', validDescriptions);
+}
+}
+
+[Parameter]
+public string IdPrefix { get; set; }
+
+[Parameter(CaptureUnmatchedValues = true)]
+public IDictionary<string, object> InputAttributes { get; set; }
+
+[Parameter]
+public string Name { get; set; }
+
+[Parameter]
+public IList<Item> Items { get; set; }
+
+[Parameter]
+public string Classes { get; set; }
+
+[Parameter]
+public RenderFragment ChildContent { get; set; }
+
+protected string FormGroupErrorClass => ErrorMessage is not null ? "govuk-form-group--error" : null;
+
+protected string ActualIdPrefix => string.IsNullOrEmpty(IdPrefix) ? Name : IdPrefix;
+
+}

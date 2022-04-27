@@ -1,0 +1,22 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.EveryoneHealthConsentModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Preferred contact for telephone consultation";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.EveryoneHealthConsentPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-consentToContact="@Model.ConsentToContact"
+           param-willContactMyself="@Model.WillContactMyself"
+           param-referralInterventions="@Model.ReferralInterventions"
+           param-emailAddress="@Model.Model.EmailAddress"
+           param-phoneNumber="@Model.Model.PhoneNumber"
+           param-emailAddressError="@Model.EmailAddressError"
+           param-phoneNumberError="@Model.PhoneNumberError"
+           param-error="@Model.Error" />

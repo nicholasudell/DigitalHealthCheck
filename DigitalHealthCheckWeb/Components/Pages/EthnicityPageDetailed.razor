@@ -1,0 +1,56 @@
+﻿@inherits Page
+
+<form method="post" novalidate>
+
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <input type='hidden' name='ShowGroup' value='False'>
+    <input type='hidden' name='EthnicGroup' value='@EthnicGroup'>
+
+    <GDSRadios Name="Ethnicity"
+               Items="EthnicityItems"
+               IdPrefix="ethnicity"
+               ErrorMessage="EthnicityError.AsErrorMessageComponent()"
+               FieldSet="@(
+                new GDSFieldSet.Options {
+                    Legend = new GDSFieldSet.LegendOptions {
+                        Text = Legend,
+                        IsPageHeading=true,
+                        Classes = "govuk-fieldset__legend--l"
+                    }
+                })" />
+
+    <GDSButton PreventDoubleClick="true" Text="Continue" Type="GDSButton.InputType.Submit" />
+</form>
+
+@code {
+
+    [Parameter]
+    public string Legend { get; set; }
+
+    [Parameter]
+    public string EthnicityError { get; set; }
+
+    [Parameter]
+    public string Ethnicity { get; set; }
+
+    [Parameter]
+    public string EthnicGroup { get; set; }
+
+    public class EthnicityItem
+    {
+        public string Value { get; set; }
+
+        public string Text { get; set; }
+    }
+
+    [Parameter]
+    public IEnumerable<EthnicityItem> Ethnicities { get; set; }
+
+    protected IList<GDSRadios.Item> EthnicityItems => Ethnicities.AsRadioComponents(x => x.Value, x => x.Text, Ethnicity);
+}

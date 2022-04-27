@@ -1,0 +1,13 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.HealthCheckCompleteModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    Layout = null;
+}
+
+<component type="typeof(Components.Emails.EveryoneHealth.EveryoneHealth)"
+           render-mode="Static"
+           param-check="@Model.Check"
+           param-everyoneHealthReferralInterventions="@Model.EveryoneHealthReferrals"
+           param-id="@Model.Id" />

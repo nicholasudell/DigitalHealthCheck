@@ -1,0 +1,557 @@
+﻿@using DigitalHealthCheckEF;
+@using DigitalHealthCheckCommon;
+@inject DigitalHealthCheckCommon.IBodyMassIndexCalculator bmiCalculator;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+</head>
+<body lang="EN-GB">
+    <div style="font-size: 12pt; font-family: arial,helvetica,sans-serif; margin: auto; max-width: 600px; ">
+
+        <p>Dear @Check.GPSurgery GP Surgery,</p>
+
+        <p style="font-size: 16pt">
+            <strong>Re: Digital NHS Health Check results</strong>
+        </p>
+
+        @if(Check.BloodPressureUpdated || Check.CholesterolUpdated || Check.BloodSugarUpdated)
+        {
+            <p>Your patient has updated their NHS Health Check, using Southwark’s digital NHS Health Check tool. This email includes: your patient's updated measurements; your patient’s CVD and Type 2 diabetes risk scores and heart age; recommendations for clinical follow-up and referral-on; and a full breakdown of their results.</p>
+            <p>The following measurements were updated. Please update them in the patient's clinical record as appropriate, using the codes found at the end of this document.</p>
+
+            <ul>
+                @if(Check.BloodPressureUpdated || Check.CholesterolUpdated)
+                {
+                    <li>QRISK3 CVD risk.</li>
+                    <li>QRISK3 Healthy Heart Age.</li>
+                }
+                @if(Check.BloodSugarUpdated)
+                {
+                    <li>QDiabetes risk.</li>
+                }
+                @if(Check.BloodPressureUpdated)
+                {
+                    <li>Systolic and diastolic blood pressure.</li>
+                }
+                @if(Check.CholesterolUpdated)
+                {
+                    <li>Total and HDL cholesterol, and their ratio.</li>
+                }
+                @if(Check.BloodSugarUpdated)
+                {
+                    <li>HbA1c</li>
+                }
+            </ul>
+
+            <p><strong>Because the patient's measurements have changed, their eligibility for follow up may have changed. Please double check the recommended follow ups below.</strong></p>
+            
+        }
+        else
+        {
+            <p>Your patient has completed their NHS Health Check, using Southwark’s digital NHS Health Check tool. This email includes: your patient’s CVD and Type 2 diabetes risk scores and heart age; recommendations for clinical follow-up and referral-on; and a full breakdown of their results.</p>
+        }        
+
+        <p>We recommend uploading this data into your patient’s record. To support this, relevant SNOMED codes are included. Southwark’s digital NHS Health Check has been developed by Southwark Council’s public health team with our IT partner <a title="QMS Website" href="https://qms-uk.com/">QMS</a>, and designed in partnership with eligible residents and local clinicians. The tool uses licensed medical devices <a href="https://qrisk.org/three/index.php">QRisk3</a> and <a href="https://qdiabetes.org/index.php">QDiabetes</a> to assess an individual’s risk of developing cardiovascular disease,  Type 2 diabetes and healthy heart age. This is the same method as a face-to-face assessment. If you have any questions about the digital NHS Health Check please contact Southwark Council’s public health team on <a href="mailto:publichealth@southwark.gov.uk">publichealth@southwark.gov.uk</a></p>
+
+        <p><strong>Registered patient:</strong> @Check.FirstName.ToTitleCase() @Check.Surname.ToTitleCase()</p>
+
+        <table>
+            <tr>
+                <td style="width:33%">
+                    <p>
+                        <strong>DOB:</strong> @Check.DateOfBirth.Value.ToString("dd/MM/yyyy")
+                    </p>
+                </td>
+                <td style="width:33%">
+                    <p>
+                        <strong>Postcode:</strong> @Check.Postcode
+                    </p>
+                </td>
+                <td style="width:33%">
+                    <p>
+                        <strong>NHS Number:</strong> @Check.NHSNumber
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        <p style="font-size: 16pt">
+            <strong>Scores:</strong>
+        </p>
+
+        <p><strong>QRISK3 Cardiovascular disease 10-year risk of developing CVD:</strong> @Check.QRisk.Value.ToString("n1"), SNOMED code: 1085871000000105 | QRISK3 cardiovascular disease 10 year risk calculator score (observable entity)</p>
+        <p><strong>10 year risk of developing Type 2 Diabetes:</strong> @Check.QDiabetes.Value.ToString("n1"), SNOMED code: 863521000000106 | QDiabetes risk calculator score (observable entity)</p>
+
+        <p style="font-size: 16pt">
+            <strong>Heart Age:</strong>
+        </p>
+        <p><strong>Healthy heart age is comparable to that of an individual aged:</strong> @Check.HeartAge.Value.ToString(), SNOMED code: 1325531000000102 | QRISK3 Healthy Heart Age (observable entity)</p>
+
+        <p style="font-size: 16pt">
+            <strong>Follow up requirements:</strong>
+        </p>
+
+        @if (ElevatedRisks.Any())
+        {
+            <p>Your patient has the following elevated risks requiring clinical follow up or referal:</p>
+            <ul>
+                @foreach (var risk in ElevatedRisks)
+                {
+                    @risk
+                }
+            </ul>
+
+            <p>You may wish to signpost your patient to the Southwark Healthy Lifestyle Telephone Support Service for physical activity, weight loss, prediabetic and psychological services. 
+This is a self-referral service. They will get free advice and guidance for up to 12 months, and be given options for local services and activities that are right for them.
+Search SNOMED: 892281000000101</p>
+        }
+        else
+        {
+            <p>Your patient has no elevated risks for developing CVD or Type 2 Diabetes</p>
+        }
+
+        @if (UrgentBloodPressure)
+        {
+            <p>Your patient has been advised to urgently contact the GP clinic to make an appointment for today because their results show that their blood pressure is 180&gt; (sys); 110&gt;(dia). To arrange an urgent discussion with a healthcare professional at the GP clinic for today they have been advised to ring 111. </p>
+        }
+
+        @if (UrgentBodyMassIndex)
+        {
+            <p>Your patient has been advised to urgently contact the GP clinic because their results show that their BMI is &lt;16.0. To arrange an urgent discussion with a healthcare professional at the GP clinic they have been advised to ring 111. </p>
+        }
+
+        @if (UrgentBloodSugar)
+        {
+            <p>Your patient has been advised to urgently contact the GP clinic because their results show that their HbA1c is &gt;100mmol/mol (&gt;11.3%). If they cannot arrange an urgent discussion with a healthcare professional at the GP clinic they have been advised to ring 111.</p>
+        }
+
+        @if (Check.BloodSugar.HasValue && Check.BloodSugar >= 42 && Check.BloodSugar <= 47)
+        {
+            <p>Your patient has an HbA1c of 42-47mmol/mol and is therefore eligible for the NHS Diabetes Prevention Programme. They have been given the option to self-refer onto the programme online.</p>
+        }
+
+        @if (Result.BodyMassIndex == BodyMassIndexStatus.Obese)
+        {
+            if (Check.Ethnicity.Value.IsHighBMIRisk())
+            {
+                <p>Your patient has a BMI of 27.5+ and is therefore eligible for the digital NHS Weight Management Programme, as well as the Tier 3 Weight Management services. </p>
+            }
+            else
+            {
+                <p>Your patient has a BMI of 30+ and is therefore eligible for the digital NHS Weight Management Programme, as well as the Tier 3 Weight Management services. </p>
+            }
+        }
+
+        <p style="font-size: 16pt">
+            <strong>Full breakdown of results are below:</strong>
+        </p>
+
+         @foreach (var result in GeneralBreakdown)
+        {
+            <p><strong>@result.Name</strong> @result.Value@(!string.IsNullOrEmpty(result.SNOMED) ? ", " + result.SNOMED : string.Empty)
+            @foreach(var note in result.Notes)
+            {
+                <br/><em>@note</em>
+            }
+            </p>
+        }
+
+        <p style="font-size: 16pt">
+            <strong>History:</strong>
+        </p>
+
+         @foreach (var result in HistoryBreakdown)
+        {
+            <p><strong>@result.Name</strong> @result.Value@(!string.IsNullOrEmpty(result.SNOMED) ? ", " + result.SNOMED : string.Empty)
+            @foreach(var note in result.Notes)
+            {
+                <br/><em>@note</em>
+            }
+            </p>
+        }
+
+        <p style="font-size: 16pt">
+            <strong>Measurements (patient reported):</strong>
+        </p>
+
+         @foreach (var result in MeasurementsBreakdown)
+        {
+            <p><strong>@result.Name</strong> @result.Value@(!string.IsNullOrEmpty(result.SNOMED) ? ", " + result.SNOMED : string.Empty)
+            @foreach(var note in result.Notes)
+            {
+                <br/><em>@note</em>
+            }
+            </p>
+        }
+
+        <p style="font-size: 16pt">
+            <strong>Scores:</strong>
+        </p>
+
+         @foreach (var result in ScoresBreakdown)
+        {
+            <p><strong>@result.Name</strong> @result.Value@(!string.IsNullOrEmpty(result.SNOMED) ? ", " + result.SNOMED : string.Empty)
+            @foreach(var note in result.Notes)
+            {
+                <br/><em>@note</em>
+            }
+            </p>
+        }
+
+        <p style="font-size: 16pt">
+            <strong>Patient-reported blood results:</strong>
+        </p>
+        @if(!BloodsBreakdown.Any())
+        {
+            <p><em>No blood results were reported.</em></p>
+        }
+        else
+        {
+             @foreach (var result in BloodsBreakdown)
+            {
+                <p><strong>@result.Name</strong> @result.Value@(!string.IsNullOrEmpty(result.SNOMED) ? ", " + result.SNOMED : string.Empty)
+                @foreach(var note in result.Notes)
+                {
+                    <br/><em>@note</em>
+                }
+                </p>
+            }
+        }
+
+        <p>If you have any questions about the digital NHS Health Check please contact Southwark Council’s public health team on publichealth@southwark.gov.uk</p>
+    </div>
+</body>
+</html>
+
+@code {
+
+    private class ResultBreakdown
+    {
+        public string Name { get; set; }
+
+        public string Value { get; set; }
+
+        public string SNOMED { get; set; }
+
+        public IEnumerable<string> Notes { get; set; } = Enumerable.Empty<string>();
+    }
+
+    private bool UrgentBloodPressure => Result.BloodPressure == BloodPressureStatus.Severe;
+
+    private bool UrgentBodyMassIndex => Result.BodyMassIndex == BodyMassIndexStatus.SeverelyUnderweight;
+
+    private bool UrgentBloodSugar => Result.BloodSugar == BloodSugarStatus.Severe;
+
+    private IEnumerable<RenderFragment> ElevatedRisks
+    {
+        get
+        {
+            if (Result.HeartDisease != DefaultStatus.Healthy)
+            {
+                yield return @<li><strong>10 year risk of developing CVD:</strong> @Check.QRisk.Value.ToString("n1")%</li>;
+            }
+
+            if (Result.Diabetes != DefaultStatus.Healthy)
+            {
+                yield return @<li><strong>10 year risk of developing Type 2 diabetes:</strong> @Check.QDiabetes.Value.ToString("n1")%</li>;
+            }
+
+            if (Result.Cholesterol.HasValue && Result.Cholesterol != DefaultStatus.Healthy)
+            {
+                yield return @<li><strong>Cholesterol:</strong> Total:@(Check.TotalCholesterol.Value)mmol/L, HDL:@(Check.HdlCholesterol.Value)mmol/L, Ratio:@(CholesterolRatio.Value.ToString("n1"))</li>;
+            }
+
+            if (Result.BloodPressure.HasValue && Result.BloodPressure != BloodPressureStatus.Healthy)
+            {
+                yield return @<li><strong>Blood Pressure:</strong> Systolic:@(Check.SystolicBloodPressure.Value)mmHg, Diastolic:@(Check.DiastolicBloodPressure.Value)mmHg</li>;
+            }
+
+            if (Result.BloodSugar.HasValue && Result.BloodSugar != BloodSugarStatus.Healthy)
+            {
+                yield return @<li><strong>HbA1c:</strong> @Check.BloodSugar.Value.ToString("n1")mmol/mol</li>;
+            }
+
+            if (Result.BodyMassIndex != BodyMassIndexStatus.Healthy)
+            {
+                yield return @<li><strong>BMI:</strong> @BMI</li>;
+            }
+
+            if (Result.Alcohol != DefaultStatus.Healthy)
+            {
+                yield return @<li><strong>Alcohol consumption:</strong> @((Check.AUDIT ?? 0).ToString())</li>;
+            }
+
+            if (Result.PhysicalActivity != PhysicalActivityStatus.Active)
+            {
+                yield return @<li><strong>Physical Activity Levels:</strong> @GPPAQHumanised</li>;
+            }
+
+            if (Result.Smoker != DefaultStatus.Healthy)
+            {
+                yield return @<li><strong>Smoker:</strong> @SmokingStatusHumanised</li>
+    ;
+            }
+
+        }
+    }
+
+    private string SmokingStatusHumanised => Check.SmokingStatus switch
+    {
+        SmokingStatus.NonSmoker => "Non-smoker",
+        SmokingStatus.ExSmoker => "Ex-smoker",
+        SmokingStatus.Light => "Light smoker",
+        SmokingStatus.Moderate => "Moderate smoker",
+        SmokingStatus.Heavy => "Heavy smoker",
+    };
+
+    private string GPPAQHumanised => Check.GPPAQ switch
+    {
+        0 => "Inactive",
+        1 => "Moderately inactive",
+        2 => "Moderately active",
+        3 => "Active"
+    };
+
+    private IEnumerable<ResultBreakdown> GeneralBreakdown
+    {
+        get
+        {
+            yield return new ResultBreakdown() { Name = "Situation", Value = "National Health Service Health Check completed by third party", SNOMED = "840391000000101 | National Health Service Health Check completed by third party" };
+            yield return new ResultBreakdown() { Name = "Age", Value = Check.Age.ToString() };
+            yield return new ResultBreakdown() { Name = "Sex Assigned At Birth", Value = Check.SexAtBirth.ToString() };
+            yield return new ResultBreakdown() { Name = "Gender Identity", Value = (Check.SexForResults != Check.SexAtBirth ? Check.CustomIdentity ?? Check.Identity : Check.SexAtBirth.ToString()) };
+            yield return new ResultBreakdown() { Name = "Sex Used To Calculate Risk Scores", Value = Check.SexForResults.ToString()};
+        }
+    }
+
+    private IEnumerable<ResultBreakdown> HistoryBreakdown
+    {
+        get
+        {
+            yield return new ResultBreakdown()
+                {
+                    Name = "Smoking Status",
+                    Value = SmokingStatusHumanised,
+                    SNOMED = Check.SmokingStatus switch
+                    {
+                        SmokingStatus.NonSmoker => "160618006 | Current non-smoker (finding)",
+                        SmokingStatus.ExSmoker => "8517006 | Ex-smoker (finding)",
+                        SmokingStatus.Light => "160603005 | Light cigarette smoker (1-9 cigs/day) (finding)",
+                        SmokingStatus.Moderate => "160604004 | Moderate cigarette smoker (10-19 cigs/day) (finding)",
+                        SmokingStatus.Heavy => "160605003 | Heavy cigarette smoker (20-39 cigs/day) (finding)",
+                    }
+                };
+
+            yield return new ResultBreakdown()
+                {
+                    Name = "Family History of CVD",
+                    Value = Check.FamilyHistoryCVD switch
+                    {
+                        true => "Yes",
+                        false => "No"
+                    },
+                    SNOMED = Check.FamilyHistoryCVD switch
+                    {
+                        true => "266895004 | Family history: Ischemic heart disease at less than 60 years (situation)",
+                        false => "266882009 | No family history: Ischemic heart disease (situation)"
+                    }
+                };
+
+            yield return new ResultBreakdown()
+                {
+                    Name = "Ethnicity",
+                    Value = Check.Ethnicity switch
+                    {
+                        Ethnicity.WhiteBritish => "English, Welsh, Scottish, Northern Irish or British",
+                        Ethnicity.Irish => "Irish",
+                        Ethnicity.GypsyOrTraveller => "Gypsy or Irish Traveller",
+                        Ethnicity.WhiteOther => "Any other White background",
+
+                        Ethnicity.WhiteBlackCaribbean => "White and Black Caribbean",
+                        Ethnicity.WhiteBlackAfrican => "White and Black African",
+                        Ethnicity.WhiteAsian => "White and Asian",
+                        Ethnicity.MixedOther => "Any other Mixed or Multiple ethnic background",
+
+                        Ethnicity.Indian => "Indian",
+                        Ethnicity.Pakistani => "Pakistani",
+                        Ethnicity.Bangladeshi => "Bangladeshi",
+                        Ethnicity.Chinese => "Chinese",
+                        Ethnicity.AsianOther => "Any other Asian background",
+
+                        Ethnicity.African => "African",
+                        Ethnicity.Caribbean => "Caribbean",
+                        Ethnicity.BlackOther => "Any other Black, African or Caribbean background",
+
+                        Ethnicity.Arab => "Arab",
+                        Ethnicity.OtherOther => "Any other ethnic group",
+
+                    },
+                    SNOMED = Check.Ethnicity switch
+                    {
+                        Ethnicity.WhiteBritish => "976631000000101 | White: English or Welsh or Scottish or Northern Irish or British - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.Irish => "976651000000108 | White: Irish - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.GypsyOrTraveller => "976671000000104 | White: Gypsy or Irish Traveller - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.WhiteOther => "976691000000100 | White: any other White background - England and Wales ethnic category 2011 census (finding) ",
+
+                        Ethnicity.WhiteBlackCaribbean => "976711000000103 | Mixed multiple ethnic groups: White and Black Caribbean - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.WhiteBlackAfrican => "976731000000106 | Mixed multiple ethnic groups: White and Black African - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.WhiteAsian => "976751000000104 | Mixed multiple ethnic groups: White and Asian - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.MixedOther => "976771000000108 | Mixed multiple ethnic groups: any other Mixed or multiple ethnic background - England and Wales ethnic category 2011 census (finding)",
+
+                        Ethnicity.Indian => "976791000000107 | Asian or Asian British: Indian - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.Pakistani => "976811000000108 | Asian or Asian British: Pakistani - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.Bangladeshi => "976831000000100 | Asian or Asian British: Bangladeshi - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.Chinese => "976851000000107 | Asian or Asian British: Chinese - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.AsianOther => "976871000000103 | Asian or Asian British: any other Asian background - England and Wales ethnic category 2011 census (finding)",
+
+                        Ethnicity.African => "976891000000104 | Black or African or Caribbean or Black British: African - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.Caribbean => "976911000000101 | Black or African or Caribbean or Black British: Caribbean - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.BlackOther => "976931000000109 | Black or African or Caribbean or Black British: other Black or African or Caribbean background - England and Wales ethnic category 2011 census (finding)",
+
+                        Ethnicity.Arab => "976951000000102 | Other ethnic group: Arab - England and Wales ethnic category 2011 census (finding)",
+                        Ethnicity.OtherOther => "976971000000106 | Other ethnic group: any other ethnic group - England and Wales ethnic category 2011 census (finding)",
+                    }
+                };
+        }
+    }
+
+    private IEnumerable<ResultBreakdown> MeasurementsBreakdown
+    {
+        get
+        {
+            if (Check.KnowYourBloodPressure == HaveYouBeenMeasured.Yes)
+            {
+                yield return new ResultBreakdown() { Name = "O/E - blood pressure reading", Value = $"{Check.SystolicBloodPressure.Value}/{Check.DiastolicBloodPressure.Value} mmHg", SNOMED = "163020007 | O/E - blood pressure reading" };
+            }
+
+            yield return new ResultBreakdown() { Name = "Body mass index", Value = $"{BMI} kg/m2", SNOMED = "60621009 | Body Mass Index" };
+        }
+    }
+
+    private IEnumerable<ResultBreakdown> ScoresBreakdown
+    {
+        get
+        {
+            yield return new ResultBreakdown()
+                {
+                    Name = "GPPAQ",
+                    Value = GPPAQHumanised,
+                    SNOMED = Check.GPPAQ switch
+                    {
+                        0 => "366121000000108 | General practice physical activity questionnaire physical activity index: inactive (finding)",
+                        1 => "366171000000107 | General practice physical activity questionnaire physical activity index: moderately inactive (finding)",
+                        2 => "366211000000105 | General practice physical activity questionnaire physical activity index: moderately active (finding)",
+                        3 => "366241000000106 | General practice physical activity questionnaire physical activity index: active (finding)",
+                    }
+                };
+
+            yield return new ResultBreakdown() { Name = "QRISK3 cardiovascular disease 10-year risk calculator score", Value = Check.QRisk.Value.ToString("n1") + "%", SNOMED = "1085871000000105 | QRISK3 cardiovascular disease 10 year risk calculator score (observable entity)", Notes = QRISKNotes() };
+
+            if (Check.AUDIT.HasValue)
+            {
+                if (Check.AUDIT == -1)
+                {
+                    if (Check.DrinksAlcohol.Value)
+                    {
+                        yield return new ResultBreakdown() { Name = "Alcohol Use Disorders Identification Test score", Value = "0", SNOMED = "443280005 | Alcohol use disorders identification test score (observable entity)" };
+                    }
+                    else
+                    {
+                        yield return new ResultBreakdown() { Name = "Alcohol Use Disorders Identification Test score", Value = "Does not drink", SNOMED = "105542008 | Current non-drinker of alcohol (finding)" };
+                    }
+                }
+                else
+                {
+                    yield return new ResultBreakdown() { Name = "Alcohol Use Disorders Identification Test score", Value = Check.AUDIT.Value.ToString(), SNOMED = "443280005 | Alcohol use disorders identification test score (observable entity)" };
+                }
+            }
+
+            yield return new ResultBreakdown() { Name = "QDiabetes risk calculator score", Value = Check.QDiabetes.Value.ToString("n1") + "%", SNOMED = "863521000000106 | QDiabetes risk calculator score (observable entity)", Notes = QDiabetesNotes() };
+
+            yield return new ResultBreakdown() { Name = "QRISK3 Healthy Heart Age", Value = Check.HeartAge.Value.ToString(), SNOMED = "1325531000000102 | QRISK3 Healthy Heart Age (observable entity)" };
+        }
+    }
+
+    private IEnumerable<ResultBreakdown> BloodsBreakdown
+    {
+        get
+        {
+            if (Check.KnowYourCholesterol == HaveYouBeenMeasured.Yes)
+            {
+                yield return new ResultBreakdown() { Name = "HDL Cholesterol", Value = Check.HdlCholesterol.ToString() + "mmol/L" };
+                yield return new ResultBreakdown() { Name = "Total Cholesterol", Value = Check.TotalCholesterol.ToString() + "mmol/L" };
+                yield return new ResultBreakdown() { Name = "Total Cholesterol : HDL Cholesterol Ratio", Value = CholesterolRatio.Value.ToString("n1") };
+            }
+
+            if (Check.KnowYourHbA1c == HaveYouBeenMeasured.Yes)
+            {
+                yield return new ResultBreakdown() { Name = "HbA1c", Value = Check.BloodSugar.Value.ToString("n1") + "mmol/mol" };
+            }
+        }
+    }
+
+    const double AverageFemaleCholesterolRatio = 3.7d;
+    const double AverageFemaleSystolicBloodPressure = 123.2d;
+    const double AverageHbA1c = 37.2d;
+    const double AverageMaleCholesterolRatio = 4.4d;
+    const double AverageMaleSystolicBloodPressure = 129.2d;
+    const double MaxHbA1c = 47.99d;
+    const int MaximumBMI = 40;
+    const double MinHbA1c = 15d;
+    const int MinimumBMI = 20;
+
+    protected IEnumerable<string> QRISKNotes()
+    {
+        var bmi = bmiCalculator.CalculateBodyMassIndex(Check.Height.Value, Check.Weight.Value);
+
+        if(bmi > MaximumBMI)
+        {
+            yield return $"The patient's provided BMI was higher than the maximum BMI that QRISK3 supports. For the purposes of calculating a QRISK3 score, a BMI of {MaximumBMI} kg/m2 was used.";
+        }
+        else if(bmi < MinimumBMI)
+        {
+            yield return $"The patient's provided BMI was lower than the minimum BMI that QRISK3 supports. For the purposes of calculating a QRISK3 score, a BMI of {MinimumBMI} kg/m2 was used.";
+        }
+
+        if(Check.SystolicBloodPressure is null)
+        {
+            yield return $"The patient did not provide their blood pressure, so a national average systolic blood pressure of {(Check.SexForResults == Sex.Female ? AverageFemaleSystolicBloodPressure : AverageMaleSystolicBloodPressure):n1} mmHg was used.";
+        }
+
+        if(Check.TotalCholesterol is null)
+        {
+            yield return $"The patient did not provide their cholesterol, so a national average cholesterol ratio of {(Check.SexForResults == Sex.Female ? AverageFemaleCholesterolRatio : AverageMaleCholesterolRatio):n1} was used.";
+        }   
+    }
+
+    protected IEnumerable<string> QDiabetesNotes()
+    {
+        if(Check.BloodSugar is null)
+        {
+            yield return $"The patient did not provide their HbA1c, so a national average HbA1c of {AverageHbA1c:n1} mmol/mol was used.";
+        }
+        else if(Check.BloodSugar < MinHbA1c)
+        {
+            yield return $"The patient's provided HbA1c was lower than the minimum HbA1c that QDiabetes supports. For the purposes of calculating a QDiabetes score, a HbA1c of {MinHbA1c : n1} mmol/mol was used.";
+        }
+        else if(Check.BloodSugar > MaxHbA1c)
+        {
+            yield return $"The patient's provided HbA1c was higher than the maximum HbA1c that QDiabetes supports. For the purposes of calculating a QDiabetes score, a HbA1c of {MaxHbA1c : n1} mmol/mol was used.";
+        }
+
+    }
+
+    [Parameter]
+    public HealthCheck Check { get; set; }
+
+    [Parameter]
+    public string BaseUrl { get; set; }
+
+    protected string BMI => bmiCalculator.CalculateBodyMassIndex(Check.Height.Value, Check.Weight.Value).ToString("n1");
+
+    protected float? CholesterolRatio => (Check.TotalCholesterol / (float)Check.HdlCholesterol.Value);
+
+    [Parameter]
+    public Result Result { get; set; }
+
+}

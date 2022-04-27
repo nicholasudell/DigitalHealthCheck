@@ -1,0 +1,29 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.HealthCheckCompleteModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@inject DigitalHealthCheckWeb.Helpers.IUrlBuilder urlBuilder
+@{
+    ViewData["Title"] = "NHS Health Check complete";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+@{
+    var baseUrl = urlBuilder.GetBaseUrl(HttpContext.Request);
+}
+
+<component type="typeof(Components.Pages.HealthCheckCompletePage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-baseUrl="@baseUrl"
+           param-id="@Model.Id"
+           param-result="@Model.Result"
+           param-sMSNumber="@Model.Model.SmsNumber"
+           param-emailAddress="@Model.Model.EmailAddress"
+           param-sMSNumberError="@Model.SmsNumberError"
+           param-emailAddressError="@Model.EmailAddressError"
+           param-requestedNoContact="@Model.RequestedNoContact"
+           param-everyoneHealthReferralInterventions="@Model.EveryoneHealthReferrals"
+           param-selected="@Model.Model.Contact"
+           param-check="@Model.Check" />

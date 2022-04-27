@@ -1,0 +1,104 @@
+﻿<ul class="govuk-list">
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+        var id = $"{ActualIdPrefix}-{i + 1}";
+
+        <li class="govuk-grid-row govuk-!-padding-bottom-2">
+            <h3 class="govuk-grid-column-two-thirds govuk-!-margin-0 govuk-heading-m" id="@id" aria-describedby="@($"{id}-tag")">
+                @item.HeadingText
+            </h3>
+            <div class="govuk-grid-column-one-third govuk-!-margin-0">
+                <GDSTag Classes="@($"traffic-tag {StatusClass(item.Status)}")" Text="@(item.StatusText ?? StatusText(item.Status))" id="@($"{id}-tag")" />
+            </div>
+            <div class="govuk-grid-column-full">
+                <GDSLabel For="@id">
+                    @if (item.Content is null)
+                    {
+                        @item.Text
+                    }
+                    else
+                    {
+                        @item.Content
+                    }
+                </GDSLabel>
+            </div>
+        </li>
+    }
+</ul>
+
+@code {
+
+    public enum Status
+    {
+        Green,
+        Amber,
+        Red,
+    }
+
+    [Parameter]
+    public string IdPrefix { get; set; }
+
+    protected string ActualIdPrefix => string.IsNullOrEmpty(IdPrefix) ? Name : IdPrefix;
+
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string RedText { get; set; } = "High risk";
+    [Parameter]
+    public string AmberText { get; set; } = "Moderate risk";
+    [Parameter]
+    public string GreenText { get; set; } = "Low risk";
+
+    protected string StatusText(Status status)
+    {
+        switch (status)
+        {
+            case Status.Red: return RedText;
+            case Status.Amber: return AmberText;
+            default:
+            case Status.Green: return GreenText;
+        }
+    }
+
+    protected string StatusClass(Status status)
+    {
+        switch (status)
+        {
+            case Status.Red: return RedClass;
+            case Status.Amber: return AmberClass;
+            default:
+            case Status.Green: return GreenClass;
+        }
+    }
+
+    const string RedClass = "govuk-tag--red";
+    const string AmberClass = "govuk-tag--orange";
+    const string GreenClass = "govuk-tag--green";
+
+    public class Item
+    {
+        public string StatusText { get; set; }
+
+        public Item() { }
+
+        public Item(string heading, Status status, string text)
+        {
+            Status = status;
+            Text = text;
+            HeadingText = heading;
+        }
+
+        public string HeadingText { get; set; }
+
+        public string Text { get; set; }
+        public RenderFragment Content { get; set; }
+
+        public Status Status { get; set; } = Status.Green;
+        public string Name { get; set; }
+    }
+
+    [Parameter]
+    public IList<Item> Items { get; set; } = new List<Item>();
+}

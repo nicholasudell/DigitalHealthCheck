@@ -1,0 +1,22 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.ResultsModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Your results";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.ResultsPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-firstHealthPriority="@Model.Priorities?.FirstHealthPriority"
+           param-secondHealthPriority="@Model.Priorities?.SecondHealthPriority"
+           param-firstHealthPrioritiesError="@Model.FirstHealthPriorityErrorMessage"
+           param-secondHealthPrioritiesError="@Model.SecondHealthPriorityErrorMessage"
+           param-result="@Model.Result"
+           param-check="@Model.Check"
+           param-variant="@Model.Variant"
+           param-id="@Model.Id" />

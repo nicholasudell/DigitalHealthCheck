@@ -1,0 +1,28 @@
+﻿@page
+@model DigitalHealthCheckWeb.Pages.ValidationModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@{
+    ViewData["Title"] = "Validation";
+}
+@{
+    var antiForgeryToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken;
+}
+
+<component type="typeof(Components.Pages.ValidationPage)"
+           render-mode="Static"
+           param-antiForgery="@antiForgeryToken"
+           param-errorList="@Model.ErrorList"
+           param-postcode="@Model.Model.Postcode"
+           param-postcodeError="@Model.PostcodeError"
+           param-surname="@Model.Model.Surname"
+           param-surnameError="@Model.SurnameError"
+           param-firstname="@Model.Model.FirstName"
+           param-firstnameError="@Model.FirstNameError"
+           param-dateOfBirthError="@Model.DateOfBirthError"
+           param-dayOfBirth="@Model.Model.DayOfBirth"
+           param-dayOfBirthInvalid="@Model.DateOfBirthDayInvalid"
+           param-monthOfBirth="@Model.Model.MonthOfBirth"
+           param-monthOfBirthInvalid="@Model.DateOfBirthMonthInvalid"
+           param-yearOfBirth="@Model.Model.YearOfBirth"
+           param-yearOfBirthInvalid="@Model.DateOfBirthYearInvalid"
+           param-couldNotValidate="@Model.CouldNotValidate" />

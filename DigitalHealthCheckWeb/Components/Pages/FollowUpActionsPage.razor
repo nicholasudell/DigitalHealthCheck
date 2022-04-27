@@ -1,0 +1,233 @@
+﻿@using DigitalHealthCheckEF;
+@using DigitalHealthCheckWeb.Helpers;
+@inherits Page;
+<form method="post" novalidate>
+    @if (ErrorList.Any())
+    {
+        <GDSErrorSummary ErrorList="@ErrorList" Title="@("There is a problem")" />
+    }
+
+    <AntiForgery AntiForgeryToken="@AntiForgery" />
+
+    <h1 class="govuk-heading-l">Next steps – Actions</h1>
+    
+    <h2 class="govuk-heading-m">Finish this final page to complete your health check</h2>
+
+    <p class="govuk-body">You can reduce your risk of heart and circulatory disease, diabetes and even some cancers by making some positive changes to your lifestyle. You can also help to better manage these and other long-term conditions. </p>
+    <p class="govuk-body"><strong>The following recommended actions are specifically tailored to your results, your health priorities and the challenges you said you face in changing your lifestyle and health. </strong></p>
+    <p class="govuk-body"><strong>You can now choose any of the following actions that feel right to you. We will provide you with links to everything you select. </strong></p>
+
+    @foreach (var actionCategory in ActionCategories)
+    {
+        <h2 class="govuk-heading-m">@actionCategory.Title</h2>
+
+        <p class="govuk-body">@actionCategory.Call</p>
+
+        if (actionCategory.Name == "Mental")
+        {
+            //Mental health has extra call text
+
+            <p class="govuk-body">We recognise it is not always easy to access services that meet your unique needs. We encourage you to follow up with the following services to see what is available and appropriate for your situation.</p>
+        }
+
+        @if (actionCategory.HasInterventions)
+        {
+            <GDSCheckboxes FieldSet="@(
+                                    new GDSFieldSet.Options
+                                    {
+                                        Legend = new GDSFieldSet.LegendOptions
+                                        {
+                                            Text = actionCategory.Label,
+                                        Classes = "govuk-fieldset__legend--s"
+                                    }
+                                })"
+                           Name="@actionCategory.Name"
+                           Items="@actionCategory.Items" />
+        }
+
+        @if (!string.IsNullOrEmpty(actionCategory.CustomBarrier))
+        {
+            <p class="govuk-body">You also said that the following was a barrier for you:</p>
+
+            <div class="govuk-inset-text">
+                @actionCategory.CustomBarrier
+            </div>
+            <p class="govuk-body">Thank you for sharing a personal barrier you experience to @actionCategory.Title.FromTitleCase(). We will review your feedback and find ways to improve our service offering to meet this need. In the meantime, <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://southwark.everyonehealth.co.uk/" title="check out the Southwark Healthy Lifestyle Service">check out the Southwark Healthy Lifestyle Telephone Support Service (opens in a new tab)</a>.</p>
+        }
+
+        if (actionCategory.Name == "Mental")
+        {
+            //Mental health has an extra body text
+
+            <p class="govuk-body">If you feel like you need support right now, call your practice, your crisis team (if you have one) or Samaritans on 116 123. <a rel="noreferrer noopener" target="_blank" href="https://www.slam.nhs.uk/patients-and-carers/crisis-support/" title="Access crisis support" class="govuk-link">You can also access crisis support (opens in a new tab)</a> on the South London and Maudsley NHS Foundation Trust website.</p>
+        }
+    }
+
+    <GDSButton PreventDoubleClick="true" Type="GDSButton.InputType.Submit" Text="Complete" />
+</form>
+
+@code {
+
+    protected class ActionCategory
+    {
+        public string Name { get; set; }
+        public string Title { get; set; }
+        public string Call { get; set; }
+        public string Label { get; set; }
+        public bool HasInterventions { get; set; }
+        public IList<GDSCheckboxes.Item> Items { get; set; }
+
+        public string CustomBarrier { get; set; }
+
+        public ActionCategory(string title, string call, string label, string name, IEnumerable<DigitalHealthCheckEF.Intervention> interventions, IList<int> selectedInterventions, string customBarrier)
+        {
+            this.Title = title;
+            this.Call = call;
+            this.Name = name;
+            this.Label = label;
+            this.HasInterventions = interventions.Any();
+            this.Items = interventions
+                .AsCheckboxComponents(x => x.Id.ToString(), x => x.Text, x => selectedInterventions.Contains(x.Id))
+                .WithNoneOption("No, I would not like to be supported")
+                .ToList();
+            this.CustomBarrier = customBarrier;
+        }
+    }
+
+    [Parameter]
+    public IList<int> SelectedInterventions { get; set; }
+
+    [Parameter]
+    public IList<DigitalHealthCheckEF.Intervention> Interventions { get; set; }
+
+    [Parameter]
+    public IList<CustomBarrier> CustomBarriers { get; set; }
+
+    protected IList<ActionCategory> ActionCategories => new[]
+    {
+        new ActionCategory
+        (
+            "Visit your GP clinic",
+            "Your GP clinic will discuss your results with you and make sure that you have all of the right follow-up clinical support you need, as well as access to lifestyle support services.",
+            "How would you like to be supported to visit your GP clinic? (optional)",
+            "GP",
+            Interventions.Where(x=> x.Category == "gp"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "gp")?.Text
+        ),
+        new ActionCategory
+        (
+            "Stop smoking",
+            "Quitting smoking will help you live a healthier life.",
+            "How would you like to be supported to stop smoking? (optional)",
+            "Smoking",
+            Interventions.Where(x=> x.Category == "smoking"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "smoking")?.Text
+        ),
+        new ActionCategory
+        (
+            "Achieve a healthy weight",
+            "Being a healthy weight is an important part of living well.",
+            "How would you like to be supported to achieve a healthy weight? (optional)",
+            "Weight",
+            Interventions.Where(x=> x.Category == "weight"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "weight")?.Text
+        ),
+        new ActionCategory
+        (
+            "Drink less",
+            "Drinking less will help you feel better and be healthier.",
+            "How would you like to be supported to drink less? (optional)",
+            "Alcohol",
+            Interventions.Where(x=> x.Category == "alcohol"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "alcohol")?.Text
+        ),
+        new ActionCategory
+        (
+            "Move more",
+            "Regular physical activity is an important part of living well.",
+            "How would you like to be supported to move more? (optional)",
+            "Move",
+            Interventions.Where(x=> x.Category == "move"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "move")?.Text
+        ),
+        new ActionCategory
+        (
+            "Improve your mental wellbeing",
+            "Taking care of your mental wellbeing will help you to live a healthier life.",
+            "How would you like to be supported to improve your mental wellbeing? (optional)",
+            "Mental",
+            Interventions.Where(x=> x.Category == "mental"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "mental")?.Text
+        ),
+        new ActionCategory
+        (
+            "Improve your cholesterol levels",
+            "Healthy cholesterol levels are an important part of living well.",
+            "How would you like to be supported to improve your cholesterol levels? (optional)",
+            "ImproveCholesterol",
+            Interventions.Where(x=> x.Category == "improvecholesterol"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "improvecholesterol")?.Text
+        ),
+        new ActionCategory
+        (
+            "Improve your blood pressure",
+            "Healthy blood pressure is an important part of living well.",
+            "How would you like to be supported to improve your blood pressure levels? (optional)",
+            "ImproveBloodPressure",
+            Interventions.Where(x=> x.Category == "improvebloodpressure"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "improvebloodpressure")?.Text
+        ),
+        new ActionCategory
+        (
+            "Improve your blood sugar level",
+            "Having a healthy blood sugar level is an important part of living well.",
+            "How would you like to be supported to improve your blood sugar level? (optional)",
+            "ImproveBloodSugar",
+            Interventions.Where(x=> x.Category == "improvebloodsugar"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "improvebloodsugar")?.Text
+        ),
+        new ActionCategory
+        (
+            "Check your blood sugar level",
+            "Knowing your blood sugar level is important for understanding your risk of heart and circulatory diseases.",
+            "How would you like to be supported to get your blood sugar level checked? (optional)",
+            "BloodSugar",
+            Interventions.Where(x=> x.Category == "bloodsugar"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "bloodsugar")?.Text
+        ),
+         new ActionCategory
+        (
+            "Check your cholesterol levels",
+            "Knowing your cholesterol levels is important for understanding your risk of heart and circulatory diseases.",
+            "How would you like to be supported to get your cholesterol levels checked? (optional)",
+            "Cholesterol",
+            Interventions.Where(x=> x.Category == "cholesterol"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "cholesterol")?.Text
+        ),
+        new ActionCategory
+        (
+            "Check your blood pressure level",
+            "Knowing your blood pressure level is important for understanding your risk of heart and circulatory diseases.",
+            "How would you like to be supported to get your blood pressure level checked? (optional)",
+            "BloodPressure",
+            Interventions.Where(x=> x.Category == "bloodpressure"),
+            SelectedInterventions,
+            CustomBarriers.FirstOrDefault(x=> x.Category == "bloodpressure")?.Text
+        ),
+
+    }
+    .Where(x => !string.IsNullOrEmpty(x.CustomBarrier) || x.HasInterventions)
+    .ToList();
+
+}
